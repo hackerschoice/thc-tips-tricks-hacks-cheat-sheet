@@ -214,7 +214,7 @@ $ shred -z foobar.txt
 
 **15. Shred & Erase without *shred***
 ```
-$ FNAME=foobar.txt; dd bs=1k count="`du -sk \"${FNAME}\" | cut -f1`" if=/dev/urandom >"${FILENAME}"; rm -f "${FNAME}"
+$ FN=foobar.txt; dd bs=1k count="`du -sk \"${FN}\" | cut -f1`" if=/dev/urandom >"${FN}"; rm -f "${FN}"
 ```
 Note: Or deploy your files in */dev/shm* directory so that no data is written to the harddrive. Data will be deleted on reboot.
 
