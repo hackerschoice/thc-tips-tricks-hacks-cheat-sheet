@@ -14,7 +14,7 @@ Tell Bash that there is no history file (*~/.bash_history*).
 ```
 $ unset HISTFILE
 ```
-This is the first command we execute on every shell. It will stop the bash from logging your commands.
+This is the first command we execute on every shell. It will stop the Bash from logging your commands.
 
 It is good housekeeping to 'commit suicide' when exiting the shell:
 ```
@@ -38,7 +38,7 @@ You or anyone else can now connect to your computer on port 31337 and gets conne
 
 **4. SSH tunnel IN**
 
-We use this to give access to a friend to an internal machine that is not on the public internet:
+We use this to give access to a friend to an internal machine that is not on the public Internet:
 ```
 $ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
 ```
@@ -54,7 +54,7 @@ In this example we execute *nmap* but let it appear with the name *syslogd* in *
 
 **6. Hide your arguments**
 
-Continuing from above..FIXME: can this be done witout LD_PRELOAD and just in bash?
+Continuing from above..FIXME: can this be done witout LD_PRELOAD and just in Bash?
 
 **7. ARP discover computers on the local network**
 ```
