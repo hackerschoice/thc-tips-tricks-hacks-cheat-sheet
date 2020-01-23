@@ -21,7 +21,7 @@ It is good housekeeping to 'commit suicide' when exiting the shell:
 $ kill -9 $$
 ```
 
-**2. Almost invisilbe ssh**
+**2. Almost invisible ssh**
 
 ```
 $ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
