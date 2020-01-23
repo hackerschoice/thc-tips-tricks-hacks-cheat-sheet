@@ -106,7 +106,7 @@ The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the u
 
 **10. File Encoding - uuencode**
 
-Sometimes it is needed to encode a binary file to a more terminal friendly character-set such as base64. Any of these encoding techniques can be (see further on) to transfer a binary file between your local system and a remote system you are logged in to using nothing else but the shell/terminal as a transport medium (e.g. no separate connection).
+Binary files transfer badly over a terminal connection. There are many ways to convert a binary into base64 or similar and make the file terminal friendly. We can then use a technique described further on to transfer a file to and from a remote system using nothing else but the shell/terminal as a transport medium (e.g. no separate connection).
 
 Encode:
 ```
