@@ -50,7 +50,7 @@ Anyone connecting to host.org:31338 will get connected to the compuyter 192.168.
 $ cp `which nmap` syslogd
 $ PATH=.:$PATH syslogd -T0 10.0.2.1/24
 ```
-In this example we execute *nmap* but let it appear with the name *syslogd* in *ps alxwww* process list
+In this example we execute *nmap* but let it appear with the name *syslogd* in *ps alxwww* process list.
 
 **6. Hide your arguments**
 
@@ -60,7 +60,10 @@ Continuing from above..FIXME: can this be done witout LD_PRELOAD and just in Bas
 ```
 $ nmap -r -sn -PR 192.168.0.1/24
 ```
-This will Arp-ping all local machines. ARP ping always seems to work and is very steahlthy (e.g. does not show up in the target's firewall).
+This will Arp-ping all local machines. ARP ping always seems to work and is very steahlthy (e.g. does not show up in the target's firewall). However, this command is by far our favourite:
+```
+$ nmap -thc
+```
 
 **8. Sniff a SSH session**
 ```
