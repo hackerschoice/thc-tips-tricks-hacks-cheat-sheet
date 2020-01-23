@@ -14,7 +14,7 @@ Tell Bash that there is no history file (*~/.bash_history*).
 ```
 $ unset HISTFILE
 ```
-This is the first command we issue on our shell. 
+This is the first command we use on every shell. It will stop the bash from logging your commands.
 
 It is good housekeeping to 'commit suicide' when exiting the shell:
 ```
