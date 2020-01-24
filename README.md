@@ -10,13 +10,21 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [Leave Bash without history](#lbwh-anchor)
    1. [Hide your command](#hyc-anchor)
    1. [Hide your arguments](#hya-anchor)
-
 2. [SSH](#ais-anchor)
    1. [Almost invisible SSH](#ais-anchor)
    1. [SSH tunnel OUT](#sto-anchor)
    1. [SSH tunnel IN](#sti-anchor)
 3. [Network](#network-anchor)
    1. [ARP discover computers on the local network](#adln-anchor)
+   1. [Monitor all new TCP connections](#mtc-anchor)
+   1. [Alert on all new TCP connections](#atc-anchor)
+4. [File Encoding and Transfer](#fe-anchor)
+   1. [uuencode](#feu-anchor)
+   1. [openssl](#feo-anchor)
+   1. [xxd](#fex-anchor)
+   1. [File transfer using screen from REMOTE to LOCAL](#ftsrl-anchor)
+   1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
+   
 
 ---
 <a id="lbwh-anchor"></a>
@@ -51,7 +59,7 @@ In this example we execute *nmap* but let it appear with the name *syslogd* in *
 
 Continuing from above..FIXME: can this be done witout LD_PRELOAD and just in Bash?
 
-
+---
 <a id="ais-anchor"></a>
 **2.i. Almost invisible SSH**
 ```
@@ -77,15 +85,32 @@ $ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
 ```
 Anyone connecting to host.org:31338 will get connected to the compuyter 192.168.0.5 on port 80 via your computer.
 
+---
 <a id="network-anchor"></a>
 <a id="adln-anchor"></a>
-**3. ARP discover computers on the local network**
+**3.i. ARP discover computers on the local network**
 ```
 $ nmap -r -sn -PR 192.168.0.1/24
 ```
 This will Arp-ping all local machines. ARP ping always seems to work and is very steahlthy (e.g. does not show up in the target's firewall). However, this command is by far our favourite:
 ```
 $ nmap -thc
+```
+
+<a id="mtc-anchor"></a>
+**3.ii. Monitor all new TCP connections**
+
+```
+# tcpdump -n "tcp[tcpflags] == tcp-syn"
+```
+
+<a id="atc-anchor"></a>
+**3.iii. Alert on new TCP connections**
+
+Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from our system (could be an admin!).
+
+```
+# tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
 ```
 
 **8. Sniff a SSH session**
@@ -130,7 +155,10 @@ $ chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
 
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
-**10. File Encoding - uuencode**
+---
+<a id="fe-anchor"></a>
+<a id="feu-anchor"></a>
+**4.i. File Encoding - uuencode**
 
 Binary files transfer badly over a terminal connection. There are many ways to convert a binary into base64 or similar and make the file terminal friendly. We can then use a technique described further on to transfer a file to and from a remote system using nothing else but the shell/terminal as a transport medium (e.g. no separate connection).
 
@@ -152,7 +180,8 @@ begin 644 issue-net-COPY
 end
 ```
 
-**11. File Encoding - openssl**
+<a id="feo-anchor"></a>
+**4.ii. File Encoding - openssl**
 
 Openssl can be used when uu/decode/encode is not available on the remote system:
 
@@ -166,7 +195,8 @@ Cut & paste the output into this command:
 $ openssl base64 -d >issue.net-COPY
 ```
 
-**12. File Encoding - xxd**
+<a id="fex-anchor"></a>
+**4.iii. File Encoding - xxd**
 
 ..and if neither *uuencode* nor *openssl* is available then we have to dig a bit deeper in our trick box and use *xxd*.
 
@@ -182,7 +212,8 @@ Decode:
 $ xxd -p -r >issue.net-COPY
 ```
 
-**13. File transfer - using *screen* from REMOTE to LOCAL**
+<a id="ftsrl-anchor"></a>
+**4.iv. File transfer - using *screen* from REMOTE to LOCAL**
 
 Transfer a file FROM the remote system to your local system:
 
@@ -208,7 +239,8 @@ $ openssl base64 -d <screen-xfer.txt
 $ rm -rf screen-xfer.txt
 ```
 
-**13. File transfer - using *screen* from LOCAL to REMOTE**
+<a id="ftslr-anchor"></a>
+**4.v. File transfer - using *screen* from LOCAL to REMOTE**
 
 On your local system (from within a different shell) encode the data:
 ```
@@ -262,19 +294,6 @@ Let's say you have modified */etc/passwd* but the file date now shows that */etc
 $ touch -r /etc/shadow /etc/passwd
 ```
 
-**18. Monitor all new TCP connections**
-
-```
-# tcpdump -n "tcp[tcpflags] == tcp-syn"
-```
-
-**19. Alert on new TCP connections**
-
-Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from our system (could be an admin!).
-
-```
-# tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
-```
 
 **20. Generate quick random Password**
 
