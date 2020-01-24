@@ -8,7 +8,7 @@ We show the tricks 'as is' without any explanation why they work. You need to kn
 Got tricks? Send them to root@thc.org.
 
 
-**1. Leave bash without history:**
+**1. Leave Bash without history:**
 
 Tell Bash that there is no history file (*~/.bash_history*).
 ```
@@ -21,7 +21,7 @@ It is good housekeeping to 'commit suicide' when exiting the shell:
 $ kill -9 $$
 ```
 
-**2. Almost invisible ssh**
+**2. Almost invisible SSH**
 
 ```
 $ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
@@ -159,7 +159,7 @@ Decode:
 $ xxd -p -r >issue.net-COPY
 ```
 
-**13. File transfer - screen from REMOTE to LOCAL**
+**13. File transfer - using *screen* from REMOTE to LOCAL**
 
 Transfer a file FROM the remote system to your local system:
 
@@ -185,7 +185,7 @@ $ openssl base64 -d <screen-xfer.txt
 $ rm -rf screen-xfer.txt
 ```
 
-**13. File transfer - screen from LOCAL to REMOTE**
+**13. File transfer - using *screen* from LOCAL to REMOTE**
 
 On your local system (from within a different shell) encode the data:
 ```
@@ -230,6 +230,28 @@ alias ls='ls -I SecretDirectory'
 ```
 
 This will hide the directory *SecretDirectory* from the *ls* command. Place in user's *~/.profile*.
+
+**17. Restore the date of a file**
+
+Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modifed. Use *touch* to change the file data to the date of another file (in this example, */etc/shadow*)
+
+```
+$ touch -r /etc/shadow /etc/passwd
+```
+
+**18. Monitor all new TCP connections**
+
+```
+# tcpdump -n "tcp[tcpflags] == tcp-syn"
+```
+
+**19. Alert on new TCP connections**
+
+Make a noise (BING) when anyone tries to SSH into our system (could be an admin!).
+
+```
+# tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
+```
 
 
 --------------------------------------------------------------------------
