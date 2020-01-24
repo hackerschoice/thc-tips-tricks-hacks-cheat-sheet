@@ -16,6 +16,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [Almost invisible SSH](#ais-anchor)
    1. [SSH tunnel OUT](#sto-anchor)
    1. [SSH tunnel IN](#sti-anchor)
+   1. [SSH socks5 IN](#ssi-anchor)
 3. [Network](#network-anchor)
    1. [ARP discover computers on the local network](#adln-anchor)
    1. [Monitor all new TCP connections](#mtc-anchor)
@@ -116,6 +117,17 @@ We use this to give access to a friend to an internal machine that is not on the
 $ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
 ```
 Anyone connecting to host.org:31338 will get connected to the compuyter 192.168.0.5 on port 80 via your computer.
+
+<a id="sti-anchor"></a>
+**2.iv SSH sock4/5 IN**
+
+OpenSSH 7.6 adds support for reverse dynamic forwarding. In this mode *ssh* will act as a SOCKS4/5 proxy and forward connections to the destinations requested by the remote SOCKS client.
+
+In this example anyone configuring host.org:1080 as their SOCKS4/5 proxy can connect to any internal computers on any port that are accessible to the system where *ssh* was executed:
+
+```
+$ ssh -R 1080 user@host.org
+```
 
 ---
 <a id="network-anchor"></a>
