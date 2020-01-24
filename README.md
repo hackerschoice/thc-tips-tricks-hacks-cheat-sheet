@@ -1,12 +1,12 @@
-# thc-1001-tips-and-tricks
-Various tips &amp; tricks
+# THC's Tips & Tricks (Cheat Sheet)
 
-A collection of our favorite tricks. Many of those tricks are not from us. We merely collect them.
+A collection of our favourite tricks. Many of those tricks are not from us. We merely collect them.
 
 We show the tricks 'as is' without any explanation why they work. You need to know Linux to understand how and why they work.
 
-Got tricks? Send them to root@thc.org.
+Got tricks? Send them to root@thc.org or submit a pull request.
 
+[follow this to ssh](#ais-anchor)
 
 **1. Leave Bash without history:**
 
@@ -28,6 +28,7 @@ $  id
 
 **2. Almost invisible SSH**
 
+####ais-anchor
 ```
 $ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
 ```
