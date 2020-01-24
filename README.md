@@ -76,6 +76,11 @@ $  id
 **1.ii. Hide your command**
 
 ```
+$ exec -a syslogd nmap -T0 10.0.2.1/24
+```
+
+Alternative if there is no Bash:
+```
 $ cp `which nmap` syslogd
 $ PATH=.:$PATH syslogd -T0 10.0.2.1/24
 ```
