@@ -209,7 +209,7 @@ $ chmod 700 stuff.shar
 $ ./stuff.shar
 ```
 
-Method 1: Using *tar*
+Method 2: Using *tar*
 ```
 $ tar cfz - *.png *.c | openssl base64 >stuff.tgz.b64
 ```
