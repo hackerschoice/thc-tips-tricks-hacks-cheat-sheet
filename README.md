@@ -24,6 +24,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [uuencode](#feu-anchor)
    1. [openssl](#feo-anchor)
    1. [xxd](#fex-anchor)
+   1. [Multiple binaries](#xeb-anchor)
    1. [File transfer using screen from REMOTE to LOCAL](#ftsrl-anchor)
    1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
 5. [Reverse Shell / Dumb Shell](#rs-anchor)
@@ -194,6 +195,27 @@ Cut & paste the output into this command:
 Decode:
 ```
 $ xxd -p -r >issue.net-COPY
+```
+<a id="feb-anchor"></a>
+**4.iii. File Encoding - Multiple Binaries**
+
+Method 1: Using *shar* to create a self extracting shell script with binaries inside:
+```
+$ shar *.png *.c >stuff.shar
+```
+Transfer *stuff.shar* to the remote system and execute it:
+```
+$ chmod 700 stuff.shar
+$ ./stuff.shar
+```
+
+Method 1: Using *tar*
+```
+$ tar cfz - *.png *.c | openssl base64 >stuff.tgz.b64
+```
+Transfer *stuff.tgz.b64* to the remote system and execute:
+```
+$ openssl base64 -d | tar xfz -
 ```
 
 <a id="ftsrl-anchor"></a>
