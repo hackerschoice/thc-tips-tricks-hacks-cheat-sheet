@@ -24,7 +24,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [uuencode](#feu-anchor)
    1. [openssl](#feo-anchor)
    1. [xxd](#fex-anchor)
-   1. [Multiple binaries](#xeb-anchor)
+   1. [Multiple binaries](#feb-anchor)
    1. [File transfer using screen from REMOTE to LOCAL](#ftsrl-anchor)
    1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
 5. [Reverse Shell / Dumb Shell](#rs-anchor)
@@ -197,7 +197,7 @@ Decode:
 $ xxd -p -r >issue.net-COPY
 ```
 <a id="feb-anchor"></a>
-**4.iii. File Encoding - Multiple Binaries**
+**4.iv. File Encoding - Multiple Binaries**
 
 Method 1: Using *shar* to create a self extracting shell script with binaries inside:
 ```
@@ -219,7 +219,7 @@ $ openssl base64 -d | tar xfz -
 ```
 
 <a id="ftsrl-anchor"></a>
-**4.iv. File transfer - using *screen* from REMOTE to LOCAL**
+**4.v. File transfer - using *screen* from REMOTE to LOCAL**
 
 Transfer a file FROM the remote system to your local system:
 
@@ -246,7 +246,7 @@ $ rm -rf screen-xfer.txt
 ```
 
 <a id="ftslr-anchor"></a>
-**4.v. File transfer - using *screen* from LOCAL to REMOTE**
+**4.vi. File transfer - using *screen* from LOCAL to REMOTE**
 
 On your local system (from within a different shell) encode the data:
 ```
