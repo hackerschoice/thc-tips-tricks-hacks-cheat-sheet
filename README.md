@@ -26,7 +26,7 @@ Note: Any command starting with a " " (space) will [not get logged to history](h
 $  id
 ```
 
-####ais-anchor
+{#ais-anchor}
 
 **2. Almost invisible SSH**
 ```
