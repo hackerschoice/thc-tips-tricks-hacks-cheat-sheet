@@ -148,7 +148,7 @@ Binary files transfer badly over a terminal connection. There are many ways to c
 
 Encode:
 ```
-$ uuencode /etc/issue.net issuer.net-COPY
+$ uuencode /etc/issue.net issue.net-COPY
 begin 644 issue-net-COPY
 356)U;G1U(#$X+C`T+C(@3%13"@``
 `
