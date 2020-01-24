@@ -119,7 +119,7 @@ $ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
 Anyone connecting to host.org:31338 will get connected to the compuyter 192.168.0.5 on port 80 via your computer.
 
 <a id="sti-anchor"></a>
-**2.iv SSH sock4/5 IN**
+**2.iv SSH socks4/5 IN**
 
 OpenSSH 7.6 adds support for reverse dynamic forwarding. In this mode *ssh* will act as a SOCKS4/5 proxy and forward connections to the destinations requested by the remote SOCKS client.
 
