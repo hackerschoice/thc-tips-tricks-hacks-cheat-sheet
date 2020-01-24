@@ -27,7 +27,6 @@ $  id
 ```
 
 <a id="ais-anchor"></a>
-
 **2. Almost invisible SSH**
 ```
 $ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
