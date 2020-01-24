@@ -130,7 +130,7 @@ $ nmap -thc
 <a id="atc-anchor"></a>
 **3.iii. Alert on new TCP connections**
 
-Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from our system (could be an admin!).
+Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from the target system (could be an admin!).
 
 ```
 # tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
