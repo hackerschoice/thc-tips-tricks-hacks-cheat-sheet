@@ -26,9 +26,8 @@ Note: Any command starting with a " " (space) will [not get logged to history](h
 $  id
 ```
 
+(#ais-anchor)
 **2. Almost invisible SSH**
-
-####ais-anchor
 ```
 $ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
 ```
