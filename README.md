@@ -1,5 +1,7 @@
 # THC's favourite Tips, Tricks & Hacks (Cheat Sheet)
 
+## Available at [https://tiny.cc/thctricks](https://tiny.cc/thctricks)
+
 A collection of our favourite tricks. Many of those tricks are not from us. We merely collect them.
 
 We show the tricks 'as is' without any explanation why they work. You need to know Linux to understand how and why they work.
