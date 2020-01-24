@@ -322,6 +322,34 @@ If the container is not running:
 $ docker run -it --user root --entrypoint /bin/bash <container>
 ```
 
+**26. Linux transportable encrypted filesystems.**
+
+Like truecrypt but better.  You may need to `losetup -f` to get a loop device.
+
+Make a junk file, here 256MB is used, encrypt, and partition. You will be prompted for a password.
+
+```
+$ dd if=/dev/urandom of=/tmp/crypted bs=1M count=256 iflag=fullblock
+$ cryptsetup luksFormat /tmp/crypted
+$ mkfs.ext3 /tmp/crypted
+```
+
+Mount:
+
+```
+# losetup /dev/loop0 /tmp/crypted
+# cryptsetup open /dev/loop0 crypted
+# mount -t ext3 /dev/mapper/crypted /mnt/crypted
+```
+
+Store data in `/mnt/crypted`, then unmount:
+
+```
+# umount /mnt/crypted
+# cryptsetup close crypted
+# losetup -d /dev/loop0
+```
+
 
 
 --------------------------------------------------------------------------
