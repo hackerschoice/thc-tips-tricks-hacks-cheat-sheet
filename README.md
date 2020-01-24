@@ -10,18 +10,18 @@ Got tricks? Send them to root@thc.org.
 
 **1. Leave Bash without history:**
 
-Tell Bash that there is no history file (*~/.bash_history*).
+Tell Bash that there is no history file (*~/.bash_history*). This is the first command we execute on every shell. It will stop the Bash from logging your commands.
+
 ```
 $ unset HISTFILE
 ```
-This is the first command we execute on every shell. It will stop the Bash from logging your commands.
 
 It is good housekeeping to 'commit suicide' when exiting the shell:
 ```
 $ kill -9 $$
 ```
 
-Note: Any command starting with a " " (space) will [not get logged history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
+Note: Any command starting with a " " (space) will [not get logged to history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
 ```
 $  id
 ```
