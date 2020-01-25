@@ -64,12 +64,11 @@ Got tricks? Send them to root@thc.org or submit a pull request.
 <a id="lbwh-anchor"></a>
 **1.i. Leave Bash without history:**
 
-Tell Bash that there is no history file (*~/.bash_history*). This is the first command we execute on every shell. It will stop the Bash from logging your commands. 
+Tell Bash to use */dev/null* instead of *~/.bash_history*. This is the first command we execute on every shell. It will stop the Bash from logging your commands. 
 
 ```
-$ unset HISTFILE
+$ export HISTFILE=/dev/null
 ```
-Note: *export HISTFILE=/dev/null* as root on some (old) Linux systems causes /dev/null to be chmod'ed to 600...causing all kind of problems).
 
 It is good housekeeping to 'commit suicide' when exiting a shell:
 ```
