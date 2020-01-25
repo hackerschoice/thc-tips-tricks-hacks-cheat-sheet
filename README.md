@@ -16,6 +16,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [Almost invisible SSH](#ais-anchor)
    1. [SSH tunnel OUT](#sto-anchor)
    1. [SSH tunnel IN](#sti-anchor)
+   1. [SSH socks5 OUT](#sso-anchor)
    1. [SSH socks5 IN](#ssi-anchor)
 3. [Network](#network-anchor)
    1. [ARP discover computers on the local network](#adln-anchor)
