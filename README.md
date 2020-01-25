@@ -51,6 +51,8 @@ Got tricks? Send them to root@thc.org or submit a pull request.
  8. [Miscellaneous](#misc-anchor)
     1. [Sniff a user's SSH session](#sss-anchor)
     1. [Sniff a user's SSH session without root priviledges](#ssswor-anchor)
+    1. [Don't use `less(1)` history file](#dulhf-anchor)
+    1. [Don't use `.viminfo` or swap file](#duvsf-anchor)
     
    
 
@@ -356,6 +358,10 @@ perl -e 'exec "/bin/bash";'
 
 # Awk
 awk 'BEGIN {system("/bin/bash")}'
+
+# Script
+script -qc /bin/bash /dev/null # Linux
+script -q /dev/null /bin/bash # BSD
 ```
 
 <a id="rsup2-anchor"></a>
@@ -524,6 +530,22 @@ $ chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
 ```
 
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
+
+<a id="dulhf-anchor"></a>
+**8.iii. Don't use `less(1)` history file**
+
+```
+export LESSHISTFILE="-"
+```
+
+<a id="duvsf-anchor"></a>
+**8.iv. Don't use `.viminfo` or swap file**
+
+```
+export EDITOR="vim -ni NONE"
+export VISUAL="$EDITOR"
+alias vim="$EDITOR" vi="vim"
+```
 
 
 
