@@ -93,8 +93,7 @@ In this example we execute *nmap* but let it appear with the name *syslogd* in *
 <a id="hya-anchor"></a>
 **1.iii. Hide your arguments**
 
-Download [zap-args.c](src/zap-args.c)
-This example will execute *nmap* but will make it appear as 'syslogd' without any arguments in the *ps alxww* output.
+Download [zap-args.c](src/zap-args.c). This example will execute *nmap* but will make it appear as 'syslogd' without any arguments in the *ps alxww* output.
 
 ```
 $ gcc -Wall -O2 -fpic -shared -o zap-args.so zap-args.c -ldl
