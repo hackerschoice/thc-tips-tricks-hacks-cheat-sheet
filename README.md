@@ -469,13 +469,32 @@ This will remove any sign of us from the log file:
 ```
 
 <a id="shhu-anchor"></a>
-**6.v. Hide files from that User withour root priviledges**
+**6.v. Hide files from that User without root priviledges**
 
+Our favorite working directory is */dev/shm/*. This location is volatile memory and will be lost on reboot. NO LOGZ == NO CRIME.
+
+Hiding permanent files:
+
+Method 1:
 ```
-alias ls='ls -I SecretDirectory'
+$ alias ls='ls -I system-dev'
 ```
 
-This will hide the directory *SecretDirectory* from the *ls* command. Place in user's *~/.profile*.
+This will hide the directory *system-dev* from the *ls* command. Place in User's *~/.profile* or system wide */etc/profile*.
+
+Method 2:
+Tricks from the 80s. Consider any directory that the admin rarely looks into (like */boot/.X11/..* or so):
+```
+$ mkdir '...'
+$ cd '...'
+```
+
+Method 3:
+Unix allows filenames with about any ASCII character but 0x00. Try tab (*\t*). Happens that most Admins do not know how to cd into any such directory.
+```
+$ mkdir $'\t'
+$ cd $'\t'
+```
 
 <a id="cr-anchor"></a>
 <a id="crgrp-anchor"></a>
