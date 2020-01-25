@@ -49,6 +49,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
  7. [Crypto](#cr-anchor)
     1. [Generate quick random Password](#crgrp-anchor)
     1. [Linux transportable encrypted filesystems](#crltefs-anchor)
+    1. [Encrypting a file](#cref-anchor)
  8. [Miscellaneous](#misc-anchor)
     1. [Sniff a user's SSH session](#sss-anchor)
     1. [Sniff a user's SSH session without root priviledges](#ssswor-anchor)
@@ -499,6 +500,21 @@ Store data in `/mnt/crypted`, then unmount:
 # umount /mnt/crypted
 # cryptsetup close crypted
 # losetup -d /dev/loop0
+```
+
+<a id="misc-anchor"></a>
+**7.iii Encrypting a file**
+
+Encrypt your 0-Days and log files before transfering them - please. (and pick your own password):
+
+Encrypt:
+```
+$ openssl enc -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt >input.txt.enc
+```
+
+Decrypt:
+```
+$ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.txt
 ```
 
 ---
