@@ -93,7 +93,14 @@ In this example we execute *nmap* but let it appear with the name *syslogd* in *
 <a id="hya-anchor"></a>
 **1.iii. Hide your arguments**
 
-Continuing from above..FIXME: can this be done witout LD_PRELOAD and just in Bash?
+Download [zap-args.c](src/zap-args.c)
+This example will execute *nmap* but will make it appear as 'syslogd' without any arguments in the *ps alxww* output.
+
+```
+$ gcc -Wall -O2 -fpic -shared -o zap-args.so zap-args.c -ldl
+$ LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24
+```
+Note: There is a gdb variant as well. Anyone?
 
 ---
 <a id="ais-anchor"></a>
