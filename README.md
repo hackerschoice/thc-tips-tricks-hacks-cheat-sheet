@@ -61,18 +61,19 @@ Got tricks? Send them to root@thc.org or submit a pull request.
 <a id="lbwh-anchor"></a>
 **1.i. Leave Bash without history:**
 
-Tell Bash that there is no history file (*~/.bash_history*). This is the first command we execute on every shell. It will stop the Bash from logging your commands.
+Tell Bash that there is no history file (*~/.bash_history*). This is the first command we execute on every shell. It will stop the Bash from logging your commands. 
 
 ```
 $ unset HISTFILE
 ```
+Note: *export HISTFILE=/dev/null* as root on some (old) Linux systems causes /dev/null to be chmod'ed to 600...causing all kind of problems).
 
-It is good housekeeping to 'commit suicide' when exiting the shell:
+It is good housekeeping to 'commit suicide' when exiting a shell:
 ```
-$ kill -9 $$
+$ alias exit='kill -9 $$'
 ```
 
-Note: Any command starting with a " " (space) will [not get logged to history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
+Any command starting with a " " (space) will [not get logged to history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
 ```
 $  id
 ```
