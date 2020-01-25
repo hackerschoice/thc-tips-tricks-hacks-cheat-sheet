@@ -20,6 +20,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [SSH socks5 IN](#ssi-anchor)
 3. [Network](#network-anchor)
    1. [ARP discover computers on the local network](#adln-anchor)
+   1. [ICMP discover local network](#idln-anchor)
    1. [Monitor all new TCP connections](#mtc-anchor)
    1. [Alert on all new TCP connections](#atc-anchor)
 4. [File Encoding and Transfer](#fe-anchor)
@@ -158,20 +159,27 @@ The others configuring host.org:1080 as their SOCKS4/5 proxy. They can now conne
 ```
 $ nmap -r -sn -PR 192.168.0.1/24
 ```
-This will Arp-ping all local machines. ARP ping always seems to work and is very steahlthy (e.g. does not show up in the target's firewall). However, this command is by far our favourite:
+This will Arp-ping all local machines just like *arping*. ARP ping always seems to work and is very steahlthy (e.g. does not show up in the target's firewall). However, this command is by far our favourite:
 ```
 $ nmap -thc
 ```
 
+**3.ii. ICMP discover local network**
+
+...and when we do not have nmap and we can not do broadcast pings (requires root) then we use this:
+```
+$ for x in `seq 1 254`; do ping -on -c 3 -i 0.1 -W 200 192.168.1.$x | grep 'bytes from' | cut -f4 -d" " | sort -u; done
+```
+
 <a id="mtc-anchor"></a>
-**3.ii. Monitor all new TCP connections**
+**3.iii. Monitor all new TCP connections**
 
 ```
 # tcpdump -n "tcp[tcpflags] == tcp-syn"
 ```
 
 <a id="atc-anchor"></a>
-**3.iii. Alert on new TCP connections**
+**3.iv. Alert on new TCP connections**
 
 Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from the target system (could be an admin!).
 
