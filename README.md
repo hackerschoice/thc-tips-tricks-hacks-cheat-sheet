@@ -119,16 +119,26 @@ $ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
 ```
 Anyone connecting to host.org:31338 will get connected to the compuyter 192.168.0.5 on port 80 via your computer.
 
+<a id="sso-anchor"></a>
+**2.iv SSH socks4/5 OUT**
+
+OpenSSH 7.6 adds support for reverse dynamic forwarding. Example: Tunnel all your browser traffic through your server.
+
+```
+$ ssh -D 1080 user@host.org
+```
+Now configure your browser to use SOCKS with 127.0.0.1:1080. All your traffic is now tunneled through *host.org* and will appear with the source IP of *host.org*.
+
 <a id="ssi-anchor"></a>
 **2.iv SSH socks4/5 IN**
 
-OpenSSH 7.6 adds support for reverse dynamic forwarding. In this mode *ssh* will act as a SOCKS4/5 proxy and forward connections to the destinations requested by the remote SOCKS client.
-
-In this example anyone configuring host.org:1080 as their SOCKS4/5 proxy can connect to any internal computers on any port that are accessible to the system where *ssh* was executed:
+This is the reverse to the above example. It give others access to your *local* network or let others use your compute as a tunnel end-point.
 
 ```
-$ ssh -R 1080 user@host.org
+$ ssh -g -R 1080 user@host.org
 ```
+
+The others configuring host.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computers on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network.
 
 ---
 <a id="network-anchor"></a>
