@@ -105,11 +105,11 @@ This will not add your user to the */var/log/utmp* file and you wont show up in 
 <a id="sto-anchor"></a>
 **2.ii SSH tunnel OUT**
 
-We use this all the time to circumvent local firewalls or IP filtering:
+We use this all the time to circumvent local firewalls and IP filtering:
 ```
 $ ssh -g -L31337:1.2.3.4:80 user@host.org
 ```
-You or anyone else can now connect to your computer on port 31337 and gets connected to 1.2.3.4:80 and appearing from host 'host.org'
+You or anyone else can now connect to your computer on port 31337 and gets tunneled to 1.2.3.4 port 80 and appearing with the source IP of 'host.org'.
 
 <a id="sti-anchor"></a>
 **2.iii SSH tunnel IN**
@@ -118,7 +118,7 @@ We use this to give access to a friend to an internal machine that is not on the
 ```
 $ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
 ```
-Anyone connecting to host.org:31338 will get connected to the compuyter 192.168.0.5 on port 80 via your computer.
+Anyone connecting to host.org:31338 will get tunneled to 192.168.0.5 on port 80 via your computer.
 
 <a id="sso-anchor"></a>
 **2.iv SSH socks4/5 OUT**
