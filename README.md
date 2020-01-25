@@ -252,7 +252,7 @@ $ tar cfz - *.png *.c | openssl base64 >stuff.tgz.b64
 ```
 Transfer *stuff.tgz.b64* to the remote system and execute:
 ```
-$ openssl base64 -d | tar xfz -
+$ openssl base64 -d <stuff.tgz.b64 | tar xfz -
 ```
 
 <a id="ftsrl-anchor"></a>
