@@ -559,6 +559,12 @@ Good for quick passwords without human element.
 $ openssl rand -base64 24
 ```
 
+If `openssl` is not available then we can also use `head` to read from `/dev/urandom`.
+
+```
+$ head -c 32 < /dev/urandom | xxd -p -c 32
+```
+
 <a id="crltefs-anchor"></a>
 **8.ii. Linux transportable encrypted filesystems**
 
