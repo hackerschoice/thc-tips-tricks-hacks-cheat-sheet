@@ -12,6 +12,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [Leave Bash without history](#lbwh-anchor)
    1. [Hide your command](#hyc-anchor)
    1. [Hide your arguments](#hya-anchor)
+   1. [Change your terminal title](#cytt-anchor)
 2. [SSH](#ais-anchor)
    1. [Almost invisible SSH](#ais-anchor)
    1. [SSH tunnel OUT](#sto-anchor)
@@ -104,6 +105,26 @@ $ gcc -Wall -O2 -fpic -shared -o zap-args.so zap-args.c -ldl
 $ LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24
 ```
 Note: There is a gdb variant as well. Anyone?
+
+<a id="cytt-anchor"></a>
+**2.iv. Change your terminal title**
+
+open `~./bashrc` file and  Add this at the end of the file
+```
+termtitle() { PROMPT_COMMAND='echo -ne "\033]0; '$1' \007"'; }
+
+```
+Applying changes
+
+```
+source ~/.bashrc
+```
+Open terminal window and change title you wish
+
+```
+termtitle "my title"
+
+```
 
 ---
 <a id="ais-anchor"></a>
