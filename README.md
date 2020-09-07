@@ -413,13 +413,10 @@ $ python -c 'import pty; pty.spawn("/bin/bash")'
 
 # Now Press Ctrl-Z to suspend the connection and return to your own terminal.
 # On your terminal execute:
-$ stty raw -echo
-
-# ...and bring the connection back into the foreground:
-$ fg
-$ reset
+$ stty raw -echo; fg
 
 # On target host
+$ reset
 $ export SHELL=bash
 $ export TERM=xterm-256color
 $ stty rows 24 columns 80
