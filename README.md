@@ -321,7 +321,7 @@ Get *screen* to slurp the base64 encoded data into screen's clipboard and paste 
 
 Note: Two C-d are required due to a [bug in openssl](https://github.com/openssl/openssl/issues/9355).
 
-<a id="ftgs-achor"></a>
+<a id="ftgs-anchor"></a>
 **4.vii. File transfer - using gs-netcat and sftp**
 
 Install [gs-netcat](https://github.com/hackerschoice/gsocket). This commands runs a SFTP server through the Global Socket Relay Network:
