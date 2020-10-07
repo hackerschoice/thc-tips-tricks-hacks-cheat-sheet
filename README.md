@@ -88,7 +88,9 @@ $  id
 **1.ii. Hide your command**
 
 ```
-$ exec -a syslogd nmap -T0 10.0.2.1/24
+$ /bin/bash -c "exec -a syslogd nmap -T0 10.0.2.1/24"
+or starting as a background process:
+$ exec -a syslogd nmap -T0 10.0.2.1/24 &>nmap.log &
 ```
 
 Alternatively if there is no Bash:
@@ -122,28 +124,28 @@ This will not add your user to the */var/log/utmp* file and you won't show up in
 
 We use this all the time to circumvent local firewalls and IP filtering:
 ```
-$ ssh -g -L31337:1.2.3.4:80 user@host.org
+$ ssh -g -L31337:1.2.3.4:80 user@server.org
 ```
-You or anyone else can now connect to your computer on port 31337 and get tunneled to 1.2.3.4 port 80 and appear with the source IP of 'host.org'.
+You or anyone else can now connect to your computer on port 31337 and get tunneled to 1.2.3.4 port 80 and appear with the source IP of 'server.org'. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
 
 <a id="sti-anchor"></a>
 **2.iii SSH tunnel IN**
 
 We use this to give access to a friend to an internal machine that is not on the public Internet:
 ```
-$ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@host.org
+$ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@server.org
 ```
-Anyone connecting to host.org:31338 will get tunneled to 192.168.0.5 on port 80 via your computer.
+Anyone connecting to server.org:31338 will get tunneled to 192.168.0.5 on port 80 via your computer. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
 
 <a id="sso-anchor"></a>
 **2.iv SSH socks4/5 OUT**
 
-OpenSSH 7.6 adds support for reverse dynamic forwarding. Example: Tunnel all your browser traffic through your server.
+OpenSSH 7.6 adds socks support for dynamic forwarding. Example: Tunnel all your browser traffic through your server.
 
 ```
-$ ssh -D 1080 user@host.org
+$ ssh -D 1080 user@server.org
 ```
-Now configure your browser to use SOCKS with 127.0.0.1:1080. All your traffic is now tunneled through *host.org* and will appear with the source IP of *host.org*.
+Now configure your browser to use SOCKS with 127.0.0.1:1080. All your traffic is now tunneled through *host.org* and will appear with the source IP of *server.org*. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
 
 <a id="ssi-anchor"></a>
 **2.v SSH socks4/5 IN**
@@ -151,10 +153,10 @@ Now configure your browser to use SOCKS with 127.0.0.1:1080. All your traffic is
 This is the reverse of the above example. It give others access to your *local* network or let others use your computer as a tunnel end-point.
 
 ```
-$ ssh -g -R 1080 user@host.org
+$ ssh -g -R 1080 user@server.org
 ```
 
-The others configuring host.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computer on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network.
+The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computer on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
 
 ---
 <a id="network-anchor"></a>
