@@ -115,7 +115,7 @@ Note: There is a gdb variant as well. Anyone?
 <a id="ais-anchor"></a>
 **2.i. Almost invisible SSH**
 ```
-$ ssh -o UserKnownHostsFile=/dev/null -T user@host.org "bash -i"
+$ ssh -o UserKnownHostsFile=/dev/null -T user@server.org "bash -i"
 ```
 This will not add your user to the */var/log/utmp* file and you won't show up in *w* or *who* command of logged in users. It will bypass .profile and .bash_profile as well. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
 
@@ -145,7 +145,7 @@ OpenSSH 7.6 adds socks support for dynamic forwarding. Example: Tunnel all your 
 ```
 $ ssh -D 1080 user@server.org
 ```
-Now configure your browser to use SOCKS with 127.0.0.1:1080. All your traffic is now tunneled through *host.org* and will appear with the source IP of *server.org*. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
+Now configure your browser to use SOCKS with 127.0.0.1:1080. All your traffic is now tunneled through *server.org* and will appear with the source IP of *server.org*. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
 
 <a id="ssi-anchor"></a>
 **2.v SSH socks4/5 IN**
