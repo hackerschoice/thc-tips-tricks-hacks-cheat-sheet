@@ -165,7 +165,7 @@ The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now con
 ```
 $ nmap -r -sn -PR 192.168.0.1/24
 ```
-This will Arp-ping all local machines just like *arping*. ARP ping always seems to work and is very steahlthy (e.g. does not show up in the target's firewall). However, this command is by far our favourite:
+This will Arp-ping all local machines just like *arping*. ARP ping always seems to work and is very stealthy (e.g. does not show up in the target's firewall). However, this command is by far our favourite:
 ```
 $ nmap -thc
 ```
