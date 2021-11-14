@@ -708,7 +708,8 @@ __EOF__
 chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
 . ~/.profile
 
-echo -e "\033[1;32m***SUCCESS***. Logfiles stored in ~/.local/.logs.
+echo -e "\033[1;32m***SUCCESS***.
+Logfiles stored in ~/.local/.logs/.
 To uninstall cut & paste this\033[0m:\033[1;36m
   grep -v 0xFD0E ~/.profile >~/.profile-new && mv ~/.profile-new ~/.profile
   rm -rf ~/.local/bin/ssh ~/.local/bin/ssh-log
