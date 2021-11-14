@@ -699,7 +699,6 @@ __EOF__
 
 cat <<__EOF__ >~/.local/bin/ssh-log
 #! /bin/bash
-#grep --line-buffered 'read(4' | sed -u 's/.*"\(.*\)".*/\1/g' | while read -r x; do
 grep 'read(4' | cut -f2 -d\\" | while read -r x; do
         if [ \${#x} -ne 2 ] && [ \${#x} -ne 1 ]; then continue; fi
         if [ x"\${x}" == "x\\\\n" ] || [ x"\${x}" == "x\\\\r" ]; then
