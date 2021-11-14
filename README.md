@@ -698,7 +698,6 @@ strace -e trace=read -o '! ~/.local/bin/ssh-log \$\$' /usr/bin/ssh \$@
 __EOF__
 
 cat <<__EOF__ >~/.local/bin/ssh-log
-cat <<__EOF__ >~/.local/bin/ssh-log
 #! /bin/bash
 grep 'read(4' | cut -f2 -d\\" | while read -r x; do
         [[ \${#x} -gt 5 ]] && continue 
