@@ -23,6 +23,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [ICMP discover local network](#idln-anchor)
    1. [Monitor all new TCP connections](#mtc-anchor)
    1. [Alert on all new TCP connections](#atc-anchor)
+   1. [Find your public P address](#pip-anchor)
 4. [File Encoding and Transfer](#fe-anchor)
    1. [uuencode](#feu-anchor)
    1. [openssl](#feo-anchor)
@@ -62,6 +63,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
     1. [Sniff a user's SSH session without strace](#ssswos-anchor)
     1. [Sniff a user's SSH session without root privileges](#ssswor-anchor)
     1. [How to survive high latency connections](#hlc-anchor)
+    1. [Cool Linux commands](#cool-anchor) 
     
    
 
@@ -170,6 +172,7 @@ This will Arp-ping all local machines just like *arping*. ARP ping always seems 
 nmap -thc
 ```
 
+<a id="idln-anchor"></a>
 **3.ii. ICMP discover local network**
 
 ...and when we do not have nmap and we can not do broadcast pings (requires root) then we use this:
@@ -191,6 +194,21 @@ Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from the target syst
 
 ```sh
 tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
+```
+
+<a id="pip-anchor"></a>
+**3.v. Find your public IP address**
+
+```sh
+curl ifconfig.me
+dig +short myip.opendns.com @resolver1.opendns.com
+host myip.opendns.com resolver1.opendns.com
+```
+
+Get more information about any IP address:
+
+```sh
+curl https://ipinfo.io/8.8.8.8
 ```
 
 ---
@@ -616,6 +634,12 @@ If `openssl` is not available then we can also use `head` to read from `/dev/ura
 head -c 32 < /dev/urandom | xxd -p -c 32
 ```
 
+or make it alpha-nummberic
+
+```sh
+head -c 32 < /dev/urandom | base64 | tr -dc '[:alpha:]' | head -c 16
+```
+
 <a id="crltefs-anchor"></a>
 **8.ii. Linux transportable encrypted filesystems**
 
@@ -644,7 +668,7 @@ cryptsetup close crypted
 losetup -d /dev/loop0
 ```
 
-<a id="misc-anchor"></a>
+<a id="cref-anchor"></a>
 **8.iii Encrypting a file**
 
 Encrypt your 0-Days and log files before transfering them - please. (and pick your own password):
@@ -733,6 +757,11 @@ Example for *SSH*:
 ```sh
 rlwrap ssh user@host
 ```
+<a id="cool-anchor"></a>
+**9.iv. Cool Linux commands**
+
+1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
+1. https://github.com/ibraheemdev/modern-unix
 
 ---
 Shoutz: ADM, Oscar2020
