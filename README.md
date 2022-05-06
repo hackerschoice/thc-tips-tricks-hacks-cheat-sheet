@@ -634,7 +634,7 @@ If `openssl` is not available then we can also use `head` to read from `/dev/ura
 head -c 32 < /dev/urandom | xxd -p -c 32
 ```
 
-or make it alpha-nummberic
+or make it alpha-numeric
 
 ```sh
 head -c 32 < /dev/urandom | base64 | tr -dc '[:alpha:]' | head -c 16
