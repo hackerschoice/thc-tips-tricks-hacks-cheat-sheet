@@ -23,7 +23,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [ICMP discover local network](#idln-anchor)
    1. [Monitor all new TCP connections](#mtc-anchor)
    1. [Alert on all new TCP connections](#atc-anchor)
-   1. [Find your public P address](#pip-anchor)
+   1. [Find your public IP address](#pip-anchor)
 4. [File Encoding and Transfer](#fe-anchor)
    1. [uuencode](#feu-anchor)
    1. [openssl](#feo-anchor)
