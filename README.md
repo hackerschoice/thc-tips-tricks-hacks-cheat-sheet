@@ -67,7 +67,8 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [with SSH-IT](#sshit-anchor)
 1. [Miscellaneous](#misc-anchor)
    1. [How to survive high latency connections](#hlc-anchor)
-   1. [Cool Linux commands](#cool-anchor) 
+   1. [Cool Linux commands](#cool-anchor)
+   1. [Useful commands](#useful-anchor)  
     
    
 
@@ -798,6 +799,14 @@ rlwrap ssh user@host
 
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
+
+<a id="useful-anchor"></a>
+**10.iii. Useful commands**
+
+Use ```lsof -Pni``` or ```netstat -antpu``` to list all Internet connections.
+
+Use ```netstat -rn``` or ```ip route show``` to show default Internet route.
+
 
 ---
 Shoutz: ADM, Oscar2020
