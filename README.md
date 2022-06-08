@@ -57,6 +57,8 @@ Got tricks? Send them to root@thc.org or submit a pull request.
  8. [Crypto](#cr-anchor)
     1. [Generate quick random Password](#crgrp-anchor)
     1. [Linux transportable encrypted filesystems](#crltefs-anchor)
+      1. [cryptsetup](#crltefs-anchor)
+      1. [EncFS](#crencfs-anchor)
     1. [Encrypting a file](#cref-anchor)
  9. [Miscellaneous](#misc-anchor)
     1. [Sniff a user's SSH session](#sss-anchor)
@@ -641,7 +643,7 @@ head -c 32 < /dev/urandom | base64 | tr -dc '[:alpha:]' | head -c 16
 ```
 
 <a id="crltefs-anchor"></a>
-**8.ii. Linux transportable encrypted filesystems**
+**8.ii. Linux transportable encrypted filesystems - cryptsetup**
 
 Create a 256MB large encrypted file system. You will be prompted for a password.
 
@@ -667,9 +669,22 @@ umount /mnt/crypted
 cryptsetup close crypted
 losetup -d /dev/loop0
 ```
+<a id="crencfs-anchor"></a>
+**8.iii. Linux transportable encrypted filesystems - EncFS**
+
+Create ```.sec``` and store the encrypted data in ```.raw```:
+```sh
+mkdir .raw .sec
+encfs --standard  "${PWD}/.raw" "${PWD}/.sec"
+```
+
+unmount:
+```sh
+fusermount -u .sec
+```
 
 <a id="cref-anchor"></a>
-**8.iii Encrypting a file**
+**8.iv Encrypting a file**
 
 Encrypt your 0-Days and log files before transfering them - please. (and pick your own password):
 
