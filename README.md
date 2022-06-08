@@ -6,7 +6,7 @@ A collection of our favourite tricks. Many of those tricks are not from us. We m
 
 We show the tricks 'as is' without any explanation why they work. You need to know Linux to understand how and why they work.
 
-Got tricks? Send them to root@thc.org or submit a pull request.
+Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 
 1. [Bash](#lbwh-anchor)
    1. [Leave Bash without history](#lbwh-anchor)
