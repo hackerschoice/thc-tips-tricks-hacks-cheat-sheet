@@ -12,19 +12,19 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [Leave Bash without history](#lbwh-anchor)
    1. [Hide your command](#hyc-anchor)
    1. [Hide your arguments](#hya-anchor)
-2. [SSH](#ais-anchor)
+1. [SSH](#ais-anchor)
    1. [Almost invisible SSH](#ais-anchor)
    1. [SSH tunnel OUT](#sto-anchor)
    1. [SSH tunnel IN](#sti-anchor)
    1. [SSH socks5 OUT](#sso-anchor)
    1. [SSH socks5 IN](#ssi-anchor)
-3. [Network](#network-anchor)
+1. [Network](#network-anchor)
    1. [ARP discover computers on the local network](#adln-anchor)
    1. [ICMP discover local network](#idln-anchor)
    1. [Monitor all new TCP connections](#mtc-anchor)
    1. [Alert on all new TCP connections](#atc-anchor)
    1. [Find your public P address](#pip-anchor)
-4. [File Encoding and Transfer](#fe-anchor)
+1. [File Encoding and Transfer](#fe-anchor)
    1. [uuencode](#feu-anchor)
    1. [openssl](#feo-anchor)
    1. [xxd](#fex-anchor)
@@ -32,7 +32,7 @@ Got tricks? Send them to root@thc.org or submit a pull request.
    1. [File transfer using screen from REMOTE to LOCAL](#ftsrl-anchor)
    1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
    1. [File transfer using gs-netcat and sftp](#ftgs-anchor)
-5. [Reverse Shell / Dumb Shell](#rs-anchor)
+1. [Reverse Shell / Dumb Shell](#rs-anchor)
    1. [Reverse Shells](#rs-anchor)
       1. [with gs-netcat](#rswg-anchor)
       1. [with Bash](#rswb-anchor)
@@ -44,28 +44,28 @@ Got tricks? Send them to root@thc.org or submit a pull request.
       1. [Upgrade a reverse shell to a pty shell](#rsup-anchor)
       1. [Upgrade a reverse shell to a fully interactive shell](#rsup2-anchor)
       1. [Reverse shell with socat (fully interactive)](#rssc-anchor)
- 6. [Backdoors](#bd-anchor)
-    1. [Background reverse shell](#bdrs-anchor)
-    1. [authorized_keys](#bdak-anchor)
-    1. [Remote access an entire network](#bdra-anchor)
- 7. [Shell Hacks](#sh-anchor)
-    1. [Shred files (secure delete)](#shsf-anchor)
-    1. [Shred files without *shred*](#shsfwo-anchor)
-    1. [Restore the date of a file](#shrdf-anchor)
-    1. [Clean logfile](#shcl-anchor)
-    1. [Hide files from a User without root privileges](#shhu-anchor)
- 8. [Crypto](#cr-anchor)
-    1. [Generate quick random Password](#crgrp-anchor)
-    1. [Linux transportable encrypted filesystems](#crltefs-anchor)
+1. [Backdoors](#bd-anchor)
+   1. [Background reverse shell](#bdrs-anchor)
+   1. [authorized_keys](#bdak-anchor)
+   1. [Remote access an entire network](#bdra-anchor)
+1. [Shell Hacks](#sh-anchor)
+   1. [Shred files (secure delete)](#shsf-anchor)
+   1. [Shred files without *shred*](#shsfwo-anchor)
+   1. [Restore the date of a file](#shrdf-anchor)
+   1. [Clean logfile](#shcl-anchor)
+   1. [Hide files from a User without root privileges](#shhu-anchor)
+1. [Crypto](#cr-anchor)
+   1. [Generate quick random Password](#crgrp-anchor)
+   1. [Linux transportable encrypted filesystems](#crltefs-anchor)
       1. [cryptsetup](#crltefs-anchor)
       1. [EncFS](#crencfs-anchor)
-    1. [Encrypting a file](#cref-anchor)
- 9. [Miscellaneous](#misc-anchor)
-    1. [Sniff a user's SSH session](#sss-anchor)
-    1. [Sniff a user's SSH session without strace](#ssswos-anchor)
-    1. [Sniff a user's SSH session without root privileges](#ssswor-anchor)
-    1. [How to survive high latency connections](#hlc-anchor)
-    1. [Cool Linux commands](#cool-anchor) 
+   1. [Encrypting a file](#cref-anchor)
+1. [Miscellaneous](#misc-anchor)
+   1. [Sniff a user's SSH session](#sss-anchor)
+   1. [Sniff a user's SSH session without strace](#ssswos-anchor)
+   1. [Sniff a user's SSH session without root privileges](#ssswor-anchor)
+   1. [How to survive high latency connections](#hlc-anchor)
+   1. [Cool Linux commands](#cool-anchor) 
     
    
 
@@ -643,7 +643,7 @@ head -c 32 < /dev/urandom | base64 | tr -dc '[:alpha:]' | head -c 16
 ```
 
 <a id="crltefs-anchor"></a>
-**8.ii. Linux transportable encrypted filesystems - cryptsetup**
+**8.ii.a. Linux transportable encrypted filesystems - cryptsetup**
 
 Create a 256MB large encrypted file system. You will be prompted for a password.
 
@@ -670,7 +670,7 @@ cryptsetup close crypted
 losetup -d /dev/loop0
 ```
 <a id="crencfs-anchor"></a>
-**8.iii. Linux transportable encrypted filesystems - EncFS**
+**8.ii.b. Linux transportable encrypted filesystems - EncFS**
 
 Create ```.sec``` and store the encrypted data in ```.raw```:
 ```sh
@@ -684,7 +684,7 @@ fusermount -u .sec
 ```
 
 <a id="cref-anchor"></a>
-**8.iv Encrypting a file**
+**8.iii Encrypting a file**
 
 Encrypt your 0-Days and log files before transfering them - please. (and pick your own password):
 
