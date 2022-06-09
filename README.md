@@ -806,7 +806,9 @@ rlwrap ssh user@host
 <a id="useful-anchor"></a>
 **10.iv. Useful commands**
 
-Use ```lsof -Pni``` or ```netstat -antpu``` to list all Internet connections.
+Use ```lsof -Pni``` or ```netstat -antpu``` (or ```ss -antpu```) to list all Internet (_-tu_) connections.
+
+Use ```ss -lntp``` to show all listening (_-l_) TCP (_-t_) sockets.
 
 Use ```netstat -rn``` or ```ip route show``` to show default Internet route.
 
