@@ -68,6 +68,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 1. [Miscellaneous](#misc-anchor)
    1. [How to survive high latency connections](#hlc-anchor)
    1. [Cool Linux commands](#cool-anchor)
+   1. [tmux](#tmux-anchor)
    1. [Useful commands](#useful-anchor)  
     
    
@@ -800,8 +801,20 @@ rlwrap ssh user@host
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
 
+<a id="tmux-anchor"></a>
+**10.iii. tmux**
+
+| | Tmux Cheat Sheet |
+| --- | --- |
+| Save Scrollback | ```Ctrl+b``` + ```:```, then type ```capture-pane -S -``` followed by ```Ctrl+b``` + ```:``` and type ```save-buffer filename.txt```. |
+| Attach | Start a new tmux, then type ```Ctrl+b``` + ```s``` to select any session. |
+| Logging | ```Ctrl+b``` + ```Shift + P``` to start and stop. |
+| Menu | ```Ctrl+b``` + ```>```. Then use ```Ctrl+b``` + ```UP```, ```DOWN```, ```LEFT``` or ```RIGHT``` to move between the panes. |
+
+
+
 <a id="useful-anchor"></a>
-**10.iii. Useful commands**
+**10.iv. Useful commands**
 
 Use ```lsof -Pni``` or ```netstat -antpu``` to list all Internet connections.
 
