@@ -797,7 +797,7 @@ rlwrap ssh user@host
 | | Tmux Cheat Sheet |
 | --- | --- |
 | Save Scrollback | ```Ctrl+b``` + ```:```, then type ```capture-pane -S -``` followed by ```Ctrl+b``` + ```:``` and type ```save-buffer filename.txt```. |
-| Attach | Start a new tmux, then type ```Ctrl+b``` + ```s``` to select any session. |
+| Attach | Start a new tmux, then type ```Ctrl+b``` + ```s``` and use ```LEFT```, ```RIGHT``` to expand and select any session. |
 | Logging | ```Ctrl+b``` + ```Shift + P``` to start and stop. |
 | Menu | ```Ctrl+b``` + ```>```. Then use ```Ctrl+b``` + ```UP```, ```DOWN```, ```LEFT``` or ```RIGHT``` to move between the panes. |
 
