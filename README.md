@@ -211,10 +211,10 @@ dig +short myip.opendns.com @resolver1.opendns.com
 host myip.opendns.com resolver1.opendns.com
 ```
 
-Get more information about any IP address:
+Get geolocation information about any IP address:
 
 ```sh
-curl https://ipinfo.io/8.8.8.8
+curl https://ipinfo.io/8.8.8.8 | jq
 ```
 
 ---
