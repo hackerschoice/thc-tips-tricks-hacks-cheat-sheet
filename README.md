@@ -24,6 +24,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Monitor all new TCP connections](#mtc-anchor)
    1. [Alert on all new TCP connections](#atc-anchor)
    1. [Find your public IP address](#pip-anchor)
+   1. [Check reachability from around the world](#pingpe-anchor)
 1. [File Encoding and Transfer](#fe-anchor)
    1. [uuencode](#feu-anchor)
    1. [openssl](#feo-anchor)
@@ -216,6 +217,11 @@ Get geolocation information about any IP address:
 ```sh
 curl https://ipinfo.io/8.8.8.8 | jq
 ```
+
+<a id="pingpe-anchor"></a>
+**3.vi. Check reachability from around the world**
+
+The fine people at [https://ping.pe/](https://ping.pe/) let you ping a host from around the world, check TCP ports, resolve a domain name, ...and many other things.
 
 ---
 <a id="fe-anchor"></a>
