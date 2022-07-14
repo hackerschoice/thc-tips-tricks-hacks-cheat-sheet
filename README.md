@@ -218,6 +218,12 @@ Get geolocation information about any IP address:
 curl https://ipinfo.io/8.8.8.8 | jq
 ```
 
+Check if TOR is working:
+
+```sh
+curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.torproject.org/api/ip
+```
+
 <a id="pingpe-anchor"></a>
 **3.vi. Check reachability from around the world**
 
