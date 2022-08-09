@@ -68,6 +68,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [with SSH-IT](#sshit-anchor)
 1. [Miscellaneous](#misc-anchor)
    1. [How to survive high latency connections](#hlc-anchor)
+   1. [Intelligenc Gathering](#osint-anchor)
    1. [Cool Linux commands](#cool-anchor)
    1. [tmux](#tmux-anchor)
    1. [Useful commands](#useful-anchor)  
@@ -797,14 +798,19 @@ Example for *SSH*:
 ```sh
 rlwrap ssh user@host
 ```
+<a id="osint-anchor"></a>
+**10.ii. Intelligence Gathering**
+
+ 1. https://osint.sh
+ 
 <a id="cool-anchor"></a>
-**10.ii. Cool Linux commands**
+**10.iii. Cool Linux commands**
 
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
 
 <a id="tmux-anchor"></a>
-**10.iii. tmux**
+**10.iv. tmux**
 
 | | Tmux Cheat Sheet |
 | --- | --- |
@@ -816,7 +822,7 @@ rlwrap ssh user@host
 
 
 <a id="useful-anchor"></a>
-**10.iv. Useful commands**
+**10.v. Useful commands**
 
 Use ```lsof -Pni``` or ```netstat -antpu``` (or ```ss -antpu```) to list all Internet (_-tu_) connections.
 
