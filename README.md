@@ -802,6 +802,7 @@ rlwrap ssh user@host
 **10.ii. Intelligence Gathering**
 
  1. https://osint.sh
+ 1. https://archive.org/web/
  
 <a id="cool-anchor"></a>
 **10.iii. Cool Linux commands**
@@ -832,4 +833,4 @@ Use ```netstat -rn``` or ```ip route show``` to show default Internet route.
 
 
 ---
-Shoutz: ADM, Oscar2020
+Shoutz: ADM, subz/#9x
