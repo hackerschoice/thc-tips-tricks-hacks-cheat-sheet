@@ -25,6 +25,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Alert on all new TCP connections](#atc-anchor)
    1. [Find your public IP address](#pip-anchor)
    1. [Check reachability from around the world](#pingpe-anchor)
+   1. [Check Open Ports](#geo-anchor)
 1. [File Encoding and Transfer](#fe-anchor)
    1. [uuencode](#feu-anchor)
    1. [openssl](#feo-anchor)
@@ -229,6 +230,13 @@ curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.t
 **3.vi. Check reachability from around the world**
 
 The fine people at [https://ping.pe/](https://ping.pe/) let you ping a host from around the world, check TCP ports, resolve a domain name, ...and many other things.
+
+<a id="geo-anchor"></a>
+**3.vii. Check Open Ports on an IP**
+
+```shell
+curl https://internetdb.shodan.io/1.1.1.1
+```
 
 ---
 <a id="fe-anchor"></a>
@@ -801,9 +809,24 @@ rlwrap ssh user@host
 <a id="osint-anchor"></a>
 **10.ii. Intelligence Gathering**
 
- 1. https://osint.sh
- 1. https://archive.org/web/
- 
+| OSINT Hacker Tools ||
+| --- | --- |
+| https://osint.sh | Free. Subdomain Finder, DNS History, Public S3 Buckets, Reverse IP, Certificate Search and much more |
+| https://account.shodan.io/billing/tour | Open Port DB & DNS Lookup from around the world |
+| https://crt.sh/ | TLS Certificate Search |
+| https://archive.org/web/ | Historical view of websites |
+| https://www.farsightsecurity.com/solutions/dnsdb/ | DNS search (not free) |
+| https://wigle.net/ | Wireless Network Mapper |
+| https://radiocells.org/ | Cell Tower Informations |
+
+| OSINT for Detectives ||
+| --- | --- |
+| https://start.me/p/rx6Qj8/nixintel-s-osint-resource-list | Nixintel's OSINT Resource List |
+| https://github.com/jivoi/awesome-osint | Awesome OSINT list |
+| https://cipher387.github.io/osint_stuff_tool_collection/ | OSINT tools collection |
+| https://osintframework.com/ | Many OSINT tools |
+
+
 <a id="cool-anchor"></a>
 **10.iii. Cool Linux commands**
 
