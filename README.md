@@ -832,6 +832,11 @@ rlwrap ssh user@host
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
 
+Get TLDR help for any linux command. Example:
+```shell
+curl cheat.sh/tar
+```
+
 <a id="tmux-anchor"></a>
 **10.iv. tmux**
 
