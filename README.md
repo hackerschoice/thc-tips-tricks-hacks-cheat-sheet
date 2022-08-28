@@ -858,10 +858,7 @@ rlwrap ssh user@host
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
 
-Get TLDR help for any linux command. Example:
-```shell
-curl cheat.sh/tar
-```
+
 
 <a id="tmux-anchor"></a>
 **10.iv. tmux**
@@ -873,8 +870,6 @@ curl cheat.sh/tar
 | Logging | ```Ctrl+b``` + ```Shift + P``` to start and stop. |
 | Menu | ```Ctrl+b``` + ```>```. Then use ```Ctrl+b``` + ```UP```, ```DOWN```, ```LEFT``` or ```RIGHT``` to move between the panes. |
 
-
-
 <a id="useful-anchor"></a>
 **10.v. Useful commands**
 
@@ -884,6 +879,7 @@ Use ```ss -lntp``` to show all listening (_-l_) TCP (_-t_) sockets.
 
 Use ```netstat -rn``` or ```ip route show``` to show default Internet route.
 
+Use ```curl cheat.sh/tar``` to get TLDR help for tar. Works with any other linux command.
 
 ---
 Shoutz: ADM, subz/#9x
