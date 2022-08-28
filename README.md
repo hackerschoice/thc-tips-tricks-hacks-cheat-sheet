@@ -138,7 +138,7 @@ hide()
 }
 ```
 
-The use this to hide a command:
+To hide a command use:
 ```sh
 hide                                 # Hides the current shell/PID
 hide 31337                           # Hides process with pid 31337
