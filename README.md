@@ -124,7 +124,7 @@ Note: There is a gdb variant as well. Anyone?
 <a id="hide-a-process"></a>
 **1.iv. Hide a process**
 
-This requires ```root`` privileges and is an old Linux trick by over-mounting /proc/&lt;pid&gt; with a useless directory:
+This requires root privileges and is an old Linux trick by over-mounting /proc/&lt;pid&gt; with a useless directory:
 ```sh
 hide()
 {
