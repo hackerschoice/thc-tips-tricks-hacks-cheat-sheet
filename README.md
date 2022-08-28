@@ -133,7 +133,7 @@ hide()
     [[ $_pid =~ ^[0-9]+$ ]] && { mount -n --bind /dev/shm /proc/$_pid && echo "[THC] PID $_pid is now hidden"; return; }
     local _argstr
     for _x in "${@:2}"; do _argstr+=" '${_x//\'/\'\"\'\"\'}'"; done
-    [[ $(bash -c "ps -o etimes= -p \$PPID") -eq 0 ]] && exec bash -c "mount -n --bind /dev/shm /proc/\$\$; exec \"$1\" $_argstr"
+    [[ $(bash -c "ps -o stat= -p \$\$") =~ \+ ]] || exec bash -c "mount -n --bind /dev/shm /proc/\$\$; exec \"$1\" $_argstr"
     bash -c "mount -n --bind /dev/shm /proc/\$\$; exec \"$1\" $_argstr"
 }
 ```
@@ -145,6 +145,8 @@ hide 31337                           # Hides process with pid 31337
 hide sleep 1234                      # Hides 'sleep 1234'
 hide nohup sleep 1234 &>/dev/null &  # Starts and hides the hidden background process 'sleep 1234'
 ```
+
+(thanks to *druichi* for improving this)
 
 ---
 <a id="ais-anchor"></a>
