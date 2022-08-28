@@ -143,7 +143,7 @@ To hide a command use:
 hide                                 # Hides the current shell/PID
 hide 31337                           # Hides process with pid 31337
 hide sleep 1234                      # Hides 'sleep 1234'
-hide nohup sleep 1234 &>/dev/null &  # Starts and hides the hidden background process 'sleep 1234'
+hide nohup sleep 1234 &>/dev/null &  # Starts and hides 'sleep 1234' as a background process
 ```
 
 (thanks to *druichi* for improving this)
