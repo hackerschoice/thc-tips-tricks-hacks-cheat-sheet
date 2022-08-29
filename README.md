@@ -831,6 +831,7 @@ bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 | https://www.farsightsecurity.com/solutions/dnsdb/ | DNS search (not free) |
 | https://wigle.net/ | Wireless Network Mapper |
 | https://radiocells.org/ | Cell Tower Informations |
+| https://www.shodan.io/ | Search Engine to find devices & Banners (not free) |
 
 | OSINT for Detectives ||
 | --- | --- |
