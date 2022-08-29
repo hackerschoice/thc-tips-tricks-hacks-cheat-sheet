@@ -520,7 +520,7 @@ python -c 'import pty; pty.spawn("/bin/bash")'
 
 # Now Press Ctrl-Z to suspend the connection and return to your own terminal.
 # On your terminal execute:
-stty raw -echo; fg
+stty raw -echo opost; fg
 
 # On target host
 reset
