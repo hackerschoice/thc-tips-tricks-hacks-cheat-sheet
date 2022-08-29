@@ -847,6 +847,7 @@ Exploits
 1. https://www.exploit-db.com/ - Also includes metasploit db and google hacking db
 
 Backdoors
+1. https://www.gsocket.io/deploy - Our very own
 1. https://github.com/m0nad/Diamorphine - Linux Kernel Module for hiding processes and files
 
 Mass Scanners
