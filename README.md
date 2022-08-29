@@ -890,6 +890,8 @@ Use ```netstat -rn``` or ```ip route show``` to show default Internet route.
 
 Use ```curl cheat.sh/tar``` to get TLDR help for tar. Works with any other linux command.
 
+Use ```curl -fsSL bench.sh | bash``` to speed test a server.
+
 Hacking over long latency links or slow links can be frustrating. Every keystroke is transmitted one by one and any typo becomes so much more frustrating and time consuming to undo. *rlwrap* comes to the rescue. It buffers all single keystrokes until *Enter* is hit and then transmits the entire line at once. This makes it so much easier to type at high speed, correct typos, ...
 
 Example for the receiving end of a revese tunnel:
