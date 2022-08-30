@@ -848,6 +848,9 @@ Exploits
 1. https://www.exploit-db.com/ - Also includes metasploit db and google hacking db
 1. https://exploits.shodan.io/welcome - Similar to exploit-db
 
+System Information Gathering
+1. https://github.com/carlospolop/PEASS-ng/tree/master/linPEAS - Quick system informations for hackers.
+
 Backdoors
 1. https://www.gsocket.io/deploy - Our very own
 1. https://github.com/m0nad/Diamorphine - Linux Kernel Module for hiding processes and files
