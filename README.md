@@ -823,6 +823,7 @@ bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 
 | OSINT Hacker Tools ||
 | --- | --- |
+| https://github.com/ninoseki/mitaka | Chrome/Firefox extension. Collates information from MANY(!) OSINT providers into one place |
 | https://osint.sh | Free. Subdomain Finder, DNS History, Public S3 Buckets, Reverse IP, Certificate Search and much more |
 | https://account.shodan.io/billing/tour | Open Port DB & DNS Lookup from around the world |
 | https://dnsdumpster.com/ | Domain Recon Tool |
@@ -908,4 +909,4 @@ Example for *SSH*:
 rlwrap ssh user@host
 ```
 ---
-Shoutz: ADM, subz/#9x
+Shoutz: ADM, subz/#9x, Doctor Who
