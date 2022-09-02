@@ -901,12 +901,12 @@ Hacking over long latency links or slow links can be frustrating. Every keystrok
 
 Example for the receiving end of a revese tunnel:
 ```sh
-rlwrap nc -vnlp 1524
+rlwrap --always-readline nc -vnlp 1524
 ```
 
 Example for *SSH*:
 ```sh
-rlwrap ssh user@host
+rlwrap --always-readline ssh user@host
 ```
 ---
 Shoutz: ADM, subz/#9x, DrWho
