@@ -98,9 +98,12 @@ $  id
 <a id="hyc-anchor"></a>
 **1.ii. Hide your command**
 
-```sh
-(exec -a syslogd nmap -T0 10.0.2.1/24") # Note the '(' brackets ')'
-# or starting as a background process:
+```shell
+(exec -a syslogd nmap -T0 10.0.2.1/24") # Note the brackets '(' and ')'
+```
+
+Starting a background hidden process:
+```
 exec -a syslogd nmap -T0 10.0.2.1/24 &>nmap.log &
 ```
 
