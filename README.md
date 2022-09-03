@@ -152,7 +152,7 @@ hide nohup sleep 1234 &>/dev/null &  # Starts and hides 'sleep 1234' as a backgr
 <a id="hide-a-connection"></a>
 **1.v. Hide a Network Connection**
 
-The trick is to hijack `netstat` and use grep to filter out our connection. This example filters any connection on port 31337 _or_ ip 1.2.3.4. 
+The trick is to hijack `netstat` and use grep to filter out our connection. This example filters any connection on port 31337 _or_ ip 1.2.3.4. The same should be done for `ss` (a netstat alternative).
 
 **Method 1 - Hijacking with bash-function from ~/.bashrc**
 
