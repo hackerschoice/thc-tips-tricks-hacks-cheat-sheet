@@ -99,7 +99,7 @@ $  id
 **1.ii. Hide your command**
 
 ```shell
-(exec -a syslogd nmap -T0 10.0.2.1/24") # Note the brackets '(' and ')'
+(exec -a syslogd nmap -T0 10.0.2.1/24) # Note the brackets '(' and ')'
 ```
 
 Starting a background hidden process:
