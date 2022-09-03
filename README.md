@@ -99,7 +99,7 @@ $  id
 **1.ii. Hide your command**
 
 ```sh
-/bin/bash -c "exec -a syslogd nmap -T0 10.0.2.1/24"
+(exec -a syslogd nmap -T0 10.0.2.1/24") # Note the '(' brackets ')'
 # or starting as a background process:
 exec -a syslogd nmap -T0 10.0.2.1/24 &>nmap.log &
 ```
