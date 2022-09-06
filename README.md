@@ -922,6 +922,7 @@ Exploits
 
 System Information Gathering
 1. https://github.com/carlospolop/PEASS-ng/tree/master/linPEAS - Quick system informations for hackers.
+1. https://github.com/zMarch/Orc - Post-exploit tool to find local RCE (type `getexploit` after install)
 
 Backdoors
 1. https://www.gsocket.io/deploy - Our very own
