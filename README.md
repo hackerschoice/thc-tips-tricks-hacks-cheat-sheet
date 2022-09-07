@@ -71,7 +71,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [with SSH-IT](#sshit-anchor)
 1. [Miscellaneous](#misc-anchor)
    1. [OSINT Intelligence Gathering](#osint-anchor)
-   1. [Tools](#tools)
+   1. [Tools of the trade](#tools)
    1. [Cool Linux commands](#cool-anchor)
    1. [tmux](#tmux-anchor)
    1. [Useful commands](#useful-anchor)  
@@ -937,6 +937,9 @@ Mass Scanners
 Tools
 1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
 1. https://tmate.io/ - Share A screen with others
+
+Tunneling
+1. [ngrok](https://ngrok.com/download) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
 
  
 <a id="cool-anchor"></a>
