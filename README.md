@@ -928,6 +928,7 @@ System Information Gathering
 Backdoors
 1. https://www.gsocket.io/deploy - Our very own
 1. https://github.com/m0nad/Diamorphine - Linux Kernel Module for hiding processes and files
+1. https://www.kali.org/tools/weevely - PHP backdoor 
 
 Mass Scanners
 1. https://github.com/robertdavidgraham/masscan - Scan the entire Internet
