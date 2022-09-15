@@ -908,7 +908,7 @@ bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 **10.i. Find out Linux Distribution**
 
 ```sh
-uname -a; lsb-release -a; cat /etc/*release /etc/issue* /proc/version
+uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 ```
 
 <a id="osint-anchor"></a>
