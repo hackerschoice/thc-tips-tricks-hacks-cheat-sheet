@@ -916,8 +916,8 @@ uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 
 | OSINT Hacker Tools ||
 | --- | --- |
-| https://github.com/ninoseki/mitaka | Chrome/Firefox extension. Collates information from MANY(!) OSINT providers in one place |
 | https://osint.sh | Free. Subdomain Finder, DNS History, Public S3 Buckets, Reverse IP, Certificate Search and much more |
+| https://hackertarget.com/ip-tools/ | Free OSINT Service (Reverse IP, MTR, port scan, CMS scans, Vulnerability Scans, API support) |
 | https://account.shodan.io/billing/tour | Open Port DB & DNS Lookup from around the world |
 | https://dnsdumpster.com/ | Domain Recon Tool |
 | https://crt.sh/ | TLS Certificate Search |
