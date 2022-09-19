@@ -952,14 +952,19 @@ Backdoors
 1. https://github.com/m0nad/Diamorphine - Linux Kernel Module for hiding processes and files
 1. https://www.kali.org/tools/weevely - PHP backdoor 
 
-Mass Scanners
+Scanners
 1. https://github.com/robertdavidgraham/masscan - Scan the entire Internet
 1. https://github.com/ptrrkssn/pnscan - Fast network scanner
 1. https://zmap.io/ - ZMap & ZGrab
+1. https://github.com/fullhunt/ - log4j and spring4shell scanner 
 
 Tools
 1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
 1. https://tmate.io/ - Share A screen with others
+
+Callback
+1. http://dnslog.cn/
+1. http://interact.sh 
 
 Tunneling
 1. [ngrok](https://ngrok.com/download) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
