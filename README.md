@@ -962,9 +962,9 @@ Tools
 1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
 1. https://tmate.io/ - Share A screen with others
 
-Callback
+Callback / Command And Control
 1. http://dnslog.cn/
-1. http://interact.sh 
+1. http://interact.sh
 
 Tunneling
 1. [ngrok](https://ngrok.com/download) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
