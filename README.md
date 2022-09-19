@@ -963,8 +963,9 @@ Tools
 1. https://tmate.io/ - Share A screen with others
 
 Callback / Command And Control
-1. http://dnslog.cn/
+1. http://dnslog.cn
 1. http://interact.sh
+1. https://api.telegram.org
 
 Tunneling
 1. [ngrok](https://ngrok.com/download) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
