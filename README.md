@@ -937,6 +937,10 @@ uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 <a id="Tools"></a>
 **11.ii. Tools**
 
+Comms
+1. https://www.cs.email/ - Disposable emails (List of [Disposable-email-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-email-services])).
+1. https://quackr.io - Disposable SMS/text messages (List of [Disposable-SMS-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-SMS-services)).
+
 Exploits
 1. https://github.com/liamg/traitor - Tries various exploits/vulnerabilities to gain root (LPE)
 1. https://packetstormsecurity.com/ - Our favorite site ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
@@ -1019,4 +1023,4 @@ rlwrap --always-readline ssh user@host
 
 1. https://book.hacktricks.xyz/welcome/readme
 
-Shoutz: ADM, subz/#9x, DrWho
+Shoutz: ADM, subz/#9x, DrWho, spoty
