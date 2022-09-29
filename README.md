@@ -329,7 +329,7 @@ curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.t
 <a id="pingpe-anchor"></a>
 **3.vi. Check reachability from around the world**
 
-The fine people at [https://ping.pe/](https://ping.pe/) let you ping a host from around the world, check TCP ports, resolve a domain name, ...and many other things.
+The fine people at [https://ping.pe/](https://ping.pe/) let you ping/traceroute/mtr/dig/port-check a host from around the world, check TCP ports, resolve a domain name, ...and many other things.
 
 <a id="geo-anchor"></a>
 **3.vii. Check Open Ports on an IP**
