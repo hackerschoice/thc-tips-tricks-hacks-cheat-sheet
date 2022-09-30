@@ -320,6 +320,14 @@ Get geolocation information about any IP address:
 curl https://ipinfo.io/8.8.8.8 | jq
 ```
 
+```
+curl http://ip-api.com/8.8.8.8
+```
+
+```
+curl https://cli.fyi/8.8.8.8
+```
+
 Check if TOR is working:
 
 ```sh
@@ -917,6 +925,7 @@ uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 | OSINT Hacker Tools ||
 | --- | --- |
 | https://osint.sh | Free. Subdomain Finder, DNS History, Public S3 Buckets, Reverse IP, Certificate Search and much more |
+| https://cli.fyi | Free. curl/json interface to many services. Try `curl cli.fyi/me` or `curl cli.fyi/thc.org`. |
 | https://hackertarget.com/ip-tools/ | Free OSINT Service (Reverse IP, MTR, port scan, CMS scans, Vulnerability Scans, API support) |
 | https://account.shodan.io/billing/tour | Open Port DB & DNS Lookup from around the world |
 | https://dnsdumpster.com/ | Domain Recon Tool |
