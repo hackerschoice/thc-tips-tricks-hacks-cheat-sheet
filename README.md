@@ -1032,5 +1032,6 @@ rlwrap --always-readline ssh user@host
 ## 12. Other Sites
 
 1. https://book.hacktricks.xyz/welcome/readme
+1. https://github.com/yeyintminthuhtut/Awesome-Red-Teaming
 
 Shoutz: ADM, subz/#9x, DrWho, spoty
