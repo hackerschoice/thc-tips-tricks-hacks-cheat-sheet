@@ -89,7 +89,11 @@ Tell Bash to use */dev/null* instead of *~/.bash_history*. This is the first com
 
 ```sh
 export HISTFILE=/dev/null
+unset SSH_CONNECTION
+unset SSH_CLIENT
 ```
+
+(We also clear SSH_* variables in case we logged in with SSH. Otherwise any process we start gets a copy of our IP in /proc/self/environ.)
 
 It is good housekeeping to 'commit suicide' when exiting a shell:
 ```sh
