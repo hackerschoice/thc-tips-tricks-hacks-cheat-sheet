@@ -1010,6 +1010,8 @@ Tunneling
 1. [TCP Gender Changer](https://tgcd.sourceforge.net/) for all your 'connect back' needs.
 1. [ngrok](https://ngrok.com/download) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
 
+Mindmaps
+1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
  
 <a id="cool-anchor"></a>
 **12.iii. Cool Linux commands**
