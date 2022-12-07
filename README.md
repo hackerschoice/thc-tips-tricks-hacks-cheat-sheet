@@ -1069,6 +1069,7 @@ rlwrap --always-readline ssh user@host
 
 1. [Hacking HackingTeam - a HackBack](https://gist.github.com/jaredsburrows/9e121d2e5f1147ab12a696cf548b90b0) - Old but real talent at work.
 1. https://book.hacktricks.xyz/welcome/readme
+1. https://github.com/Z4nzu/hackingtool
 1. https://github.com/yeyintminthuhtut/Awesome-Red-Teaming
 
 ---
