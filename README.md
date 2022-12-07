@@ -938,9 +938,10 @@ Trusted VPN Providers
 
 Virtual Private Servers
 1. https://1984.hosting/ - Privacy
-1. https://bithost.io/ - Pay by bitcoin
+1. https://bithost.io/ - Pay with Crypto
 1. https://buyvm.net/ - Warez best friends
 1. https://www.hetzner.com/ - Cheap
+1. https://www.privatelayer.com/ - Pay with Crypto. Swiss based.
 
 ---
 <a id="post-hack"></a>
