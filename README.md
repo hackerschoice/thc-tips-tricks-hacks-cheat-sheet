@@ -71,7 +71,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [with SSH-IT](#sshit-anchor)
 1. [VPN and Shells](#shell)
    1. [Disposable Root Servers](#shell)
-   1. [VPN Providers](#vpn)
+   1. [VPN/VPS Providers](#vpn)
 1. [Post Compromise](#post-hack)
    1. [Find out Linux Distribution](#post-hack)
 1. [Miscellaneous](#misc-anchor)
@@ -930,10 +930,17 @@ $ ssh root@segfault.net # Use password 'segfault'
 https://thc.org/segfault
 
 <a id="vpn"></a>
-**10.ii. VPN**
+**10.ii. VPN/VPS**
 
+Trusted VPN Providers
 1. https://www.mullvad.net
 1. https://www.cryptostorm.is
+
+Virtual Private Servers
+1. https://1984.hosting/ - Privacy
+1. https://bithost.io/ - Pay by bitcoin
+1. https://buyvm.net/ - Warez best friends
+1. https://www.hetzner.com/ - Cheap
 
 ---
 <a id="post-hack"></a>
