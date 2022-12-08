@@ -937,11 +937,13 @@ Trusted VPN Providers
 1. https://www.cryptostorm.is
 
 Virtual Private Servers
-1. https://1984.hosting/ - Privacy
-1. https://bithost.io/ - Pay with Crypto
-1. https://buyvm.net/ - Warez best friends
-1. https://www.hetzner.com/ - Cheap
-1. https://www.privatelayer.com/ - Pay with Crypto. Swiss based.
+1. https://www.hetzner.com - Cheap
+1. https://dmzhost.co - Ignore most abuse requests
+1. https://buyvm.net - Warez best friend
+1. https://serverius.net - Used by gangsters
+1. https://1984.hosting - Privacy
+1. https://bithost.io - Reseller for DigitalOcean, Linode, Hetzner and Vultr (accepts Crypto)
+1. https://www.privatelayer.com - Swiss based.
 
 ---
 <a id="post-hack"></a>
