@@ -945,6 +945,10 @@ Virtual Private Servers
 1. https://bithost.io - Reseller for DigitalOcean, Linode, Hetzner and Vultr (accepts Crypto)
 1. https://www.privatelayer.com - Swiss based.
 
+Many other services (for free)  
+1. https://free-for.dev/
+
+
 ---
 <a id="post-hack"></a>
 **11.i. Find out Linux Distribution**
