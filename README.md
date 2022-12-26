@@ -791,7 +791,7 @@ head -c 32 < /dev/urandom | xxd -p -c 32
 or make it alpha-numeric
 
 ```sh
-head -c 32 < /dev/urandom | base64 | tr -dc '[:alpha:]' | head -c 16
+head -c 32 < /dev/urandom | base64 | tr -dc '[:alnum:]' | head -c 16
 ```
 
 <a id="crltefs-anchor"></a>
