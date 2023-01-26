@@ -246,6 +246,8 @@ ssh -g -L31337:1.2.3.4:80 user@server.org
 ```
 You or anyone else can now connect to your computer on port 31337 and get tunneled to 1.2.3.4 port 80 and appear with the source IP of 'server.org'. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
 
+Clever hackers use the keyboard combination `~C` to dynamically create these tunnels without having to reconnect the SSH. (thanks MessedeDegod).
+
 <a id="sti-anchor"></a>
 **2.iii SSH tunnel IN**
 
