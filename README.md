@@ -1031,9 +1031,10 @@ Tunneling
 1. [TCP Gender Changer](https://tgcd.sourceforge.net/) for all your 'connect back' needs.
 1. [ngrok](https://ngrok.com/download), [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
 
-Mindmaps
+Mindmaps & Knowledge
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
- 
+1. [Z Library](https://singlelogin.me)/[Z Library on TOR](http://bookszlibb74ugqojhzhg2a63w5i2atv5bqarulgczawnbmsb6s6qead.onion/)
+
 <a id="cool-anchor"></a>
 **12.iii. Cool Linux commands**
 
