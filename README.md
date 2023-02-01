@@ -984,6 +984,11 @@ uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 | https://cipher387.github.io/osint_stuff_tool_collection/ | OSINT tools collection |
 | https://osintframework.com/ | Many OSINT tools |
 
+| OSINT Databases ||
+| --- | --- |
+| http://breached65xqh64s7xbkvqgg7bmj4nj7656hcb7x4g42x753r7zmejqd.onion/ | Live Data Breach information |
+| https://data.ddosecrets.com/ | Database Dumps
+
 <a id="Tools"></a>
 **12.ii. Tools**
 
@@ -1024,7 +1029,7 @@ Callback / Command And Control
 
 Tunneling
 1. [TCP Gender Changer](https://tgcd.sourceforge.net/) for all your 'connect back' needs.
-1. [ngrok](https://ngrok.com/download) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
+1. [ngrok](https://ngrok.com/download), [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
 
 Mindmaps
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
