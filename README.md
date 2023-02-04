@@ -1082,8 +1082,10 @@ rlwrap --always-readline ssh user@host
 ## 13. Other Sites
 
 1. [Hacking HackingTeam - a HackBack](https://gist.github.com/jaredsburrows/9e121d2e5f1147ab12a696cf548b90b0) - Old but real talent at work.
+1. [Conti Leak](https://github.com/ForbiddenProgrammer/conti-pentester-guide-leak) - Windows hacking. Pragmatic.
 1. https://book.hacktricks.xyz/welcome/readme
 1. https://github.com/yeyintminthuhtut/Awesome-Red-Teaming
+
 
 ---
 Shoutz: ADM, subz/#9x, DrWho, spoty
