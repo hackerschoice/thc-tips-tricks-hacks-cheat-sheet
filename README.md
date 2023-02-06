@@ -291,12 +291,13 @@ ssh_j()
 	local pw
 	pw=$1
 	[[ -z $pwd ]] && { pw=$(head -c32 </dev/urandom | base64); pw=${pw:0:12}; }
+	echo "Press Ctrl-C to stop this tunnel."
 	echo -e "To connect to this host: \e[0;36mssh -J ${pw,,}@ssh-j.com root@${pw,,}\e[0m"
 	ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 ${pw,,}@ssh-j.com -N -R ${pw,,}:22:${2:-0}:${3:-22}
 }
 ```
 ```sh
-ssh_j  # This will generate a random tunnel ID [e.g. 5dmxf27tl4kx]
+ssh_j  # Generates a random tunnel ID [e.g. 5dmxf27tl4kx] and keeps the tunnel connected.
 ```
 
 Then use this command from anywhere else in the world to connect as 'root' to '5dmxf27tl4kx' (the host behind the NAT):
