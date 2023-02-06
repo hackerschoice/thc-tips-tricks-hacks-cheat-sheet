@@ -20,6 +20,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [SSH tunnel IN](#sti-anchor)
    1. [SSH socks5 OUT](#sso-anchor)
    1. [SSH socks5 IN](#ssi-anchor)
+   1. [SSH to NATed host](#ssh-j) 
 1. [Network](#network-anchor)
    1. [ARP discover computers on the local network](#adln-anchor)
    1. [ICMP discover local network](#idln-anchor)
@@ -277,6 +278,31 @@ ssh -g -R 1080 user@server.org
 ```
 
 The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computer on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
+
+<a id="ssh-j"></a>
+**2.vi SSH to a host behind NAT**
+
+[ssh-j.com](http://ssh-j.com) provides a great relay service: To access a host behind NAT/Firewall (via SSH).
+
+On the host behind NAT: Create a reverse SSH tunnel to [ssh-j.com](http://ssh-j.com):
+```sh
+ssh_j()
+{
+	[[ -z $1 ]] && { echo "ssh_j [anyrandomname]"; return; }
+	echo "To connect to this host: ssh -J ${1,,}@ssh-j.com ${1,,}"
+	ssh -o StrictHostKeyChecking=no ${1,,}@ssh-j.com -N -R ${1,,}:22:127.0.0.1:22
+}
+```
+```sh
+ssh_j BlahAnyName
+```
+
+Then log in to 'BlahAnyName' (the host behind NAT) from anywhere else in the world:
+```sh
+ssh -J blahanyname@ssh-j.com blahanyname
+```
+
+This command connects to ssh-j.com first and then 'jumps' into the reverse channel. The traffic is end-2-end encrypted and ssh-j.com can not see the content.
 
 ---
 <a id="network-anchor"></a>
