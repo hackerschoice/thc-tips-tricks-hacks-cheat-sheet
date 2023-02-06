@@ -284,25 +284,26 @@ The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now con
 
 [ssh-j.com](http://ssh-j.com) provides a great relay service: To access a host behind NAT/Firewall (via SSH).
 
-On the host behind NAT: Create a reverse SSH tunnel to [ssh-j.com](http://ssh-j.com):
+On the host behind NAT: Create a reverse SSH tunnel to [ssh-j.com](http://ssh-j.com) like so:
 ```sh
 ssh_j()
 {
-	[[ -z $1 ]] && { echo "ssh_j [anyrandomname]"; return; }
-	echo "To connect to this host: ssh -J ${1,,}@ssh-j.com ${1,,}"
-	ssh -o StrictHostKeyChecking=no ${1,,}@ssh-j.com -N -R ${1,,}:22:127.0.0.1:22
+	local pw
+	pw=$1
+	[[ -z $pwd ]] && { pw=$(head -c32 </dev/urandom | base64); pw=${pw:0:12}; }
+	echo -e "To connect to this host: \e[0;36mssh -J ${pw,,}@ssh-j.com root@${pw,,}\e[0m"
+	ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 ${pw,,}@ssh-j.com -N -R ${pw,,}:22:${2:-0}:${3:-22}
 }
 ```
 ```sh
-ssh_j BlahAnyName
+ssh_j  # This will generate a random tunnel ID [e.g. 5dmxf27tl4kx]
 ```
 
-Then log in to 'BlahAnyName' (the host behind NAT) from anywhere else in the world:
+Then use this command from anywhere else in the world to connect as 'root' to '5dmxf27tl4kx' (the host behind the NAT):
 ```sh
-ssh -J blahanyname@ssh-j.com blahanyname
+ssh -J 5dmxf27tl4kx@ssh-j.com root@5dmxf27tl4kx
 ```
-
-This command connects to ssh-j.com first and then 'jumps' into the reverse channel. The traffic is end-2-end encrypted and ssh-j.com can not see the content.
+The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind NAT. The traffic is end-2-end encrypted and ssh-j.com can not see the content.
 
 ---
 <a id="network-anchor"></a>
