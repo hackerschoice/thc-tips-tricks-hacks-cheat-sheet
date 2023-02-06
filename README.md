@@ -292,7 +292,7 @@ ssh_j()
 	pw=$1
 	[[ -z $pwd ]] && { pw=$(head -c32 </dev/urandom | base64); pw=${pw:0:12}; }
 	echo "Press Ctrl-C to stop this tunnel."
-	echo -e "To connect to this host: \e[0;36mssh -J ${pw,,}@ssh-j.com root@${pw,,}\e[0m"
+	echo -e "To connect to this host: \e[0;36mssh -J ${pw,,}@ssh-j.com ${USER:-root}@${pw,,}\e[0m"
 	ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 ${pw,,}@ssh-j.com -N -R ${pw,,}:22:${2:-0}:${3:-22}
 }
 ```
