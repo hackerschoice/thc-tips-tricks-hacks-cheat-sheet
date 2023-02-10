@@ -1036,7 +1036,7 @@ System Information Gathering
 1. https://github.com/zMarch/Orc - Post-exploit tool to find local RCE (type `getexploit` after install)
 
 Backdoors
-1. https://www.gsocket.io/deploy - Our very own
+1. https://www.gsocket.io/deploy - The world's smallest backdoor
 1. https://github.com/m0nad/Diamorphine - Linux Kernel Module for hiding processes and files
 1. https://www.kali.org/tools/weevely - PHP backdoor 
 
@@ -1058,6 +1058,10 @@ Callback / Command And Control
 Tunneling
 1. [TCP Gender Changer](https://tgcd.sourceforge.net/) for all your 'connect back' needs.
 1. [ngrok](https://ngrok.com/download), [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
+
+Publishing
+1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
+1. Or use /onion on [segfault.net](https://www.thc.org/segfault) or plain old https with ngrok.
 
 Mindmaps & Knowledge
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
