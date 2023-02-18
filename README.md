@@ -960,7 +960,7 @@ $ ssh root@segfault.net # Use password 'segfault'
 https://thc.org/segfault
 
 <a id="vpn"></a>
-**10.ii. VPN/VPS**
+**10.ii. VPN/VPS/Proxies**
 
 Trusted VPN Providers
 1. https://www.mullvad.net
@@ -974,6 +974,13 @@ Virtual Private Servers
 1. https://1984.hosting - Privacy
 1. https://bithost.io - Reseller for DigitalOcean, Linode, Hetzner and Vultr (accepts Crypto)
 1. https://www.privatelayer.com - Swiss based.
+
+Proxies (we dont use any of those)
+1. [proxyscrape.com](https://api.proxyscrape.com/v2/?request=displayproxies&protocol=all&timeout=750&country=all)
+1. [my-proxy.com](https://www.my-proxy.com)
+1. [getfreeproxylists.blogspot.com](https://getfreeproxylists.blogspot.com/)
+1. [proxypedia.org](https://proxypedia.org/)
+1. [socks-proxy.net](https://socks-proxy.net/)
 
 Many other services (for free)  
 1. https://free-for.dev/
