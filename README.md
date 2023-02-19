@@ -290,14 +290,16 @@ ssh_j()
 {
 	local pw
 	pw=$1
-	[[ -z $pwd ]] && { pw=$(head -c32 </dev/urandom | base64); pw=${pw:0:12}; }
+	[[ -z "$pw" ]] && { pw=$(head -c32 </dev/urandom | base64 | sed -e 's/[+=/]//g' -e 's/\(.*\)/\L\1/'); pw=${pw:0:12}; }
 	echo "Press Ctrl-C to stop this tunnel."
-	echo -e "To connect to this host: \e[0;36mssh -J ${pw,,}@ssh-j.com ${USER:-root}@${pw,,}\e[0m"
-	ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 ${pw,,}@ssh-j.com -N -R ${pw,,}:22:${2:-0}:${3:-22}
+	echo -e "To connect to this host: \e[0;36mssh -J ${pw}@ssh-j.com ${USER:-root}@${pw}\e[0m"
+	ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes ${pw}@ssh-j.com -N -R ${pw}:22:${2:-0}:${3:-22}
 }
 ```
 ```sh
-ssh_j  # Generates a random tunnel ID [e.g. 5dmxf27tl4kx] and keeps the tunnel connected.
+ssh_j                          # Generates a random tunnel ID [e.g. 5dmxf27tl4kx] to localhost:22 and keeps the tunnel connected.
+ssh_j myhost                   # Creates tunnel with `myhost` hostname and username to localhost:22
+ssh_j anotherhost 192.168.1.1  # Tunnel to some other host in LAN
 ```
 
 Then use this command from anywhere else in the world to connect as 'root' to '5dmxf27tl4kx' (the host behind the NAT):
