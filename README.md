@@ -28,7 +28,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Find your public IP address](#your-ip)
    1. [Check reachability from around the world](#check-reachable)
    1. [Check Open Ports](#check-open-ports)
-   1. [Brute Force](#bruteforce)
+   1. [Brute Force Password Cracking](#bruteforce)
 1. [File Encoding and Transfer](#file-encoding)
    1. [uuencode](#uuencode)
    1. [openssl](#file-encoding-openssl)
@@ -382,7 +382,7 @@ curl https://internetdb.shodan.io/1.1.1.1
 ```
 
 <a id="bruteforce"></a>
-**3.viii. Brute Force Password**
+**3.viii. Brute Force Password Cracking**
 
 (This list is curated by Joey (?))
 
