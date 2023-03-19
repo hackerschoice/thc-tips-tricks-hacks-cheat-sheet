@@ -393,7 +393,7 @@ ssh root@segfaul.net # password is 'segfault'
 (You may want to use your [own EXIT node](https://www.thc.org/segfault/wireguard))
 
 Tools:
-* [Ncrack](https://nmap.org/ncrack/)
+* [Ncrack](https://nmap.org/ncrack/man.html)
 * [Nmap BRUTE](https://nmap.org/nsedoc/categories/brute.html)
 * [THC Hydra](https://sectools.org/tool/hydra/)
 * [Medusa](https://www.geeksforgeeks.org/password-cracking-with-medusa-in-linux/) / [docs](http://foofus.net/goons/jmk/medusa/medusa.html)
