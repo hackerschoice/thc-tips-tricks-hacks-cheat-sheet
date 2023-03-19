@@ -396,7 +396,7 @@ Tools:
 * [Ncrack](https://nmap.org/ncrack/)
 * [Nmap BRUTE](https://nmap.org/nsedoc/categories/brute.html)
 * [THC Hydra](https://sectools.org/tool/hydra/)
-* [Medusa](http://foofus.net/goons/jmk/medusa/medusa.html)
+* [Medusa](https://www.geeksforgeeks.org/password-cracking-with-medusa-in-linux/) / [docs](http://foofus.net/goons/jmk/medusa/medusa.html)
 * [Metasploit](https://docs.rapid7.com/metasploit/bruteforce-attacks/)
 
 Username & Password lists:
@@ -484,7 +484,7 @@ nmap --script smb-brute "$T"
 
 ```shell
 ## Telnet
-nmap -p23 --script --script-args telnet-brute.timeout=8s telnet-brute "$T"
+nmap -p23 --script telnet-brute --script-args telnet-brute.timeout=8s "$T"
 ```
 
 ```shell
@@ -496,12 +496,12 @@ medusa -P "${PLIST}" –u root –M vnc -h "$T"
 ```
 
 ```shell
-## Brute Force VNC with metasploit
+## VNC (with metasploit)
 msfconsole
 use auxiliary/scanner/vnc/vnc_login
-msf auxiliary(scanner/vnc/vnc_login) > set rhosts 192.168.0.1
-msf auxiliary(scanner/vnc/vnc_login) > set pass_file /usr/share/wordlists/seclists/Passwords/500-worst-passwords.txt
-msf auxiliary(scanner/vnc/vnc_login) > run
+set rhosts 192.168.0.1
+set pass_file /usr/share/wordlists/seclists/Passwords/500-worst-passwords.txt
+run
 ```
 
 ---
