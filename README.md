@@ -386,6 +386,12 @@ curl https://internetdb.shodan.io/1.1.1.1
 
 (This list is curated by Joey (?))
 
+All tools are pre-installed on segfault:
+```shell
+ssh root@segfaul.net # password is 'segfault'
+```
+(You may want to use your [own EXIT node](https://www.thc.org/segfault/wireguard))
+
 Tools:
 * [Ncrack](https://nmap.org/ncrack/)
 * [Nmap BRUTE](https://nmap.org/nsedoc/categories/brute.html)
