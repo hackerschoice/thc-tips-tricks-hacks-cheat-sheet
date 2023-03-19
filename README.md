@@ -862,7 +862,13 @@ shred -z foobar.txt
 <a id="shred-without-shred"></a>
 **7.ii. Shred & Erase without *shred***
 ```sh
-FN=foobar.txt; dd bs=1k count="`du -sk \"${FN}\" | cut -f1`" if=/dev/urandom >"${FN}"; rm -f "${FN}"
+shred()
+{
+    [[ -z $1 || ! -f "$1" ]] && { echo >&2 "shred [FILE]"; return 255; }
+    dd bs=1k count=$(du -sk ${1:?} | cut -f1) if=/dev/urandom >"$1"
+    rm -f "${1:?}"
+}
+shred foobar.txt
 ```
 Note: Or deploy your files in */dev/shm* directory so that no data is written to the harddrive. Data will be deleted on reboot.
 
