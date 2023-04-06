@@ -784,9 +784,8 @@ stty raw -echo opost; fg
 
 # On target host
 reset
-export SHELL=bash
+export SHELL=/bin/bash
 export TERM=xterm-256color
-unset HISTFILE
 stty rows 24 columns 80
 PS1='\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]# ' # Pimp up your prompt
 ```
