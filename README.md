@@ -308,21 +308,19 @@ The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind
 SSH ProxyJump trick can save you a lot of time and hassle when working with remote servers. Let's assume the scenario as below.
 We have $local-kali behind NAT, we want to ssh into $target-host without interactively login to each intermediary servers. 
 The route is; we can SSH to C2, the C2 can SSH to internal-jumphost via internal IP(eth1) and internal-jumphost can SSH to target-host via eth2.
-```
+```sh
           $local-kali       -> $C2            -> $internal-jumphost    -> $target-host
 eth0      192.168.8.160      10.25.237.119             
 eth1                         192.168.5.130       192.168.5.135
 eth2                                             172.16.2.120             172.16.2.121
 ```
-``` 
-# if we want to SSH to $target-host:
+```sh 
+## if we want to SSH to $target-host:
 kali@local-kali$ ssh -J c2@10.25.237.119:22,jumpuser@192.168.5.135:22 target@172.16.2.121
 
-# if we want to SSH to $internal-jumphost:
+## if we want to SSH to $internal-jumphost:
 kali@local-kali$ ssh -J c2@10.25.237.119:22 jumpuser@192.168.5.135:22
 ```
-
-
 
 ---
 <a id="network"></a>
