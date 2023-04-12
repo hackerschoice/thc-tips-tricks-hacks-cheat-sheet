@@ -401,6 +401,14 @@ curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.t
 
 The fine people at [https://ping.pe/](https://ping.pe/) let you ping/traceroute/mtr/dig/port-check a host from around the world, check TCP ports, resolve a domain name, ...and many other things.
 
+To check how well your (current) host can reach Internet use [OONI Probe](https://ooni.org/support/ooni-probe-cli):
+```sh
+ooniprobe run im
+ooniprobe run websites
+ooniprobe list
+ooniprobe list 1
+```
+
 <a id="check-open-ports"></a>
 **3.vii. Check Open Ports on an IP**
 
