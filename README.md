@@ -24,6 +24,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Discover hosts](#discover)
    1. [Tcpdump](#tcpdump)
    1. [Tunnel and forwarding](#tunnel)
+   1. [Use any tool via Socks Proxy](#scan-proxy)
    1. [Find your public IP address](#your-ip)
    1. [Check reachability from around the world](#check-reachable)
    1. [Check Open Ports](#check-open-ports)
@@ -346,8 +347,34 @@ openssl s_client -connect smtp.gmail.com:465
 socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 ```
 
+<a id="scan-proxy"></a>
+**3.iv. Use any tool via Socks Proxy**
+
+On the target's network:
+```sh
+## Create a SOCKS proxy into the target's network.
+## Use gs-netcat but ssh -D would work as well.
+gs-netcat -l -S
+```
+
+On your workstation:
+```sh
+## Create a gsocket tunnel into the target's network:
+gs-netcat -p 1080
+```
+
+```sh
+## Use ProxyChain to access any host on the target's network: 
+echo -e "[ProxyList]\nsocks5 127.0.0.1 1080" >pc.conf
+proxychain -f pc.conf -q curl ipinfo.io
+## Scan the router at 192.168.1.1
+proxychain -f pc.conf -q nmap -n -Pn -sT -F --open --script=banner 192.168.1.1
+## Start 10 nmaps in parallel:
+seq 1 254 | xargs -P10 -I{} proxychains -f pc.conf -q nmap -n -Pn -sT -F --open --script=banner --script-timeout=5s 192.168.1.{} 
+```
+
 <a id="your-ip"></a>
-**3.iv. Find your public IP address**
+**3.v. Find your public IP address**
 
 ```sh
 curl ifconfig.me
@@ -370,12 +397,12 @@ curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.t
 ```
 
 <a id="check-reachable"></a>
-**3.v. Check reachability from around the world**
+**3.vi. Check reachability from around the world**
 
 The fine people at [https://ping.pe/](https://ping.pe/) let you ping/traceroute/mtr/dig/port-check a host from around the world, check TCP ports, resolve a domain name, ...and many other things.
 
 <a id="check-open-ports"></a>
-**3.vi. Check Open Ports on an IP**
+**3.vii. Check Open Ports on an IP**
 
 ```shell
 curl https://internetdb.shodan.io/1.1.1.1
