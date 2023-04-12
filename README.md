@@ -20,6 +20,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [SSH tunnel](#ssh-tunnel)
    1. [SSH socks5 tunnel](#ssh-socks-tunnel)
    1. [SSH to NATed host](#ssh-j) 
+   1. [SSH pivot via ProxyJump](#ssh-pj)
 1. [Network](#network)
    1. [Discover hosts](#discover)
    1. [Tcpdump](#tcpdump)
@@ -300,6 +301,28 @@ Then use this command from anywhere else in the world to connect as 'root' to '5
 ssh -J 5dmxf27tl4kx@ssh-j.com root@5dmxf27tl4kx
 ```
 The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind NAT. The traffic is end-2-end encrypted and ssh-j.com can not see the content.
+
+<a id="ssh-pj"></a>
+**2.v SSH pivoting to multiple servers**
+
+SSH ProxyJump trick can save you a lot of time and hassle when working with remote servers. Let's assume the scenario as below.
+We have $local-kali behind NAT, we want to ssh into $target-host without interactively login to each intermediary servers. 
+The route is; we can SSH to C2, the C2 can SSH to internal-jumphost via internal IP(eth1) and internal-jumphost can SSH to target-host via eth2.
+```
+          $local-kali       -> $C2            -> $internal-jumphost    -> $target-host
+eth0      192.168.8.160     10.25.237.119             
+eth1                        192.168.5.130       192.168.5.135
+eth2                                            172.16.2.120              172.16.2.121
+```
+``` 
+# if we want to SSH to $target-host:
+kali@local-kali$ ssh -J c2@10.25.237.119:22,jumpuser@192.168.5.135:22 target@172.16.2.121
+
+# if we want to SSH to $internal-jumphost:
+kali@local-kali$ ssh -J c2@10.25.237.119:22 jumpuser@192.168.5.135:22
+```
+
+
 
 ---
 <a id="network"></a>
