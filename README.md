@@ -347,6 +347,8 @@ openssl s_client -connect smtp.gmail.com:465
 socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 ```
 
+More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvesec/port-forwarding).
+
 <a id="scan-proxy"></a>
 **3.iv. Use any tool via Socks Proxy**
 
