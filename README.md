@@ -310,9 +310,9 @@ We have $local-kali behind NAT, we want to ssh into $target-host without interac
 The route is; we can SSH to C2, the C2 can SSH to internal-jumphost via internal IP(eth1) and internal-jumphost can SSH to target-host via eth2.
 ```
           $local-kali       -> $C2            -> $internal-jumphost    -> $target-host
-eth0      192.168.8.160     10.25.237.119             
-eth1                        192.168.5.130       192.168.5.135
-eth2                                            172.16.2.120              172.16.2.121
+eth0      192.168.8.160      10.25.237.119             
+eth1                         192.168.5.130       192.168.5.135
+eth2                                             172.16.2.120             172.16.2.121
 ```
 ``` 
 # if we want to SSH to $target-host:
