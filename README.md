@@ -459,18 +459,18 @@ PLIST="/usr/share/wordlists/seclists/Passwords/500-worst-passwords.txt"
 T="192.168.0.1"
 ```
 
-Userful **Nmap** parameters:
+Useful **Nmap** parameters:
 ```shell
 --script-args userdb="${ULIST}",passdb="${PLIST}",brute.firstOnly
 ```
 
-Userful **Ncrack** parameters:
+Useful **Ncrack** parameters:
 ```shell
 -U "${ULIST}"
 -P "${PLIST}"
 ```
 
-Userful **Hydra** parameters:
+Useful **Hydra** parameters:
 ```shell
 -t4      # Limit to 4 tasks
 -l root  # Set username
