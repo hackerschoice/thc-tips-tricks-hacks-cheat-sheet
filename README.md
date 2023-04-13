@@ -305,15 +305,20 @@ The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind
 <a id="ssh-pj"></a>
 **2.v SSH pivoting to multiple servers**
 
-SSH ProxyJump trick can save you a lot of time and hassle when working with remote servers. Let's assume the scenario as below.
-We have $local-kali behind NAT, we want to ssh into $target-host without interactively login to each intermediary servers. 
-The route is; we can SSH to C2, the C2 can SSH to internal-jumphost via internal IP(eth1) and internal-jumphost can SSH to target-host via eth2.
+SSH ProxyJump can save you a lot of time and hassle when working with remote servers. Let's assume the scenario:  
+
+Our workstation is $local-kali and we like to SSH into $target-host. There is no direct connection between our workstation and $target-host. Our workstation can only reach $C2. $C2 can reach $internal-jumphost (via internal eth1) and $internal-jumphost can reach the final $target-host via eth2.
 ```sh
           $local-kali       -> $C2            -> $internal-jumphost    -> $target-host
 eth0      192.168.8.160      10.25.237.119             
 eth1                         192.168.5.130       192.168.5.135
 eth2                                             172.16.2.120             172.16.2.121
 ```
+
+> We do not execute `ssh` on any computer but our trusted workstation - and neither shall you (ever).
+
+That's where ProxyJump helps: We can 'jump' via the intermediary servers $C2 and $internal-jumphost without spawning a shell on those servers. The ssh-connection is end-2-end encrypted between our $local-kali and $target-host and no password or key is exposed to $C2 or $internal-jumphost.
+
 ```sh 
 ## if we want to SSH to $target-host:
 kali@local-kali$ ssh -J c2@10.25.237.119:22,jumpuser@192.168.5.135:22 target@172.16.2.121
@@ -321,6 +326,8 @@ kali@local-kali$ ssh -J c2@10.25.237.119:22,jumpuser@192.168.5.135:22 target@172
 ## if we want to SSH to $internal-jumphost:
 kali@local-kali$ ssh -J c2@10.25.237.119:22 jumpuser@192.168.5.135:22
 ```
+
+> We use this as well to hide our IP address when logging into servers. 
 
 ---
 <a id="network"></a>
