@@ -317,14 +317,14 @@ eth2                                             172.16.2.120             172.16
 
 > We do not execute `ssh` on any computer but our trusted workstation - and neither shall you (ever).
 
-That's where ProxyJump helps: We can 'jump' via the intermediary servers $C2 and $internal-jumphost without spawning a shell on those servers. The ssh-connection is end-2-end encrypted between our $local-kali and $target-host and no password or key is exposed to $C2 or $internal-jumphost.
+That's where ProxyJump helps: We can 'jump' via the two intermediary servers $C2 and $internal-jumphost (without spawning a shell on those servers). The ssh-connection is end-2-end encrypted between our $local-kali and $target-host and no password or key is exposed to $C2 or $internal-jumphost.
 
 ```sh 
 ## if we want to SSH to $target-host:
-kali@local-kali$ ssh -J c2@10.25.237.119:22,jumpuser@192.168.5.135:22 target@172.16.2.121
+kali@local-kali$ ssh -J c2@10.25.237.119,jumpuser@192.168.5.135 target@172.16.2.121
 
-## if we want to SSH to $internal-jumphost:
-kali@local-kali$ ssh -J c2@10.25.237.119:22 jumpuser@192.168.5.135:22
+## if we want to SSH to just $internal-jumphost:
+kali@local-kali$ ssh -J c2@10.25.237.119 jumpuser@192.168.5.135
 ```
 
 > We use this as well to hide our IP address when logging into servers. 
