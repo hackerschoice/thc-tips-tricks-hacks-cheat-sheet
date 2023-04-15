@@ -729,6 +729,10 @@ sftp -D gs-netcat                                        # Workstation
 python -m http.server 8080
 ```
 
+```sh
+## Request a temporary tunnel on a public domain
+cloudflared tunnel -url 127.0.0.1:8080
+```
 
 ---
 <a id="reverse-shell"></a>
