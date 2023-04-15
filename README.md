@@ -1017,6 +1017,11 @@ cd $'\t'
 uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 ```
 
+```sh
+# Speed check the system
+curl -fsSL bench.sh | bash
+```
+
 ---
 <a id="crypto"></a>
 ## 8. Crypto
@@ -1267,6 +1272,9 @@ Scanners
 1. https://zmap.io/ - ZMap & ZGrab
 1. https://github.com/fullhunt/ - log4j and spring4shell scanner 
 
+Phishing
+1. https://github.com/htr-tech/zphisher - We don't hack like this but this is what we would use.
+
 Tools
 1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
 1. https://tmate.io/ - Share A screen with others
@@ -1308,15 +1316,15 @@ Mindmaps & Knowledge
 <a id="useful-commands"></a>
 **12.iv. Useful commands**
 
-Use ```lsof -Pni``` or ```netstat -antpu``` (or ```ss -antpu```) to list all Internet (_-tu_) connections.
+Use `lsof -Pni` or `netstat -putan` (or `ss -putan`) to list all Internet (_-tu_) connections.
 
-Use ```ss -lntp``` to show all listening (_-l_) TCP (_-t_) sockets.
+Use `ss -lntp` to show all listening (_-l_) TCP (_-t_) sockets.
 
-Use ```netstat -rn``` or ```ip route show``` to show default Internet route.
+Use `netstat -rn` or `ip route show` to show default Internet route.
 
-Use ```curl cheat.sh/tar``` to get TLDR help for tar. Works with any other linux command.
+Use `curl cheat.sh/tar` to get TLDR help for tar. Works with any other linux command.
 
-Use ```curl -fsSL bench.sh | bash``` to speed test a server.
+Use `curl -fsSL bench.sh | bash` to speed test a server.
 
 Hacking over long latency links or slow links can be frustrating. Every keystroke is transmitted one by one and any typo becomes so much more frustrating and time consuming to undo. *rlwrap* comes to the rescue. It buffers all single keystrokes until *Enter* is hit and then transmits the entire line at once. This makes it so much easier to type at high speed, correct typos, ...
 
