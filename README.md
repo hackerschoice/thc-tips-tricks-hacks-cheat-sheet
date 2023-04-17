@@ -407,6 +407,7 @@ seq 1 254 | xargs -P10 -I{} proxychains -f pc.conf -q nmap -n -Pn -sT -F --open 
 **3.v. Find your public IP address**
 
 ```sh
+curl -s wtfismyip.com/json | jq
 curl ifconfig.me
 dig +short myip.opendns.com @resolver1.opendns.com
 host myip.opendns.com resolver1.opendns.com
