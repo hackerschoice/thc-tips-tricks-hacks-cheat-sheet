@@ -375,7 +375,7 @@ openssl s_client -connect smtp.gmail.com:465
 socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 ```
 
-More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvesec/port-forwarding).
+More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvesec/port-forwarding) and [Tunnel via Cloudflare to any TCP Service](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).
 
 <a id="scan-proxy"></a>
 **3.iv. Use any tool via Socks Proxy**
@@ -396,9 +396,9 @@ gs-netcat -p 1080
 ```sh
 ## Use ProxyChain to access any host on the target's network: 
 echo -e "[ProxyList]\nsocks5 127.0.0.1 1080" >pc.conf
-proxychain -f pc.conf -q curl ipinfo.io
+proxychains -f pc.conf -q curl ipinfo.io
 ## Scan the router at 192.168.1.1
-proxychain -f pc.conf -q nmap -n -Pn -sT -F --open --script=banner 192.168.1.1
+proxychains -f pc.conf -q nmap -n -Pn -sT -F --open --script=banner 192.168.1.1
 ## Start 10 nmaps in parallel:
 seq 1 254 | xargs -P10 -I{} proxychains -f pc.conf -q nmap -n -Pn -sT -F --open --script=banner --script-timeout=5s 192.168.1.{} 
 ```
