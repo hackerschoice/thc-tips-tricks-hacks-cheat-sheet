@@ -1128,6 +1128,9 @@ Consider using [zap-args](#bash-hide-arguments) to hide the the arguments and /d
 Even dirtier way in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH clients unless uid=0)
 
 Create a wrapper script called 'ssh' that executes strace + ssh to log the session:
+<details>
+  <summary>Show wrapper script - CLICK HERE</summary>
+
 ```sh
 # Cut & Paste the following into a bash shell:
 # Add a local path to the PATH variable so our 'ssh' is executed instead of the real ssh:
@@ -1161,6 +1164,7 @@ To uninstall cut & paste this\033[0m:\033[1;36m
   rmdir ~/.local/bin ~/.local/logs ~/.local &>/dev/null \033[0m"
 ```
 (thanks to Gerald for testing this)
+</details>
 
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
@@ -1300,6 +1304,7 @@ Publishing
 1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
 1. Or use /onion on [segfault.net](https://www.thc.org/segfault) or plain old https with ngrok.
 1. [DuckDNS](https://www.duckdns.org/) - Free dynamic Domain Names
+1. [0bin](https://0bin.net/) - Encrypted PasteBin
 
 Mindmaps & Knowledge
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
