@@ -375,6 +375,42 @@ openssl s_client -connect smtp.gmail.com:465
 socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 ```
 
+**3.iii.b. HTTPS reverse tunnels**
+
+On the server:  
+```sh
+### Reverse HTTPS tunnel to forward public HTTPS requests to Port 8080 on this server:
+ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@localhost.run
+### Or using cloudflared
+cloudflared tunnel --url http://localhost:8080 --no-autoupdate
+```
+Either tunnel will generate a new HTTPS-URL for you. Use this URL from your workstation (see below).
+
+Convert the requests to a simple TCP pipe:
+```sh
+websocat -s 8080
+### and on the workstation use this command to connect:
+websocat wss://<HTTPS-URL>
+```
+
+Or run a Socks5 Proxy behind the HTTPS tunnel (using Gost instead of websocat):
+```sh
+gost -L mws://:8080
+```
+
+On the workstation:  
+
+Forward 2222 to server's 22.
+```sh
+gost -L tcp://:2222/127.0.0.1:22 -F 'mwss://<HTTPS-URL>:443'
+```
+or make it a Socks5 Proxy:
+```sh
+gost -L :1080 -F 'mwss://<HTTPS-URL>:443'
+### Test the Socks5 proxy:
+curl -x socks5h://0 ipinfo.io
+```
+
 More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvesec/port-forwarding) and [Tunnel via Cloudflare to any TCP Service](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).
 
 <a id="scan-proxy"></a>
