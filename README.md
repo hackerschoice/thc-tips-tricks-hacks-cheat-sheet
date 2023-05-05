@@ -28,7 +28,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Use any tool via Socks Proxy](#scan-proxy)
    1. [Find your public IP address](#your-ip)
    1. [Check reachability from around the world](#check-reachable)
-   1. [Check Open Ports](#check-open-ports)
+   1. [Check/Scan Open Ports](#check-open-ports)
    1. [Brute Force Password Cracking](#bruteforce)
 1. [Data Upload/Download/Exfil](#exfil)
    1. [File Encoding/Decoding](#file-encoding)
@@ -479,10 +479,16 @@ ooniprobe list 1
 ```
 
 <a id="check-open-ports"></a>
-**3.vii. Check Open Ports on an IP**
+**3.vii. Check/Scan Open Ports on an IP**
 
+[Censys](https://search.censys.io/) or [Shodan](https://internetdb.shodan.io) Port lookup service:
 ```shell
 curl https://internetdb.shodan.io/1.1.1.1
+```
+
+Fast (-F) vulnerability scan
+```shell
+nmap -A -T5 -F -Pn --script vulners.nse scanme.nmap.org
 ```
 
 <a id="bruteforce"></a>
