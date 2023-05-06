@@ -780,7 +780,7 @@ python -m http.server 8080
 cloudflared tunnel -url localhost:8080
 ```
 
-<a id="http"></a>
+<a id="webdav"></a>
 
 ### 4.iv. File transfer - using WebDAV
 
@@ -790,7 +790,7 @@ cloudflared tunnel --url localhost:8080 &
 # [...]
 # +--------------------------------------------------------------------------------------------+
 # |  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |
-# |  https://example-foo-bar-lights.trycloudflare.com                     |
+# |  https://example-foo-bar-lights.trycloudflare.com                                          |
 # +--------------------------------------------------------------------------------------------+
 # [...]
 wsgidav --port=8080 --root=.  --auth=anonymous
