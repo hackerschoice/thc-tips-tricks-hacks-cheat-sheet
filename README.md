@@ -784,7 +784,7 @@ cloudflared tunnel -url localhost:8080
 
 ### 4.iv. File transfer - using WebDAV
 
-On your workstation (e.g. segfault.net) start a WebDAV server via Cloudflared:
+On your workstation (e.g. segfault.net) start WebDAV & connect it via a Cloudflare-Tunnel:
 ```sh
 cloudflared tunnel --url localhost:8080 &
 # [...]
@@ -802,7 +802,7 @@ curl -T file.dat https://structured-foo-bar-lights.trycloudflare.com
 # Or create a directory remotely
 curl -X MKCOL https://structured-foo-bar-lights.trycloudflare.com/sources
 # Create a directory hirachy remotely
-find . -type d | xargs -P10 -I{} curl -X MKCOL https://example-foo-bar-lights.trycloudflare.com/sources/{}
+find . -type d | xargs -I{} curl -X MKCOL https://example-foo-bar-lights.trycloudflare.com/sources/{}
 # And upload all *.c files (in parallel):
 find . -name '*.c' | xargs -P10 -I{} curl -T{} https://example-foo-bar-lights.trycloudflare.com/sources/{}
 ```
