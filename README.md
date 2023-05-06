@@ -1381,7 +1381,8 @@ Exfil
 1. [Blitz](https://github.com/hackerschoice/gsocket#blitz)
 1. [Mega](https://mega.io/cmd)
 1. [BashUpload](https://bashupload.com/)
-1. [MagicWormhole](https://pypi.org/project/magic-wormhole/)
+2. [Transfer.sh](https://transfer.sh/) - curl --upload-file foo.txt https://transfer.sh
+3. [MagicWormhole](https://pypi.org/project/magic-wormhole/)
 
 Publishing
 1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
