@@ -523,6 +523,7 @@ Username & Password lists:
 * `/usr/share/nmap/nselib/data`  
 * `/usr/share/wordlists/seclists/Passwords`  
 * https://github.com/danielmiessler/SecLists  
+* https://wordlists.assetnote.io  
 * https://weakpass.com  
 
 
