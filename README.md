@@ -463,7 +463,8 @@ curl https://cli.fyi/8.8.8.8
 Check if TOR is working:
 
 ```sh
-curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.torproject.org/api/ip
+curl -x socks5h://localhost:9050 -s https://check.torproject.org/api/ip
+### Result should be {"IsTor":true...
 ```
 
 <a id="check-reachable"></a>
