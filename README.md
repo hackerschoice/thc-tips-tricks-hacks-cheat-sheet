@@ -29,7 +29,8 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Find your public IP address](#your-ip)
    1. [Check reachability from around the world](#check-reachable)
    1. [Check/Scan Open Ports](#check-open-ports)
-   1. [Brute Force Password Cracking](#bruteforce)
+   1. [Crack Passwords hashes](#bruteforce)
+   1. [Brute Force Passwords](#bruteforce)
 1. [Data Upload/Download/Exfil](#exfil)
    1. [File Encoding/Decoding](#file-encoding)
    1. [File transfer using screen](#file-transfer-screen)
@@ -494,9 +495,17 @@ nmap -A -T5 -F -Pn --script vulners.nse scanme.nmap.org
 ```
 
 <a id="bruteforce"></a>
-**3.viii. Brute Force Password Cracking**
+**3.viii. Crack Password hashes**
 
-(This list is curated by Joey (?))
+```shell
+hashcat --username -w3 my-hash /usr/share/wordlists/rockyou.txt
+```
+
+Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions) or use [Crackstation](https://crackstation.net).
+
+**3.ix. Brute Force Passwords**
+
+The following is for brute forcing (guessing) passwords of ONLINE SERVICES.
 
 <a id="gmail"></a>
 <details>
@@ -526,6 +535,7 @@ Username & Password lists:
 * https://github.com/danielmiessler/SecLists  
 * https://wordlists.assetnote.io  
 * https://weakpass.com  
+* https://crackstation.net/  
 
 
 Set **U**sername/**P**assword list and **T**arget host.
