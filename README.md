@@ -1028,7 +1028,6 @@ gs-netcat -p 1080    # Your workstation.
 # Access route.local:22 on the Host's private LAN from your Workstation:
 socat -  "SOCKS4a:127.1:route.local:22"
 ```
-
 Read [Use any tool via Socks Proxy](#scan-proxy).
 
 Other methods:
