@@ -344,7 +344,8 @@ nmap -r -sn -PR 192.168.0.1/24
 
 ```sh
 ## ICMP discover computers on the local netowrk
-for x in `seq 1 254`; do ping -on -c 3 -i 0.1 -W 200 192.168.1.$x | grep 'bytes from' | cut -f4 -d" " | sort -u; done
+NET="10.11.0"  # discover 10.11.0.1-10.11.0.254
+seq 1 254 | xargs -P20 -I{} ping -n -c3 -i0.2 -w1 -W200 "${NET:-192.168.0}.{}" | grep 'bytes from' | awk '{print $4" "$7;}' | sort -uV -k1,1
 ```
 
 <a id="tcpdump"></a>
