@@ -1118,7 +1118,9 @@ uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 
 ```sh
 # Speed check the system
-curl -fsSL bench.sh | bash
+curl -sL bench.sh | bash
+# Another speed check:  
+# curl -sL yabs.sh | bash
 ```
 
 ---
