@@ -1382,7 +1382,6 @@ Backdoors
 1. https://www.gsocket.io/deploy - The world's smallest backdoor
 1. https://github.com/m0nad/Diamorphine - Linux Kernel Module for hiding processes and files
 1. https://www.kali.org/tools/weevely - PHP backdoor
-1. https://www.hahwul.com/2019/01/23/php-hidden-webshell-with-carriage/ - Carriage Return backdoor
 
 Scanners
 1. https://github.com/robertdavidgraham/masscan - Scan the entire Internet
