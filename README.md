@@ -1379,6 +1379,10 @@ Scanners
 1. https://zmap.io/ - ZMap & ZGrab
 1. https://github.com/fullhunt/ - log4j and spring4shell scanner 
 
+Static Binaries / Warez
+1. https://github.com/andrew-d/static-binaries/tree/master/binaries/linux/x86_64
+1. https://iq.thc.org/cross-compiling-exploits
+
 Phishing
 1. https://github.com/htr-tech/zphisher - We don't hack like this but this is what we would use.
 
