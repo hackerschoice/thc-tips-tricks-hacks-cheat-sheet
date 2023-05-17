@@ -242,7 +242,7 @@ Stops you from showing up in *w* or *who* command and stops logging the host to 
 ssh -o UserKnownHostsFile=/dev/null -T user@server.org "bash -i"
 ```
 
-Go full comfort with `thcssh user@server.org`:
+Go full comfort with PTY and colors: `thcssh user@server.org`:
 
 ```sh
 ### Cut & Paste the following to your shell, then execute
