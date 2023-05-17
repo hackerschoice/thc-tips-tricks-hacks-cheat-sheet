@@ -255,7 +255,7 @@ thcssh()
     ttyp=$(stty -g)
     stty raw -echo opost
     [[ $(ssh -V 2>&1) == OpenSSH_[67]* ]] && a="no"
-    ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking="${a:-accept-new}" -T \
+    ssh -o UpdateHostKeys=no -o StrictHostKeyChecking="${a:-accept-new}" -T \
         "$@" \
         "unset SSH_CLIENT SSH_CONNECTION; TERM=xterm-256color BASH_HISTORY=/dev/null exec -a [ntp] script -qc 'exec -a [uid] /bin/bash -i' /dev/null"
     stty "${ttyp}"
