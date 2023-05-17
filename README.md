@@ -834,9 +834,9 @@ wsgidav --port=8080 --root=.  --auth=anonymous
 On another server:
 ```sh
 # Upload a file to your workstation
-curl -T file.dat https://structured-foo-bar-lights.trycloudflare.com
+curl -T file.dat https://example-foo-bar-lights.trycloudflare.com
 # Create a directory remotely
-curl -X MKCOL https://structured-foo-bar-lights.trycloudflare.com/sources
+curl -X MKCOL https://example-foo-bar-lights.trycloudflare.com/sources
 # Create a directory hirachy remotely
 find . -type d | xargs -I{} curl -X MKCOL https://example-foo-bar-lights.trycloudflare.com/sources/{}
 # Upload all *.c files (in parallel):
