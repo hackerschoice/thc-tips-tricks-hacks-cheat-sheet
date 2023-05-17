@@ -1128,8 +1128,10 @@ cat /dev/null >/var/log/auth.log
 
 This will remove any sign of us from the log file:
 ```sh
-cd /dev/shm
-grep -Fv 'thc.org' /var/log/auth.log >a.log; cat a.log >/var/log/auth.log; rm -f a.log
+#DEL=thc.org
+DEL=1.2.3.4
+LOG=/var/log/auth.log
+IFS="" a=$(sed "/${DEL}/d" <"${LOG}") && echo "$a">"${LOG}"
 ```
 
 <a id="shell-hide-files"></a>
