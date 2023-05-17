@@ -1125,7 +1125,7 @@ This will reset the logfile to 0 without having to restart syslogd etc:
 cat /dev/null >/var/log/auth.log
 ```
 
-This will remove any sign of us from the log file:
+This will remove any line containing the IP `1.2.3.4` from the log file:
 ```sh
 #DEL=thc.org
 #DEL=${SSH_CLIENT%% *}
