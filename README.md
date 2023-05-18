@@ -238,7 +238,7 @@ ANSI escape characters or a simple `\r` ([carriage return](https://www.hahwul.co
 
 Hide the last command (example: `id`) in `~/.bashrc`:
 ```sh
-echo  -e "id #\\033[2K\\033[1A" >>~/.bashrc
+echo -e "id #\\033[2K\\033[1A" >>~/.bashrc
 ### The ANSI escape sequence \\033[2K erases the line. The next sequence \\033[1A
 ### move the cursor 1 line up.
 ### The '#' after the command 'id' is needed so that bash still executes the 'id'
