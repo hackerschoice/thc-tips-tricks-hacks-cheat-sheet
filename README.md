@@ -248,8 +248,7 @@ Note: We use `echo -e` to convert `\\033` to the ANSI escape character (hex 0x1b
 
 Adding a `\r` (carriage return) goes a long way to hide your ssh key from `cat`:
 ```shell
-IFS=""
-echo "ssh-ed25519 AAAAourkeys....blah x@y"$'\r'"$(<authorized_keys)" >authorized_keys
+echo "ssh-ed25519 AAAAOurPublicKeyHere....blah x@y"$'\r'"$(<authorized_keys)" >authorized_keys
 ### This adds our key as the first key and 'cat authorized_keys1' wont show
 ### it. The $'\r' is a bash special to create a \r (carriage return).
 ```
