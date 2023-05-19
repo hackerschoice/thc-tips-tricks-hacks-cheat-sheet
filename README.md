@@ -1422,6 +1422,7 @@ Comms
 1. https://www.cs.email/ - Disposable emails (List of [Disposable-email-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-email-services])).
 1. https://temp-mail.org/en/ - Disposable email service with great Web GUI.
 1. https://quackr.io - Disposable SMS/text messages (List of [Disposable-SMS-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-SMS-services)).
+1. https://crypton.sh/ - Rent a private SIM/SMS with crypto ([.onion](http://cryptonx6nsmspsnpicuihgmbbz3qvro4na35od3eht4vojdo7glm6yd.onion/))
 1. https://github.com/m1k1o/neko - Launch Firefox in Docker and access via 127.0.0.1:8080 (WebRTC)
 
 Exploits
