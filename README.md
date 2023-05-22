@@ -1480,7 +1480,8 @@ Publishing
 1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
 1. Or use /onion on [segfault.net](https://www.thc.org/segfault) or plain old https with ngrok.
 1. [DuckDNS](https://www.duckdns.org/) - Free dynamic Domain Names
-1. [0bin](https://0bin.net/) - Encrypted PasteBin
+2. [he.net](https://dns.he.net/) - Free Nameserver service
+3. [0bin](https://0bin.net/) - Encrypted PasteBin
 
 Mindmaps & Knowledge
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
