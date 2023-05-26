@@ -339,7 +339,7 @@ ssh_j()
 
 ssh_j                                 # Generates a random tunnel ID [e.g. 5dmxf27tl4kx] and keeps the tunnel connected
 ssh_j foobarblahblub                  # Creates tunnel with specific tunnel ID
-ssh_j foobarblahblub 192.168.0.1 2222 # Tunnel to some other host on the LAN
+ssh_j foobarblahblub 192.168.0.1 2222 # Tunnel to host 192.168.0.1 on port 2222 on the LAN
 ```
 
 Then use this command from anywhere else in the world to connect as 'root' to '5dmxf27tl4kx' (the host behind the NAT):
@@ -347,6 +347,8 @@ Then use this command from anywhere else in the world to connect as 'root' to '5
 ssh -J 5dmxf27tl4kx@ssh-j.com root@5dmxf27tl4kx
 ```
 The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind NAT. The traffic is end-2-end encrypted and ssh-j.com can not see the content.
+
+An alterntive is [remote.moe](https://github.com/fasmide/remotemoe).
 
 <a id="ssh-pj"></a>
 **2.v SSH pivoting to multiple servers**
