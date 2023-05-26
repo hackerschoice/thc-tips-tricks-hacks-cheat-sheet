@@ -348,7 +348,6 @@ ssh -J 5dmxf27tl4kx@ssh-j.com root@5dmxf27tl4kx
 ```
 The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind NAT. The traffic is end-2-end encrypted and ssh-j.com can not see the content.
 
-An alterntive is [remote.moe](https://github.com/fasmide/remotemoe).
 
 <a id="ssh-pj"></a>
 **2.v SSH pivoting to multiple servers**
@@ -431,6 +430,8 @@ On the server:
 ```sh
 ### Reverse HTTPS tunnel to forward public HTTPS requests to Port 8080 on this server:
 ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@localhost.run
+### Or using remote.moe
+ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@remote.moe
 ### Or using cloudflared
 cloudflared tunnel --url http://localhost:8080 --no-autoupdate
 ```
