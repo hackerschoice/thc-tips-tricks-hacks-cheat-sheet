@@ -1443,10 +1443,14 @@ Backdoors
 1. https://github.com/m0nad/Diamorphine - Linux Kernel Module for hiding processes and files
 1. https://www.kali.org/tools/weevely - PHP backdoor
 
-Scanners
+Network Scanners
 1. https://github.com/robertdavidgraham/masscan - Scan the entire Internet
 1. https://github.com/ptrrkssn/pnscan - Fast network scanner
 1. https://zmap.io/ - ZMap & ZGrab
+
+Vulnerability Scanners
+1. [Raccoon](https://github.com/evyatarmeged/Raccoon) - Reconnaissance and Information Gathering
+1. [Osmedeus](https://github.com/j3ssie/osmedeus) - Vulnerability and Information gathering
 1. https://github.com/fullhunt/ - log4j and spring4shell scanner 
 
 Static Binaries / Warez
