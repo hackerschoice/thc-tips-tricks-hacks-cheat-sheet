@@ -1412,7 +1412,6 @@ Many other services (for free)
 
 | OSINT Databases ||
 | --- | --- |
-| http://breached65xqh64s7xbkvqgg7bmj4nj7656hcb7x4g42x753r7zmejqd.onion/ | Live Data Breach information |
 | https://data.ddosecrets.com/ | Database Dumps
 
 ---
