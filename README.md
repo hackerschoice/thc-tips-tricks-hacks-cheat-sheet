@@ -1000,7 +1000,8 @@ reset
 export SHELL=/bin/bash
 export TERM=xterm-256color
 stty rows 24 columns 80
-PS1='\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]# ' # Pimp up your prompt
+# Pimp up your prompt
+PS1='{THC} USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
 ```
 
 <a id="reverse-shell-socat"></a>
