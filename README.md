@@ -550,7 +550,7 @@ nmap -A -T5 -F -Pn --script vulners.nse scanme.nmap.org
 hashcat --username -w3 my-hash /usr/share/wordlists/rockyou.txt
 ```
 
-Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions) or use [Crackstation](https://crackstation.net).
+Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions) or use [Crackstation](https://crackstation.net) or [ColabCat/cloud](https://github.com/someshkar/colabcat) or on [AWS](https://akimbocore.com/article/hashcracking-with-aws/).
 
 **3.ix. Brute Force Passwords**
 
