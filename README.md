@@ -1573,3 +1573,4 @@ rlwrap --always-readline ssh user@host
 Shoutz: ADM, subz/#9x, DrWho, spoty
 Join us on [Telegram](https://t.me/thcorg).
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/hackerschoice)
