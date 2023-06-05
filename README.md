@@ -1385,11 +1385,12 @@ Trusted VPN Providers
 Virtual Private Servers
 1. https://www.hetzner.com - Cheap
 1. https://dmzhost.co - Ignore most abuse requests
-1. https://buyvm.net - Warez best friend
-1. https://serverius.net - Used by gangsters
-1. https://1984.hosting - Privacy
-1. https://bithost.io - Reseller for DigitalOcean, Linode, Hetzner and Vultr (accepts Crypto)
-1. https://www.privatelayer.com - Swiss based.
+2. https://alexhost.com - DMCA free zone
+3. https://buyvm.net - Warez best friend
+4. https://serverius.net - Used by gangsters
+5. https://1984.hosting - Privacy
+6. https://bithost.io - Reseller for DigitalOcean, Linode, Hetzner and Vultr (accepts Crypto)
+7. https://www.privatelayer.com - Swiss based.
 
 Proxies (we dont use any of those)
 1. [proxyscrape.com](https://api.proxyscrape.com/v2/?request=displayproxies&protocol=all&timeout=750&country=all)
@@ -1506,10 +1507,12 @@ Publishing
 2. [he.net](https://dns.he.net/) - Free Nameserver service
 3. [0bin](https://0bin.net/) / [paste.ec](https://paste.ec) - Encrypted PasteBin
 
-Forums & Channels
+Forums, Channels and Conferences
 1. [THC](https://t.me/thcorg) - THC's public channel
 1. [0x00Sec](https://0x00sec.org/) - Reverse Engineering & Hacking with a pinch of Malware
 2. [CyberArsenal](https://cyberarsenal.org/)/[Telegram](https://t.me/pwn3rzs) - Hacker Warez, tools and programs
+3. [AlligatorCon](https://www.alligatorcon.eu/)
+4. [0x41con](https://0x41con.org/)
 
 Mindmaps & Knowledge
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
