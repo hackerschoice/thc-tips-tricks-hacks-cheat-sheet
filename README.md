@@ -1419,6 +1419,8 @@ Many other services (for free)
 | https://wigle.net/ | Wireless Network Mapper |
 | https://radiocells.org/ | Cell Tower Informations |
 | https://www.shodan.io/ | Search Engine to find devices & Banners (not free) |
+| https://spur.us/context/me | IP rating `https://spur.us/context/<IP>` |
+| https://www.abuseipdb.com | IP abuse rating |
 
 | OSINT for Detectives ||
 | --- | --- |
@@ -1480,7 +1482,7 @@ Tools
 1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
 1. https://tmate.io/ - Share A screen with others
 
-Callback / Command And Control
+Callback / Canary / Command & Control
 1. http://dnslog.cn
 1. http://interact.sh
 1. https://api.telegram.org
@@ -1511,8 +1513,9 @@ Forums, Channels and Conferences
 1. [THC](https://t.me/thcorg) - THC's public channel
 1. [0x00Sec](https://0x00sec.org/) - Reverse Engineering & Hacking with a pinch of Malware
 2. [CyberArsenal](https://cyberarsenal.org/)/[Telegram](https://t.me/pwn3rzs) - Hacker Warez, tools and programs
-3. [AlligatorCon](https://www.alligatorcon.eu/)
+3. [AlligatorCon](https://www.alligatorcon.eu/) - the original
 4. [0x41con](https://0x41con.org/)
+5. [TumpiCon](https://tumpicon.org/)
 
 Mindmaps & Knowledge
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
