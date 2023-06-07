@@ -540,7 +540,7 @@ curl https://internetdb.shodan.io/1.1.1.1
 
 Fast (-F) vulnerability scan
 ```shell
-nmap -A -T5 -F -Pn --script vulners.nse scanme.nmap.org
+nmap -A -T5 -F -Pn --min-rate 10000 --script vulners.nse scanme.nmap.org
 ```
 
 <a id="bruteforce"></a>
