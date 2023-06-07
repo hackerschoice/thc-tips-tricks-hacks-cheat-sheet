@@ -487,9 +487,9 @@ gs-netcat -p 1080
 echo -e "[ProxyList]\nsocks5 127.0.0.1 1080" >pc.conf
 proxychains -f pc.conf -q curl ipinfo.io
 ## Scan the router at 192.168.1.1
-proxychains -f pc.conf -q nmap -n -Pn -sT -F --open --script=banner 192.168.1.1
+proxychains -f pc.conf -q nmap -n -Pn -sV -F --open 192.168.1.1
 ## Start 10 nmaps in parallel:
-seq 1 254 | xargs -P10 -I{} proxychains -f pc.conf -q nmap -n -Pn -sT -F --open --script=banner --script-timeout=5s 192.168.1.{} 
+seq 1 254 | xargs -P10 -I{} proxychains -f pc.conf -q nmap -n -Pn -sV -F --open 192.168.1.{} 
 ```
 
 <a id="your-ip"></a>
@@ -540,7 +540,10 @@ curl https://internetdb.shodan.io/1.1.1.1
 
 Fast (-F) vulnerability scan
 ```shell
-nmap -A -T5 -F -Pn --min-rate 10000 --script vulners.nse scanme.nmap.org
+# Version gathering
+nmap -sCV -F -Pn --min-rate 10000 scanme.nmap.org
+# Vulns
+nmap -A -F -Pn --min-rate 10000 --script vulners.nse --script-timeout=5s scanme.nmap.org
 ```
 
 <a id="bruteforce"></a>
