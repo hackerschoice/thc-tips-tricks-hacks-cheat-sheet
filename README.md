@@ -1384,6 +1384,9 @@ https://thc.org/segfault
 Trusted VPN Providers
 1. https://www.mullvad.net
 1. https://www.cryptostorm.is
+2. https://proton.me - Offers FREE VPN
+3. https://vpn.fail - Rrun by volunteers
+4. https://github.com/mahdibland/V2RayAggregator
 
 Virtual Private Servers
 1. https://www.hetzner.com - Cheap
