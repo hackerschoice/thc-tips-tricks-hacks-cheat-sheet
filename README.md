@@ -1398,12 +1398,13 @@ Virtual Private Servers
 7. https://www.privatelayer.com - Swiss based.
 
 Proxies (we dont use any of those)
-1. https://github.com/mahdibland/V2RayAggregator
-1. [proxyscrape.com](https://api.proxyscrape.com/v2/?request=displayproxies&protocol=all&timeout=750&country=all)
-1. [my-proxy.com](https://www.my-proxy.com)
-1. [getfreeproxylists.blogspot.com](https://getfreeproxylists.blogspot.com/)
-1. [proxypedia.org](https://proxypedia.org/)
-1. [socks-proxy.net](https://socks-proxy.net/)
+1. [V2Ray Proxies](https://github.com/mahdibland/V2RayAggregator)
+2. [Hola Proxies](https://github.com/snawoot/hola-proxy)
+3. [proxyscrape.com](https://api.proxyscrape.com/v2/?request=displayproxies&protocol=all&timeout=750&country=all)
+4. [my-proxy.com](https://www.my-proxy.com)
+5. [getfreeproxylists.blogspot.com](https://getfreeproxylists.blogspot.com/)
+6. [proxypedia.org](https://proxypedia.org/)
+7. [socks-proxy.net](https://socks-proxy.net/)
 
 Many other services (for free)  
 1. https://free-for.dev/
