@@ -1384,9 +1384,8 @@ https://thc.org/segfault
 Trusted VPN Providers
 1. https://www.mullvad.net
 1. https://www.cryptostorm.is
-2. https://proton.me - Offers FREE VPN
-3. https://vpn.fail - Rrun by volunteers
-4. https://github.com/mahdibland/V2RayAggregator
+1. https://proton.me - Offers FREE VPN
+1. https://vpn.fail - Run by volunteers
 
 Virtual Private Servers
 1. https://www.hetzner.com - Cheap
@@ -1399,6 +1398,7 @@ Virtual Private Servers
 7. https://www.privatelayer.com - Swiss based.
 
 Proxies (we dont use any of those)
+1. https://github.com/mahdibland/V2RayAggregator
 1. [proxyscrape.com](https://api.proxyscrape.com/v2/?request=displayproxies&protocol=all&timeout=750&country=all)
 1. [my-proxy.com](https://www.my-proxy.com)
 1. [getfreeproxylists.blogspot.com](https://getfreeproxylists.blogspot.com/)
