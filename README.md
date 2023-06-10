@@ -1575,8 +1575,9 @@ rlwrap --always-readline ssh user@host
 1. [Hacking HackingTeam - a HackBack](https://gist.github.com/jaredsburrows/9e121d2e5f1147ab12a696cf548b90b0) - Old but real talent at work.
 2. [HTB absolute](https://0xdf.gitlab.io/2023/05/27/htb-absolute.html) - Well written and explained attack.
 3. [Conti Leak](https://github.com/ForbiddenProgrammer/conti-pentester-guide-leak) - Windows hacking. Pragmatic.
-4. https://book.hacktricks.xyz/welcome/readme
-5. https://github.com/yeyintminthuhtut/Awesome-Red-Teaming
+4. [Red Team Notes](https://www.ired.team/)
+6. [HackTricks](https://book.hacktricks.xyz/welcome/readme)
+7. [Awesome Red Teaming](https://github.com/yeyintminthuhtut/Awesome-Red-Teaming)
 
 
 ---
