@@ -436,7 +436,7 @@ ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@remote.moe
 ### Or using cloudflared
 cloudflared tunnel --url http://localhost:8080 --no-autoupdate
 ```
-Either tunnel will generate a new HTTPS-URL for you. Use this URL on your workstation (see below).
+Either tunnel will generate a new HTTPS-URL for you. Use this URL on your workstation (see below). Use [Gost](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) to tunnel raw TCP over the HTTP(s) link.
 
 A simple STDIN/STDOUT pipe via HTTPS:
 ```sh
@@ -464,7 +464,7 @@ gost -L :1080 -F 'mwss://<HTTPS-URL>:443'
 curl -x socks5h://0 ipinfo.io
 ```
 
-More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvesec/port-forwarding) and [Tunnel via Cloudflare to any TCP Service](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).
+More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvesec/port-forwarding) and [Tunnel via Cloudflare to any TCP Service](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) and [Awesome Tunneling](https://github.com/anderspitman/awesome-tunneling).
 
 <a id="scan-proxy"></a>
 **3.iv. Use any tool via Socks Proxy**
