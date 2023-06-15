@@ -951,7 +951,7 @@ Note: Use */tmp/.fio* if */dev/shm* is not available.
 Note: This trick logs your commands to a file. The file will be *unlinked* from the fs after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
 
 <a id="revese-shell-remote-moe"></a>
-**5.i.d. Reverse shell with remote.moe
+**5.i.d. Reverse shell with remote.moe**
 
 It is possible to tunnel raw TCP (e.g bash reverse shell) through [remote.moe](https://remote.moe):
 
