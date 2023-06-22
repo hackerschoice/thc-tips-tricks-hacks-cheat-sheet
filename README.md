@@ -908,6 +908,7 @@ curl -s "https://api.telegram.org/bot<TG-BOT-TOKEN>/getUpdates" | jq -r '.result
 ```
 
 ```sh
+# Upload file.zip straight into the group chat:
 curl -sF document=@file.zip "https://api.telegram.org/bot<TG-BOT-TOKEN>/sendDocument?chat_id=<TG-CHAT-ID>"
 ```
 
