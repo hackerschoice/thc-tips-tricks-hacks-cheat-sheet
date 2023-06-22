@@ -1436,6 +1436,7 @@ Proxies (we dont use any of those)
 5. [getfreeproxylists.blogspot.com](https://getfreeproxylists.blogspot.com/)
 6. [proxypedia.org](https://proxypedia.org/)
 7. [socks-proxy.net](https://socks-proxy.net/)
+8. [Segfault](https://www.thc.org/segfault): `curl -x socks5h://$(PROXY) ipinfo.io` - selects a random proxy for every request
 
 Many other services (for free)  
 1. https://free-for.dev/
