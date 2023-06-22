@@ -1642,6 +1642,7 @@ rlwrap --always-readline ssh user@host
 4. [Red Team Notes](https://www.ired.team/)
 6. [HackTricks](https://book.hacktricks.xyz/welcome/readme)
 7. [Awesome Red Teaming](https://github.com/yeyintminthuhtut/Awesome-Red-Teaming)
+8. [VulHub](https://github.com/vulhub/vulhub) - Test your exploits
 
 
 ---
