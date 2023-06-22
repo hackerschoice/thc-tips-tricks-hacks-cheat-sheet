@@ -1509,6 +1509,9 @@ Vulnerability Scanners
 1. [Osmedeus](https://github.com/j3ssie/osmedeus) - Vulnerability and Information gathering
 1. https://github.com/fullhunt/ - log4j and spring4shell scanner 
 
+DDoS
+1. [DeepNet](https://github.com/the-deepnet/ddos) - we despise DDoS but if we had to then this would be our choice.
+
 Static Binaries / Warez
 1. https://github.com/andrew-d/static-binaries/tree/master/binaries/linux/x86_64
 1. https://iq.thc.org/cross-compiling-exploits
