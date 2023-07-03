@@ -346,9 +346,9 @@ ssh_j foobarblahblub                  # Creates tunnel with specific tunnel ID
 ssh_j foobarblahblub 192.168.0.1 2222 # Tunnel to host 192.168.0.1 on port 2222 on the LAN
 ```
 
-Then use this command from anywhere else in the world to connect as 'root' to '5dmxf27tl4kx' (the host behind the NAT):
+Then use this command from anywhere else in the world to connect as 'root' to 'foobarblahblub' (the host behind the NAT):
 ```sh
-ssh -J 5dmxf27tl4kx@ssh-j.com root@5dmxf27tl4kx
+ssh -J foobarblahblub@ssh-j.com root@foobarblahblub
 ```
 The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind NAT. The traffic is end-2-end encrypted and ssh-j.com can not see the content.
 
