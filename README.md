@@ -1516,7 +1516,7 @@ Comms
 
 OpSec
 1. [OpSec for Rebellsions](https://medium.com/@hackerschoice/it-security-and-privacy-for-the-rebellions-of-the-world-db4023cadcca) - Start Here. The simplest 3 steps.
-1. [RiseUp](https://riseup.net/) - Mail, VPN and Tips for (online) rebellions (Al
+1. [RiseUp](https://riseup.net/) - Mail, VPN and Tips for (online) rebellions.
 1. [Neko](https://github.com/m1k1o/neko) - Launch Firefox in Docker and access via 127.0.0.1:8080 (WebRTC)
 2. [x11Docker](https://github.com/mviereck/x11docker) - Isolate any X11 app in a container (Linux & Windows only). ([Article](https://techviewleo.com/run-gui-applications-in-docker-using-x11docker/?expand_article=1))
 3. [DangerZone](https://github.com/freedomofpress/dangerzone) - Make PDFs safe before opening them.
