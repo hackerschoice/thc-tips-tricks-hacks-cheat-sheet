@@ -1509,13 +1509,13 @@ Many other services (for free)
 **12.i. Tools of the trade**
 
 Comms
-1. https://www.cs.email/ - Disposable emails (send & receive). (List of [Disposable-email-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-email-services])).
-1. https://temp-mail.org/en/ - Disposable email service with great Web GUI. Receive only.
-1. https://quackr.io - Disposable SMS/text messages (List of [Disposable-SMS-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-SMS-services)).
-1. https://crypton.sh/ - Rent a private SIM/SMS with crypto ([.onion](http://cryptonx6nsmspsnpicuihgmbbz3qvro4na35od3eht4vojdo7glm6yd.onion/))
+1. [CryptoStorm Email](https://www.cs.email/) - Disposable emails (send & receive). (List of [Disposable-email-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-email-services])).
+1. [Temp-Mail](https://temp-mail.org/en/) - Disposable email service with great Web GUI. Receive only.
+1. [Quackr.Io](https://quackr.io/) - Disposable SMS/text messages (List of [Disposable-SMS-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-SMS-services)).
+1. [Crypton](https://crypton.sh/) - Rent a private SIM/SMS with crypto ([.onion](http://cryptonx6nsmspsnpicuihgmbbz3qvro4na35od3eht4vojdo7glm6yd.onion/))
 
 OpSec
-1. [OpSec for Rebellsions](https://medium.com/@hackerschoice/it-security-and-privacy-for-the-rebellions-of-the-world-db4023cadcca) - Start Here. The simplest 3 steps.
+1. [OpSec for Rebellions](https://medium.com/@hackerschoice/it-security-and-privacy-for-the-rebellions-of-the-world-db4023cadcca) - Start Here. The simplest 3 steps.
 1. [RiseUp](https://riseup.net/) - Mail, VPN and Tips for (online) rebellions.
 1. [Neko](https://github.com/m1k1o/neko) - Launch Firefox in Docker and access via 127.0.0.1:8080 (WebRTC)
 2. [x11Docker](https://github.com/mviereck/x11docker) - Isolate any X11 app in a container (Linux & Windows only). ([Article](https://techviewleo.com/run-gui-applications-in-docker-using-x11docker/?expand_article=1))
@@ -1524,10 +1524,10 @@ OpSec
 5. [EFF](https://www.eff.org/) - Clever advise for freedom figthers.
 
 Exploits
-1. https://github.com/liamg/traitor - Tries various exploits/vulnerabilities to gain root (LPE)
-1. https://packetstormsecurity.com/ - Our favorite site ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
-1. https://www.exploit-db.com/ - Also includes metasploit db and google hacking db
-1. https://exploits.shodan.io/welcome - Similar to exploit-db
+1. [Traitor](https://github.com/liamg/traitor) - Tries various exploits/vulnerabilities to gain root (LPE)
+1. [PacketStorm](https://packetstormsecurity.com) - Our favorite site ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
+1. [ExploitDB](https://www.exploit-db.com) - Also includes metasploit db and google hacking db
+1. [Shodan/Exploits](https://exploits.shodan.io/welcome) - Similar to exploit-db
 
 System Information Gathering
 1. https://github.com/carlospolop/PEASS-ng/tree/master/linPEAS - Quick system informations for hackers.
@@ -1546,7 +1546,7 @@ Network Scanners
 Vulnerability Scanners
 1. [Raccoon](https://github.com/evyatarmeged/Raccoon) - Reconnaissance and Information Gathering
 1. [Osmedeus](https://github.com/j3ssie/osmedeus) - Vulnerability and Information gathering
-1. https://github.com/fullhunt/ - log4j and spring4shell scanner 
+1. [FullHunt](https://github.com/fullhunt/) - log4j and spring4shell scanner 
 
 DDoS
 1. [DeepNet](https://github.com/the-deepnet/ddos) - we despise DDoS but if we had to then this would be our choice.
