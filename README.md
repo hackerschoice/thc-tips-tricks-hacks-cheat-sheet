@@ -1564,7 +1564,7 @@ Tools
 
 Callback / Canary / Command & Control
 1. http://dnslog.cn
-1. http://interact.sh
+1. https://app.interactsh.com
 1. https://api.telegram.org
 
 Tunneling
