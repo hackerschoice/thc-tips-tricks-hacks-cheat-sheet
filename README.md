@@ -1566,6 +1566,7 @@ Callback / Canary / Command & Control
 1. http://dnslog.cn
 1. https://app.interactsh.com
 1. https://api.telegram.org
+1. https://webhook.site
 
 Tunneling
 1. [Gost](https://github.com/ginuerzh/gost/blob/master/README_en.md)
