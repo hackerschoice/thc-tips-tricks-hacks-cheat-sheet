@@ -1519,7 +1519,9 @@ OpSec
 1. [RiseUp](https://riseup.net/) - Mail, VPN and Tips for (online) rebellions (Al
 1. [Neko](https://github.com/m1k1o/neko) - Launch Firefox in Docker and access via 127.0.0.1:8080 (WebRTC)
 2. [x11Docker](https://github.com/mviereck/x11docker) - Isolate any X11 app in a container (Linux & Windows only). ([Article](https://techviewleo.com/run-gui-applications-in-docker-using-x11docker/?expand_article=1))
-3. [EFF](https://www.eff.org/) - Clever advise for freedom figthers.
+3. [DangerZone](https://github.com/freedomofpress/dangerzone) - Make PDFs safe before opening them.
+4. [ExifTool](https://exiftool.org/) - Remove meta data from files (`exiftool -all= example.pdf example1.jpg ...`)
+5. [EFF](https://www.eff.org/) - Clever advise for freedom figthers.
 
 Exploits
 1. https://github.com/liamg/traitor - Tries various exploits/vulnerabilities to gain root (LPE)
