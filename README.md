@@ -1653,6 +1653,7 @@ rlwrap --always-readline ssh user@host
 6. [HackTricks](https://book.hacktricks.xyz/welcome/readme)
 7. [Awesome Red Teaming](https://github.com/yeyintminthuhtut/Awesome-Red-Teaming)
 8. [VulHub](https://github.com/vulhub/vulhub) - Test your exploits
+9. [Qubes-OS](https://www.qubes-os.org/) - Desktop OS focused on security with XEN isolated (disposable) guest VMs (Fedora, Debian, Whonix out of the box)
 
 
 ---
