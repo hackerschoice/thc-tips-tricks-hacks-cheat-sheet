@@ -586,7 +586,8 @@ Tools:
 
 Username & Password lists:
 * `/usr/share/nmap/nselib/data`  
-* `/usr/share/wordlists/seclists/Passwords`  
+* `/usr/share/wordlists/seclists/Passwords`
+* https://github.com/berzerk0/Probable-Wordlists - >THC's FAVORITE<
 * https://github.com/danielmiessler/SecLists  
 * https://wordlists.assetnote.io  
 * https://weakpass.com  
