@@ -1453,11 +1453,12 @@ Virtual Private Servers
 1. https://www.hetzner.com - Cheap
 1. https://dmzhost.co - Ignore most abuse requests
 2. https://alexhost.com - DMCA free zone
-3. https://buyvm.net - Warez best friend
-4. https://serverius.net - Used by gangsters
-5. https://1984.hosting - Privacy
-6. https://bithost.io - Reseller for DigitalOcean, Linode, Hetzner and Vultr (accepts Crypto)
-7. https://www.privatelayer.com - Swiss based.
+3. https://basehost.eu - Ignores court orders
+4. https://buyvm.net - Warez best friend
+5. https://serverius.net - Used by gangsters
+6. https://1984.hosting - Privacy
+7. https://bithost.io - Reseller for DigitalOcean, Linode, Hetzner and Vultr (accepts Crypto)
+8. https://www.privatelayer.com - Swiss based.
 
 Proxies (we dont use any of those)
 1. [V2Ray Proxies](https://github.com/mahdibland/V2RayAggregator)
