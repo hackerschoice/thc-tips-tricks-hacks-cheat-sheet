@@ -513,6 +513,17 @@ curl http://ip-api.com/8.8.8.8
 curl https://cli.fyi/8.8.8.8
 ```
 
+Get ASN information by IP address:
+
+```sh
+asn() {
+  [[ -n $1 ]] && { echo -e "begin\nverbose\n${1}\nend"|netcat whois.cymru.com 43| tail -n +2; return; }
+  (echo -e 'begin\nverbose';cat -;echo end)|netcat whois.cymru.com 43|tail -n +2
+}
+asn 1.1.1.1           # Single IP Lookup
+cat IPS.txt | asn     # Bulk Lookup
+```
+
 Check if TOR is working:
 
 ```sh
