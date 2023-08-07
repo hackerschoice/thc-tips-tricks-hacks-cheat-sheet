@@ -1599,9 +1599,10 @@ Exfil<a id="cloudexfil"></a>
 Publishing
 1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
 1. Or use /onion on [segfault.net](https://www.thc.org/segfault) or plain old https with ngrok.
-1. [DuckDNS](https://www.duckdns.org/) - Free dynamic Domain Names
+1. [DuckDNS](https://www.duckdns.org/) - Free Dynamic Domain Names
+3. [afraid.org](https://www.afraid.org) - Free Dynamic DNS for your domain
 2. [he.net](https://dns.he.net/) - Free Nameserver service
-3. [0bin](https://0bin.net/) / [paste.ec](https://paste.ec) - Encrypted PasteBin
+4. [0bin](https://0bin.net/) / [paste.ec](https://paste.ec) - Encrypted PasteBin
 
 Forums, Channels and Conferences
 1. [THC](https://t.me/thcorg) - THC's public channel
