@@ -1067,15 +1067,20 @@ exec python -c 'import pty; pty.spawn("/bin/bash")'
 ```sh
 # On the target host spwan a PTY using any of the above examples:
 python -c 'import pty; pty.spawn("/bin/bash")'
-
 # Now Press Ctrl-Z to suspend the connection and return to your own terminal.
+```
+
+```
 # On your terminal execute:
 stty raw -echo opost; fg
+```
 
+```
 # On target host
 export SHELL=/bin/bash
-export TERM=xterm-256colorreset
-stty rows 24 columns 80
+export TERM=xterm-256color
+reset
+stty rows 24 columns 180
 # Pimp up your prompt
 PS1='{THC} USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
 ```
