@@ -1080,7 +1080,7 @@ stty raw -echo opost; fg
 export SHELL=/bin/bash
 export TERM=xterm-256color
 reset
-stty rows 24 columns 180
+stty rows 24 columns 120
 # Pimp up your prompt
 PS1='{THC} USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
 ```
