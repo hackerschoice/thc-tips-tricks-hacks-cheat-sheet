@@ -1506,6 +1506,7 @@ Many other services (for free)
 | https://radiocells.org/ | Cell Tower Informations |
 | https://www.shodan.io/ | Search Engine to find devices & Banners (not free) |
 | https://spur.us/context/me | IP rating `https://spur.us/context/<IP>` |
+| http://drs.whoisxmlapi.com | Reverse Whois Lookup (not free) |
 | https://www.abuseipdb.com | IP abuse rating |
 
 | OSINT for Detectives ||
@@ -1594,7 +1595,6 @@ Exfil<a id="cloudexfil"></a>
 1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - `blitz -l` / `blitz foo.txt`
 1. [Mega](https://mega.io/cmd)
 2. [oshiAt](https://oshi.at/) - also on TOR. `curl -T foo.txt https://oshi.at`
-4. [AnonFiles](https://www.anonfiles.com) - `curl -F "file=@foo.txt" https://api.anonfiles.com/upload`
 5. [Transfer.sh](https://transfer.sh/) - `curl -T foo.txt https://transfer.sh`
 6. [LitterBox](https://litterbox.catbox.moe/tools.php) - `curl -F reqtype=fileupload -F time=72h -F 'fileToUpload=@foo.txt' https://litterbox.catbox.moe/resources/internals/api.php`  
 7. [Croc](https://github.com/schollz/croc) - `croc send foo.txt / croc anit-price-example`
