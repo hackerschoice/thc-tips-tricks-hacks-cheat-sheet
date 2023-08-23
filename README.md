@@ -115,15 +115,24 @@ $  id
 ```
 
 <a id="bash-hide-command"></a>
-**1.ii. Hide your command**
+**1.ii. Hide your command / Daemonzie your command**
+
+Hide as "syslogd".
 
 ```shell
 (exec -a syslogd nmap -T0 10.0.2.1/24) # Note the brackets '(' and ')'
 ```
 
-Starting a background hidden process:
+Start a background hidden process:
 ```
-exec -a syslogd nmap -T0 10.0.2.1/24 &>nmap.log &
+(exec -a syslogd nmap -T0 10.0.2.1/24 &>nmap.log &)
+```
+
+Start within a [GNU screen](https://linux.die.net/man/1/screen):
+```
+screen -dmS MyName nmap -T0 10.0.2.1/24
+### Attach back to the nmap process
+screen -x MyName
 ```
 
 Alternatively if there is no Bash:
