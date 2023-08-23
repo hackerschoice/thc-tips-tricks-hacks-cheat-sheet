@@ -1625,6 +1625,15 @@ Forums, Channels and Conferences
 4. [0x41con](https://0x41con.org/)
 5. [TumpiCon](https://tumpicon.org/)
 
+Telegram Channels
+1. [TheHackerNews](https://t.me/thehackernews)
+1. [CyberSecurityTechnologies](https://t.me/CyberSecurityTechnologies)
+1. [OffensiveTwitter](https://t.me/OffensiveTwitter)
+1. [Pwn3rzs](https://t.me/Pwn3rzs)
+1. [VX-Underground](https://t.me/vxunderground)
+1. [cKure](https://t.me/cKure)
+1. [BookZillaaa](https://t.me/bookzillaaa)
+
 Mindmaps & Knowledge
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
 1. [Z Library](https://singlelogin.me)/[Z Library on TOR](http://bookszlibb74ugqojhzhg2a63w5i2atv5bqarulgczawnbmsb6s6qead.onion/)
