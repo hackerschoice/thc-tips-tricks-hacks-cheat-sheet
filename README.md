@@ -1,6 +1,8 @@
 <!-- Use `grip 8080` to render the markdown locally -->
 # THC's favourite Tips, Tricks & Hacks (Cheat Sheet)
 
+https://tinyurl.com/thctips
+
 A collection of our favourite tricks. Many of those tricks are not from us. We merely collect them.
 
 We show the tricks 'as is' without any explanation why they work. You need to know Linux to understand how and why they work.
@@ -1625,7 +1627,7 @@ Forums, Channels and Conferences
 4. [0x41con](https://0x41con.org/)
 5. [TumpiCon](https://tumpicon.org/)
 
-Telegram Channels
+Telegram Channels<a id="channels"></a>
 1. [TheHackerNews](https://t.me/thehackernews)
 1. [CyberSecurityTechnologies](https://t.me/CyberSecurityTechnologies)
 1. [OffensiveTwitter](https://t.me/OffensiveTwitter)
