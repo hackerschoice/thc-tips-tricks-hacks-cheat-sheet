@@ -1634,6 +1634,7 @@ Telegram Channels<a id="channels"></a>
 1. [Pwn3rzs](https://t.me/Pwn3rzs)
 1. [VX-Underground](https://t.me/vxunderground)
 1. [cKure](https://t.me/cKure)
+1. [OSINT CyberDetective](https://t.me/cybdetective)
 1. [BookZillaaa](https://t.me/bookzillaaa)
 
 Mindmaps & Knowledge
