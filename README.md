@@ -148,11 +148,13 @@ In this example we execute *nmap* but let it appear with the name *syslogd* in *
 <a id="bash-hide-arguments"></a>
 **1.iii. Hide your arguments**
 
-Download [zap-args.c](src/zap-args.c). This example will execute *nmap* but will make it appear as 'syslogd' without any arguments in the *ps alxww* output.
+Download [zap-args.c](raw/master/src/zap-args.c). This example will execute *nmap* but will make it appear as 'syslogd' without any arguments in the *ps alxww* output.
 
 ```sh
 gcc -Wall -O2 -fpic -shared -o zap-args.so zap-args.c -ldl
-LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24
+(LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24)
+### Or as daemon background process:
+(LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24 &>nmap.log &)
 ```
 Note: There is a gdb variant as well. Anyone?
 
