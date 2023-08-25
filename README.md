@@ -1638,7 +1638,7 @@ Forums and Conferences
 5. [TumpiCon](https://tumpicon.org/)
 
 Telegram Channels<a id="channels"></a>
-1. [THC](https://t.me/thcorg) - THC's public channel
+1. [The Hacker's Choice](https://t.me/thcorg)
 1. [TheHackerNews](https://t.me/thehackernews)
 1. [CyberSecurityTechnologies](https://t.me/CyberSecurityTechnologies)
 1. [OffensiveTwitter](https://t.me/OffensiveTwitter)
