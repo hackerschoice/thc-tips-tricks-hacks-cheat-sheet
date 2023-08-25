@@ -1639,12 +1639,13 @@ Forums and Conferences
 
 Telegram Channels<a id="channels"></a>
 1. [The Hacker's Choice](https://t.me/thcorg)
-1. [TheHackerNews](https://t.me/thehackernews)
-1. [CyberSecurityTechnologies](https://t.me/CyberSecurityTechnologies)
-1. [OffensiveTwitter](https://t.me/OffensiveTwitter)
+1. [The Hacker News](https://t.me/thehackernews)
+1. [CyberSecurity Technologies](https://t.me/CyberSecurityTechnologies)
+1. [Offensive Twitter](https://t.me/OffensiveTwitter)
 1. [Pwn3rzs](https://t.me/Pwn3rzs)
 1. [VX-Underground](https://t.me/vxunderground)
 1. [cKure](https://t.me/cKure)
+1. [Android Security / Malware](https://t.me/androidMalware)
 1. [OSINT CyberDetective](https://t.me/cybdetective)
 1. [BookZillaaa](https://t.me/bookzillaaa)
 
