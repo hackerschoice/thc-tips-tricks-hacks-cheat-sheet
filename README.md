@@ -1245,7 +1245,7 @@ touch -r /etc/shadow /etc/passwd
 
 This will reset the logfile to 0 without having to restart syslogd etc:
 ```sh
-cat /dev/null >/var/log/auth.log
+>/var/log/auth.log # or on old shells: cat /dev/null >/var/log/auth.log
 ```
 
 This will remove any line containing the IP `1.2.3.4` from the log file:
@@ -1489,12 +1489,14 @@ Virtual Private Servers
 Proxies (we dont use any of those)
 1. [V2Ray Proxies](https://github.com/mahdibland/V2RayAggregator)
 2. [Hola Proxies](https://github.com/snawoot/hola-proxy)
-3. [proxyscrape.com](https://api.proxyscrape.com/v2/?request=displayproxies&protocol=all&timeout=750&country=all)
-4. [my-proxy.com](https://www.my-proxy.com)
-5. [getfreeproxylists.blogspot.com](https://getfreeproxylists.blogspot.com/)
-6. [proxypedia.org](https://proxypedia.org/)
-7. [socks-proxy.net](https://socks-proxy.net/)
-8. [Segfault](https://www.thc.org/segfault): `curl -x socks5h://$(PROXY) ipinfo.io` - selects a random proxy for every request
+3. [Zaeem's Free Proxy List](https://github.com/Zaeem20/FREE_PROXIES_LIST)
+4. [Proxy Broker 2](https://github.com/bluet/proxybroker2)
+5. [proxyscrape.com](https://api.proxyscrape.com/v2/?request=displayproxies&protocol=all&timeout=750&country=all)
+6. [my-proxy.com](https://www.my-proxy.com)
+7. [getfreeproxylists.blogspot.com](https://getfreeproxylists.blogspot.com/)
+8. [proxypedia.org](https://proxypedia.org/)
+9. [socks-proxy.net](https://socks-proxy.net/)
+10. [Segfault](https://www.thc.org/segfault): `curl -x socks5h://$(PROXY) ipinfo.io` - selects a random proxy for every request
 
 Many other services (for free)  
 1. https://free-for.dev/
@@ -1619,8 +1621,7 @@ Publishing
 2. [he.net](https://dns.he.net/) - Free Nameserver service
 4. [0bin](https://0bin.net/) / [paste.ec](https://paste.ec) - Encrypted PasteBin
 
-Forums, Channels and Conferences
-1. [THC](https://t.me/thcorg) - THC's public channel
+Forums and Conferences
 1. [0x00Sec](https://0x00sec.org/) - Reverse Engineering & Hacking with a pinch of Malware
 2. [CyberArsenal](https://cyberarsenal.org/)/[Telegram](https://t.me/pwn3rzs) - Hacker Warez, tools and programs
 3. [AlligatorCon](https://www.alligatorcon.eu/) - the original
@@ -1628,6 +1629,7 @@ Forums, Channels and Conferences
 5. [TumpiCon](https://tumpicon.org/)
 
 Telegram Channels<a id="channels"></a>
+1. [THC](https://t.me/thcorg) - THC's public channel
 1. [TheHackerNews](https://t.me/thehackernews)
 1. [CyberSecurityTechnologies](https://t.me/CyberSecurityTechnologies)
 1. [OffensiveTwitter](https://t.me/OffensiveTwitter)
@@ -1686,13 +1688,15 @@ rlwrap --always-readline ssh user@host
 ## 13. Other Sites
 
 1. [Hacking HackingTeam - a HackBack](https://gist.github.com/jaredsburrows/9e121d2e5f1147ab12a696cf548b90b0) - Old but real talent at work.
-2. [HTB absolute](https://0xdf.gitlab.io/2023/05/27/htb-absolute.html) - Well written and explained attack.
-3. [Conti Leak](https://github.com/ForbiddenProgrammer/conti-pentester-guide-leak) - Windows hacking. Pragmatic.
-4. [Red Team Notes](https://www.ired.team/)
-6. [HackTricks](https://book.hacktricks.xyz/welcome/readme)
-7. [Awesome Red Teaming](https://github.com/yeyintminthuhtut/Awesome-Red-Teaming)
-8. [VulHub](https://github.com/vulhub/vulhub) - Test your exploits
-9. [Qubes-OS](https://www.qubes-os.org/) - Desktop OS focused on security with XEN isolated (disposable) guest VMs (Fedora, Debian, Whonix out of the box)
+2. [Guacamaya Hackback](https://www.youtube.com/watch?v=5vRIisM0Op4)
+3. [Vx Underground](https://www.vx-underground.org/)
+4. [HTB absolute](https://0xdf.gitlab.io/2023/05/27/htb-absolute.html) - Well written and explained attack.
+5. [Conti Leak](https://github.com/ForbiddenProgrammer/conti-pentester-guide-leak) - Windows hacking. Pragmatic.
+6. [Red Team Notes](https://www.ired.team/)
+7. [HackTricks](https://book.hacktricks.xyz/welcome/readme)
+8. [Awesome Red Teaming](https://github.com/yeyintminthuhtut/Awesome-Red-Teaming)
+9. [VulHub](https://github.com/vulhub/vulhub) - Test your exploits
+10. [Qubes-OS](https://www.qubes-os.org/) - Desktop OS focused on security with XEN isolated (disposable) guest VMs (Fedora, Debian, Whonix out of the box)
 
 
 ---
