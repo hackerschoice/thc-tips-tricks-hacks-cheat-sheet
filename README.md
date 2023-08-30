@@ -1634,7 +1634,6 @@ Publishing
 
 Forums and Conferences
 1. [0x00Sec](https://0x00sec.org/) - Reverse Engineering & Hacking with a pinch of Malware
-2. [CyberArsenal](https://cyberarsenal.org/)/[Telegram](https://t.me/pwn3rzs) - Hacker Warez, tools and programs
 3. [AlligatorCon](https://www.alligatorcon.eu/) - the original
 4. [0x41con](https://0x41con.org/)
 5. [TumpiCon](https://tumpicon.org/)
