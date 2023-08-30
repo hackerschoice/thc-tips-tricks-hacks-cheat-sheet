@@ -1599,6 +1599,7 @@ Static Binaries / Warez
 
 Phishing
 1. https://github.com/htr-tech/zphisher - We don't hack like this but this is what we would use.
+2. https://da.gd/ - Tinier TinyUrl and allows https://www.google.com-fish-fish@da.gd/blah
 
 Tools
 1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
