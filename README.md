@@ -345,19 +345,19 @@ The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now con
 On the host behind NAT: Create a reverse SSH tunnel to [ssh-j.com](http://ssh-j.com) like so:
 ```sh
 ## Cut & Paste on the host behind NAT.
-ssh_j()
+sshj()
 {
    local pw
-   pw=$1
+   pw=${1,,}
    [[ -z $pw ]] && { pw=$(head -c64 </dev/urandom | base64 | tr -d -c a-z0-9); pw=${pw:0:12}; }
    echo "Press Ctrl-C to stop this tunnel."
-   echo -e "To connect to this host: \e[0;36mssh -J ${pw}@ssh-j.com ${USER:-root}@${pw}\e[0m"
+   echo -e "To ssh to ${USER:-root}@${2:-127.0.0.1}:${3:-22} type: \e[0;36mssh -J ${pw}@ssh-j.com ${USER:-root}@${pw}\e[0m"
    ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes ${pw}@ssh-j.com -N -R ${pw}:22:${2:-0}:${3:-22}
 }
 
-ssh_j                                 # Generates a random tunnel ID [e.g. 5dmxf27tl4kx] and keeps the tunnel connected
-ssh_j foobarblahblub                  # Creates tunnel with specific tunnel ID
-ssh_j foobarblahblub 192.168.0.1 2222 # Tunnel to host 192.168.0.1 on port 2222 on the LAN
+sshj                                 # Generates a random tunnel ID [e.g. 5dmxf27tl4kx] and keeps the tunnel connected
+sshj foobarblahblub                  # Creates tunnel to 127.0.0.1:22 with specific tunnel ID
+sshj foobarblahblub 192.168.0.1 2222 # Tunnel to host 192.168.0.1:2222 on the LAN
 ```
 
 Then use this command from anywhere else in the world to connect as 'root' to 'foobarblahblub' (the host behind the NAT):
