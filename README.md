@@ -868,6 +868,15 @@ export GSOCKET_ARGS="-s MySecret"                        # Workstation
 sftp -D gs-netcat                                        # Workstation
 ```
 
+Or to DUMP a single file:
+```sh
+# On the sender
+gs-netcat -l <"FILENAME" # Will output a SECRET used by the receiver
+
+# On the receiver
+gs-netcat >"FILENAME"  # When prompted, enter the SECRET from the sender
+```
+
 <a id="http"></a>
 ### 4.v. File transfer - using HTTP
 
