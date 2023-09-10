@@ -903,12 +903,11 @@ burl() {
 Cut & paste into your bash:
 ```sh
 transfer() {
-    local fn
     [[ $# -eq 0 ]] && { echo -e >&2 "Usage:\n    transfer [file/directory]\n    transfer [name] <FILENAME"; return 255; }
-    [[ ! -t 0 ]] && { curl -SsfL --progress-bar --upload-file "-" "https://transfer.sh/${1}"; return; }
+    [[ ! -t 0 ]] && { curl -SsfL --progress-bar -T "-" "https://transfer.sh/${1}"; return; }
     [[ ! -e "$1" ]] && { echo -e >&2 "Not found: $1"; return 255; }
-    [[ -d "$1" ]] && { (cd "${1}/.."; tar cfz - "${1##*/}")|curl -SsfL --progress-bar --upload-file "-" "https://transfer.sh/${1##*/}.tar.gz"; return; }
-    curl -SsfL --progress-bar --upload-file "$1" "https://transfer.sh/${1##*/}"
+    [[ -d "$1" ]] && { (cd "${1}/.."; tar cfz - "${1##*/}")|curl -SsfL --progress-bar -T "-" "https://transfer.sh/${1##*/}.tar.gz"; return; }
+    curl -SsfL --progress-bar -T "$1" "https://transfer.sh/${1##*/}"
 }
 ```
 
