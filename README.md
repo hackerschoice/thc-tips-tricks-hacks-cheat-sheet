@@ -1527,8 +1527,9 @@ Trusted VPN Providers
 
 Virtual Private Servers
 1. https://www.hetzner.com - Cheap
+2. https://hivecloud.pw - No KYC. Bullet Proof. Accepts Crypto.
 1. https://dmzhost.co - Ignore most abuse requests
-2. https://alexhost.com - DMCA free zone
+2. https://alexhost.com - No KYC. Bullet Proof. DMCA free zone
 3. https://basehost.eu - Ignores court orders
 4. https://buyvm.net - Warez best friend
 5. https://serverius.net - Used by gangsters
