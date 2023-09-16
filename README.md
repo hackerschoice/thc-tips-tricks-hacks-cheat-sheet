@@ -12,7 +12,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 1. [Bash](#bash)
    1. [Leave Bash without history](#bash-no-history)
    1. [Hide your commands](#bash-hide-command)
-   1. [Hide your arguments](#bash-hide-arguments)
+   1. [Hide your command line options](#zap)
    1. [Hide a network connection](#bash-hide-connection)
    1. [Hide a process as user](#hide-a-process-user)
    1. [Hide a process as root](#hide-a-process-root)
@@ -146,18 +146,18 @@ PATH=.:$PATH syslogd -T0 10.0.2.1/24
 ```
 In this example we execute *nmap* but let it appear with the name *syslogd* in *ps alxwww* process list.
 
-<a id="bash-hide-arguments"></a>
-**1.iii. Hide your arguments**
+<a id="zap"></a>
+**1.iii. Hide your command line options**
 
-Download [zap-args.c](https://raw.githubusercontent.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/master/src/zap-args.c). This example will execute *nmap* but will make it appear as 'syslogd' without any arguments in the *ps alxww* output.
-
+Use [zapper](https://github.com/hackerschoice/zapper):
 ```sh
-gcc -Wall -O2 -fpic -shared -o zap-args.so zap-args.c -ldl
-(LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24)
-### Or as daemon background process:
-(LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24 &>nmap.log &)
+# Start Nmap but zap all options and show it as 'klog' in the process list:
+./zapper -a klog nmap -T0 10.0.0.1/24
+# Same but started as a daemon:
+(./zapper -a klog nmap -T0 10.0.0.1/24 &>nmap.log &)
+# Start a tmux and hide tmux and all further processes as some kernel process:
+exec ./zapper -f -a'[kworker/1:0-rcu_gp]' tmux
 ```
-Note: There is a gdb variant as well. Anyone?
 
 <a id="bash-hide-connection"></a>
 **1.iv. Hide a Network Connection**
