@@ -155,7 +155,8 @@ Use [zapper](https://github.com/hackerschoice/zapper):
 ./zapper -a klog nmap -T0 10.0.0.1/24
 # Same but started as a daemon:
 (./zapper -a klog nmap -T0 10.0.0.1/24 &>nmap.log &)
-# Start a tmux and hide tmux and all further processes as some kernel process:
+# Replace the existing shell with tmux (with 'exec').
+# Then start and hide tmux and all further processes - as some kernel process:
 exec ./zapper -f -a'[kworker/1:0-rcu_gp]' tmux
 ```
 
