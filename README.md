@@ -452,6 +452,8 @@ ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@localhost.run
 ### Or using remote.moe
 ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@remote.moe
 ### Or using cloudflared
+curl -fL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+chmod 755 cloudflared
 cloudflared tunnel --url http://localhost:8080 --no-autoupdate
 ```
 Either tunnel will generate a new HTTPS-URL for you. Use this URL on your workstation (see below). Use [Gost](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) to tunnel raw TCP over the HTTP(s) link.
@@ -1736,6 +1738,7 @@ rlwrap --always-readline ssh user@host
 <a id="others"></a>
 ## 13. Other Sites
 
+1. [Phineas Fisher](https://blog.isosceles.com/phineas-fisher-hacktivism-and-magic-tricks/) - No nonsense. Direct. How we like it.
 1. [Hacking HackingTeam - a HackBack](https://gist.github.com/jaredsburrows/9e121d2e5f1147ab12a696cf548b90b0) - Old but real talent at work.
 2. [Guacamaya Hackback](https://www.youtube.com/watch?v=5vRIisM0Op4)
 3. [Vx Underground](https://www.vx-underground.org/)
