@@ -882,8 +882,9 @@ gs-netcat >"FILENAME"  # When prompted, enter the SECRET from the sender
 ```
 
 <a id="http"></a>
-### 4.v. File transfer - using HTTP
+### 4.v. File transfer - using HTTPs
 
+#### Download from Server to Receiver:
 ```sh
 ## Spawn a temporary HTTP server and share the current working directory.
 python -m http.server 8080
@@ -892,6 +893,24 @@ python -m http.server 8080
 ```sh
 ## Request a temporary tunnel on a public domain
 cloudflared tunnel -url localhost:8080
+```
+Receiver: Access the URL from any browser to view/download the remote file system.
+
+#### Upload from Sender to Receiver:
+```sh
+## Spawn an upload server on the Receiver:
+pip install uploadserver
+python -m uploadserver
+```
+
+```sh
+## Make it available through a public domain
+cloudflared tunnel -url localhost:8000
+```
+
+On the Sender:
+```sh
+curl -X POST  https://CF-URL-CHANGE-ME.trycloudflare.com/upload -F 'files=@myfile.txt'
 ```
 
 <a id="burl"></a>
