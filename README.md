@@ -897,7 +897,7 @@ cloudflared tunnel -url localhost:8080
 Receiver: Access the URL from any browser to view/download the remote file system.
 
 #### Upload from Sender to Receiver:
-```sh
+```
 ## Spawn an upload server on the Receiver:
 pip install uploadserver
 python -m uploadserver
