@@ -1754,8 +1754,8 @@ Telegram Channels<a id="channels"></a>
 1. [BookZillaaa](https://t.me/bookzillaaa)
 
 Mindmaps & Knowledge
+1. [Compass Sec Cheat Sheets](https://github.com/CompassSecurity/Hacking_Tools_Cheat_Sheet)
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
-1. [Z Library](https://singlelogin.me)/[Z Library on TOR](http://bookszlibb74ugqojhzhg2a63w5i2atv5bqarulgczawnbmsb6s6qead.onion/)
 
 <a id="cool-linux-commands"></a>
 **12.ii. Cool Linux commands**
