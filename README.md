@@ -33,7 +33,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Check reachability from around the world](#check-reachable)
    1. [Check/Scan Open Ports](#check-open-ports)
    1. [Crack Passwords hashes](#bruteforce)
-   1. [Brute Force Passwords](#bruteforce)
+   1. [Brute Force Passwords / Keys](#bruteforce)
 1. [Data Upload/Download/Exfil](#exfil)
    1. [File Encoding/Decoding](#file-encoding)
    1. [File transfer using cut & paste](#cut-paste)
@@ -588,7 +588,7 @@ hashcat --username -w3 my-hash /usr/share/wordlists/rockyou.txt
 
 Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions) or use [Crackstation](https://crackstation.net) or [ColabCat/cloud](https://github.com/someshkar/colabcat)/[Cloudtopolis](https://github.com/JoelGMSec/Cloudtopolis) or on [AWS](https://akimbocore.com/article/hashcracking-with-aws/).
 
-**3.ix. Brute Force Passwords**
+**3.ix. Brute Force Passwords / Keys**
 
 The following is for brute forcing (guessing) passwords of ONLINE SERVICES.
 
@@ -613,6 +613,7 @@ Tools:
 * [THC Hydra](https://sectools.org/tool/hydra/)
 * [Medusa](https://www.geeksforgeeks.org/password-cracking-with-medusa-in-linux/) / [docs](http://foofus.net/goons/jmk/medusa/medusa.html)
 * [Metasploit](https://docs.rapid7.com/metasploit/bruteforce-attacks/)
+* [Crowbar](https://github.com/galkan/crowbar) - great for trying all ssh keys on a target IP range.
 
 Username & Password lists:
 * `/usr/share/nmap/nselib/data`  
