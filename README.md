@@ -1417,12 +1417,9 @@ curl -sL bench.sh | bash
 <a id="suid"></a>
 **7.vi. Find +s files / Find writeable directory**
 
+Find all suid/sgid binaries:
 ```
 find  / -xdev -type f -perm /6000  -ls 2>/dev/null
-```
-
-```
-find / -xdev -writable 2>/dev/null
 ```
 
 Find all writeable directories:
