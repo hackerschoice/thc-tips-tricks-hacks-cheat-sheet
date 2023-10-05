@@ -70,6 +70,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Clean logfile](#shell-clean-logs)
    1. [Hide files from a User without root privileges](#shell-hide-files)
    1. [Find out Linux Distro](#linux-info)
+   2. [Find +s binaries / Find writeable directories](#suid)
 1. [Crypto](#crypto)
    1. [Generate quick random Password](#gen-password)
    1. [Linux transportable encrypted filesystems](#crypto-filesystem)
@@ -1411,6 +1412,17 @@ uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
 curl -sL bench.sh | bash
 # Another speed check:  
 # curl -sL yabs.sh | bash
+```
+
+<a id="suid"></a>
+**7.vi. Find +s files / Find writeable directory
+
+```
+find  / -xdev -type f -perm /6000  -ls 2>/dev/null
+```
+
+```
+find / -xdev -writable 2>/dev/null
 ```
 
 ---
