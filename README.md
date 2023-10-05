@@ -1404,7 +1404,7 @@ cd $'\t'
 
 ```sh
 # Find out Linux Distribution
-uname -a; lsb_release -a; cat /etc/*release /etc/issue* /proc/version
+uname -a; lsb_release -a 2>/dev/null; cat /etc/*release /etc/issue* /proc/version /etc/hosts 2>/dev/null
 ```
 
 ```sh
