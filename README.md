@@ -1425,6 +1425,23 @@ find  / -xdev -type f -perm /6000  -ls 2>/dev/null
 find / -xdev -writable 2>/dev/null
 ```
 
+Find all writeable directories:
+```sh
+wfind() {
+    local arr dir
+
+    arr=("$@")
+    while [[ ${#arr[@]} -gt 0 ]]; do
+        dir=${arr[${#arr[@]}-1]}
+        unset 'arr[${#arr[@]}-1]'
+        find "$dir"  -maxdepth 1 -type d -writable -ls 2>/dev/null
+        IFS=$'\n' arr+=($(find "$dir" -mindepth 1 -maxdepth 1 -type d ! -writable 2>/dev/null))
+    done
+}
+# Usage: wfind /
+# Usage: wfind /etc /var /usr 
+```
+
 ---
 <a id="crypto"></a>
 ## 8. Crypto
