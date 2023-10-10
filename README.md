@@ -463,7 +463,7 @@ Using [bore.pub](https://github.com/ekzhang/bore) (free):
 bore local 31337 --to bore.pub```
 ```
 
-See also [remote.moe](?revese-shell-remote-moe) (free) to forward raw TCP from the target to your workstation or [ngrok](https://ngrok.com/) (paid subscription) to forward a raw public TCP port.
+See also [remote.moe](#revese-shell-remote-moe) (free) to forward raw TCP from the target to your workstation or [ngrok](https://ngrok.com/) (paid subscription) to forward a raw public TCP port.
 
 Other free services are limited to forward HTTPS only (not raw TCP). Some tricks below show how to tunnel raw TCP over HTTPS forwards (using websockets).
 
