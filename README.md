@@ -451,7 +451,7 @@ socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 <a id="ports"></a>
 **3.iii.a Raw TCP reverse ports**
 
-Using [segfault.net])(https://thc.org/segfault.net) (free):
+Using [segfault.net](https://thc.org/segfault.net) (free):
 ```sh
 echo "Your public IP:PORT is $(cat /config/self/reverse_ip):$(cat /config/self/reverse_port)"
 nc -vnlp $(cat /config/self/reverse_port)
