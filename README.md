@@ -495,7 +495,7 @@ websocat wss://<HTTPS-URL>
 
 B. Forward raw TCP via HTTPS:
 ```sh
-### On the server
+### On the server: Gost will translate any HTTP-websocket request to any raw TCP socks5 request:
 gost -L mws://:8080
 ```
 
@@ -503,8 +503,10 @@ Forward port 2222 to the server's port 22.
 ```sh
 ### On the workstation:
 gost -L tcp://:2222/127.0.0.1:22 -F 'mwss://<HTTPS-URL>:443'
+### Test the connection (will connect to localhost:22 on the server)
+nc -vn 127.0.0.1 2222
 ```
-or use the server as an Socks-Proxy EXIT node (from the workstation, via the HTTPS reverse tunnel):
+or use the server as a Socks-Proxy EXIT node (e.g. access any host inside the server's network or even the Internet via the server (using the HTTPS reverse tunnel from above):
 ```sh
 ### On the workstation:
 gost -L :1080 -F 'mwss://<HTTPS-URL>:443'
