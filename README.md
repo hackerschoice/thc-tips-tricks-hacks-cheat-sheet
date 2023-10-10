@@ -470,7 +470,7 @@ Other free services are limited to forward HTTPS only (not raw TCP). Some tricks
 <a id="https"></a>
 **3.iii.b HTTPS reverse tunnels**
 
-On the server, use any one of these three tunneling services:  
+On the server, use any one of these three HTTPS tunneling services:  
 ```sh
 ### Reverse HTTPS tunnel to forward public HTTPS requests to this server's port 8080:
 ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@localhost.run
@@ -481,7 +481,9 @@ curl -fL -o cloudflared https://github.com/cloudflare/cloudflared/releases/lates
 chmod 755 cloudflared
 cloudflared tunnel --url http://localhost:8080 --no-autoupdate
 ```
-Either service will generate a new temporary HTTPS-URL for you to use. Optionally, use [Gost](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) on both ends to tunnel raw TCP over the HTTPS URL.
+Either service will generate a new temporary HTTPS-URL for you to use.  
+
+Then, use [websocat](https://github.com/vi/websocat) or [Gost](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) on both ends to tunnel raw TCP over the HTTPS URL:
 
 A. A simple STDIN/STDOUT pipe via HTTPS:
 ```sh
@@ -495,7 +497,7 @@ websocat wss://<HTTPS-URL>
 
 B. Forward raw TCP via HTTPS:
 ```sh
-### On the server: Gost will translate any HTTP-websocket request to any raw TCP socks5 request:
+### On the server: Gost will translate any HTTP-websocket request to a TCP socks5 request:
 gost -L mws://:8080
 ```
 
