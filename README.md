@@ -28,6 +28,8 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Discover hosts](#discover)
    1. [Tcpdump](#tcpdump)
    1. [Tunnel and forwarding](#tunnel)
+      1. [Raw TCP reverse ports](#ports)
+      1. [HTTPS reverse forwards](#https)
    1. [Use any tool via Socks Proxy](#scan-proxy)
    1. [Find your public IP address](#your-ip)
    1. [Check reachability from around the world](#check-reachable)
@@ -446,8 +448,27 @@ openssl s_client -connect smtp.gmail.com:465
 socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 ```
 
+<a id="ports"></a>
+**3.iii.a Raw TCP reverse ports**
+
+Using [segfault.net])(https://thc.org/segfault.net) (free):
+```sh
+echo "Your public IP:PORT is $(cat /config/self/reverse_ip):$(cat /config/self/reverse_port)"
+nc -vnlp $(cat /config/self/reverse_port)
+```
+
+Using [bore.pub](https://github.com/ekzhang/bore) (free):
+```sh
+# Forward a random public TCP port to localhost:31337
+bore local 31337 --to bore.pub```
+```
+
+See also [remote.moe](?revese-shell-remote-moe) (free) to forward raw TCP from the target to your workstation or [ngrok](https://ngrok.com/) (paid subscription) to forward a raw public TCP port.
+
+Other free services are limited to forward HTTPS only (not raw TCP). Some tricks below show how to tunnel raw TCP over HTTPS forwards (using websockets).
+
 <a id="https"></a>
-**3.iii.b. HTTPS reverse tunnels**
+**3.iii.b HTTPS reverse tunnels**
 
 On the server:  
 ```sh
@@ -590,7 +611,7 @@ hashcat --username -w3 my-hash /usr/share/wordlists/rockyou.txt
 
 Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions) or use [Crackstation](https://crackstation.net) or [ColabCat/cloud](https://github.com/someshkar/colabcat)/[Cloudtopolis](https://github.com/JoelGMSec/Cloudtopolis) or on [AWS](https://akimbocore.com/article/hashcracking-with-aws/).
 
-**3.ix. Brute Force Passwords / Keys**
+**3.xi. Brute Force Passwords / Keys**
 
 The following is for brute forcing (guessing) passwords of ONLINE SERVICES.
 
