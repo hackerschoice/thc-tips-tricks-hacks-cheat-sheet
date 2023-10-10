@@ -470,9 +470,9 @@ Other free services are limited to forward HTTPS only (not raw TCP). Some tricks
 <a id="https"></a>
 **3.iii.b HTTPS reverse tunnels**
 
-On the server:  
+On the server, use any one of these three tunneling services:  
 ```sh
-### Reverse HTTPS tunnel to forward public HTTPS requests to Port 8080 on this server:
+### Reverse HTTPS tunnel to forward public HTTPS requests to this server's port 8080:
 ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@localhost.run
 ### Or using remote.moe
 ssh -R80:0:8080 -o StrictHostKeyChecking=accept-new nokey@remote.moe
@@ -481,29 +481,32 @@ curl -fL -o cloudflared https://github.com/cloudflare/cloudflared/releases/lates
 chmod 755 cloudflared
 cloudflared tunnel --url http://localhost:8080 --no-autoupdate
 ```
-Either tunnel will generate a new HTTPS-URL for you. Use this URL on your workstation (see below). Use [Gost](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) to tunnel raw TCP over the HTTP(s) link.
+Either service will generate a new temporary HTTPS-URL for you to use. Optionally, use [Gost](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) on both ends to tunnel raw TCP over the HTTPS URL.
 
-A simple STDIN/STDOUT pipe via HTTPS:
+A. A simple STDIN/STDOUT pipe via HTTPS:
 ```sh
+### On the server convert WebSocket to raw TCP:
 websocat -s 8080
-### and on the workstation use this command to connect:
+```
+```sh
+### On the remote target forward stdin/stdout to WebSocket:
 websocat wss://<HTTPS-URL>
 ```
 
-Or run a Socks-Proxy (via HTTPS):
+B. Forward raw TCP via HTTPS:
 ```sh
 ### On the server
 gost -L mws://:8080
 ```
 
-On the workstation:  
-
 Forward port 2222 to the server's port 22.
 ```sh
+### On the workstation:
 gost -L tcp://:2222/127.0.0.1:22 -F 'mwss://<HTTPS-URL>:443'
 ```
-or use it as a Socks-Proxy:
+or use the server as an Socks-Proxy EXIT node (from the workstation, via the HTTPS reverse tunnel):
 ```sh
+### On the workstation:
 gost -L :1080 -F 'mwss://<HTTPS-URL>:443'
 ### Test the Socks-proxy:
 curl -x socks5h://0 ipinfo.io
