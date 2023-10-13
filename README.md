@@ -432,7 +432,7 @@ tcpdump -n "tcp[tcpflags] == tcp-syn"
 tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
 
 ## Ascii output (for all large packets. Change to >40 if no TCP options are used).
-tcpdump -s 2048 -nAq 'tcp and (ip[2:2] > 60)'
+tcpdump -s0 -nAq 'tcp and (ip[2:2] > 60)'
 ```
 
 <a id="tunnel"></a>
