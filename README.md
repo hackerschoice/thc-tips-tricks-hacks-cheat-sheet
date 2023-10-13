@@ -1931,10 +1931,11 @@ rlwrap --always-readline ssh user@host
 4. [HTB absolute](https://0xdf.gitlab.io/2023/05/27/htb-absolute.html) - Well written and explained attack.
 5. [Conti Leak](https://github.com/ForbiddenProgrammer/conti-pentester-guide-leak) - Windows hacking. Pragmatic.
 6. [Red Team Notes](https://www.ired.team/)
-7. [HackTricks](https://book.hacktricks.xyz/welcome/readme)
-8. [Awesome Red Teaming](https://github.com/yeyintminthuhtut/Awesome-Red-Teaming)
-9. [VulHub](https://github.com/vulhub/vulhub) - Test your exploits
-10. [Qubes-OS](https://www.qubes-os.org/) - Desktop OS focused on security with XEN isolated (disposable) guest VMs (Fedora, Debian, Whonix out of the box)
+7. [InfoSec CheatSheet](https://github.com/r1cksec/cheatsheets)
+8. [HackTricks](https://book.hacktricks.xyz/welcome/readme)
+9. [Awesome Red Teaming](https://github.com/yeyintminthuhtut/Awesome-Red-Teaming)
+10. [VulHub](https://github.com/vulhub/vulhub) - Test your exploits
+11. [Qubes-OS](https://www.qubes-os.org/) - Desktop OS focused on security with XEN isolated (disposable) guest VMs (Fedora, Debian, Whonix out of the box)
 
 
 ---
