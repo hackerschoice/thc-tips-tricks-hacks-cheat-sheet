@@ -415,12 +415,12 @@ mkdir -p ~/.ssh 2>/dev/null
 ssh-keygen -q -N "" -t ed25519 -f sshd_key
 cat sshd_key.pub >>~/.ssh/authorized_keys
 cat sshd_key
-$(command -v sshd) -f /dev/null -o HostKey=$(pwd)/sshd_key -p 31337 # -Dvvv
+$(command -v sshd) -f /dev/null -o HostKey=$(pwd)/sshd_key -o GatewayPorts=yes -p 31337 # -Dvvv
 ```
 ```sh
 # On the client, copy the sshd_key from the server
-# and proxy connection via the server:
-ssh -D1080 -i sshd_key -p 31337 joe@1.2.3.4
+# and proxy connection via the server and forward 31339 to localhsot:
+ssh -D1080 -R31339:0:31339 -i sshd_key -p 31337 joe@1.2.3.4
 # curl -x socks5h://0 ipinfo.io
 ```
 
