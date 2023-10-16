@@ -24,6 +24,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [SSH socks5 tunnel](#ssh-socks-tunnel)
    1. [SSH to NATed host](#ssh-j)
    1. [SSH pivot via ProxyJump](#ssh-pj)
+   1. [SSHD as user](#sshd-user)
 1. [Network](#network)
    1. [Discover hosts](#discover)
    1. [Tcpdump](#tcpdump)
@@ -403,6 +404,23 @@ kali@local-kali$ ssh -J c2@10.25.237.119 jumpuser@192.168.5.135
 ```
 
 > We use this as well to hide our IP address when logging into servers. 
+
+<a id="sshd-user"></a>
+**2.vi SSHD as user land**
+
+It is possible to start another SSHD on any port as non-root user and use this for connection multiplexing or forwarding (and without logging):
+```sh
+# On the server, as non-root user 'joe':
+mkdir -p ~/.ssh 2>/dev/null
+ssh-keygen -q -N "" -t ed25519 -f sshd_key
+cat sshd_key.pub >>~/.ssh/authorized_keys
+cat sshd_key
+$(command -v sshd) -f /dev/null -o HostKey=$(pwd)/sshd_key -p 31337 # -Dvvv
+```
+```sh
+# On the client, copy the sshd_key from the server:
+ssh -i sshd_key -p 31337 joe@1.2.3.4
+```
 
 ---
 <a id="network"></a>
