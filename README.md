@@ -418,8 +418,8 @@ cat sshd_key
 $(command -v sshd) -f /dev/null -o HostKey=$(pwd)/sshd_key -o GatewayPorts=yes -p 31337 # -Dvvv
 ```
 ```sh
-# On the client, copy the sshd_key from the server
-# and proxy connection via the server and forward 31339 to localhsot:
+# On the client, copy the sshd_key from the server. Then login:
+# Example: Proxy connection via the server and reverse-forward 31339 to localhost:
 ssh -D1080 -R31339:0:31339 -i sshd_key -p 31337 joe@1.2.3.4
 # curl -x socks5h://0 ipinfo.io
 ```
