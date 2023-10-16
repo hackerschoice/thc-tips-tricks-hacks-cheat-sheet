@@ -619,7 +619,7 @@ nmap -A -F -Pn --min-rate 10000 --script vulners.nse --script-timeout=5s scanme.
 hashcat --username -w3 my-hash /usr/share/wordlists/rockyou.txt
 ```
 
-Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions) or use [Crackstation](https://crackstation.net) or [ColabCat/cloud](https://github.com/someshkar/colabcat)/[Cloudtopolis](https://github.com/JoelGMSec/Cloudtopolis) or on [AWS](https://akimbocore.com/article/hashcracking-with-aws/).
+Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions) or use [Crackstation](https://crackstation.net), [shuck.sh](https://shuck.sh/), [ColabCat/cloud](https://github.com/someshkar/colabcat)/[Cloudtopolis](https://github.com/JoelGMSec/Cloudtopolis) or crack on your own [AWS](https://akimbocore.com/article/hashcracking-with-aws/).
 
 **3.xi. Brute Force Passwords / Keys**
 
