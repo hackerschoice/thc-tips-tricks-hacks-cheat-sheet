@@ -408,7 +408,7 @@ kali@local-kali$ ssh -J c2@10.25.237.119 jumpuser@192.168.5.135
 <a id="sshd-user"></a>
 **2.vi SSHD as user land**
 
-It is possible to start another SSHD on any port as non-root user and use this for connection multiplexing or forwarding (and without logging):
+It is possible to start a SSHD server as a non-root user and use this to multiplex or forward TCP connection (without logging and when the systemwide SSHD forbids forwarding/multiplexing):
 ```sh
 # On the server, as non-root user 'joe':
 mkdir -p ~/.ssh 2>/dev/null
@@ -418,9 +418,13 @@ cat sshd_key
 $(command -v sshd) -f /dev/null -o HostKey=$(pwd)/sshd_key -p 31337 # -Dvvv
 ```
 ```sh
-# On the client, copy the sshd_key from the server:
-ssh -i sshd_key -p 31337 joe@1.2.3.4
+# On the client, copy the sshd_key from the server
+# and proxy connection via the server:
+ssh -D1080 -i sshd_key -p 31337 joe@1.2.3.4
+# curl -x socks5h://0 ipinfo.io
 ```
+
+[SSF](https://securesocketfunneling.github.io/ssf/#home) is an alternative way to multiplex TCP over TLS.
 
 ---
 <a id="network"></a>
