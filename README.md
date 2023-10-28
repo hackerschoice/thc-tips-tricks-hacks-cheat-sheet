@@ -1571,24 +1571,22 @@ Create a 256MB large encrypted file system. You will be prompted for a password.
 ```sh
 dd if=/dev/urandom of=/tmp/crypted bs=1M count=256 iflag=fullblock
 cryptsetup luksFormat /tmp/crypted
-mkfs.ext3 /tmp/crypted
+cryptsetup open /tmp/crypted sec
+mkfs -t ext3 /dev/mapper/sec
 ```
 
 Mount:
 
 ```sh
-losetup -f
-losetup /dev/loop0 /tmp/crypted
-cryptsetup open /dev/loop0 crypted
-mount -t ext3 /dev/mapper/crypted /mnt/crypted
+cryptsetup open /tmp/crypted sec
+mount -o nofail,noatime /dev/mapper/sec /mnt/sec
 ```
 
 Store data in `/mnt/crypted`, then unmount:
 
 ```sh
-umount /mnt/crypted
-cryptsetup close crypted
-losetup -d /dev/loop0
+umount /mnt/sec
+cryptsetup close sec 
 ```
 <a id="encfs"></a>
 **8.ii.b. Linux transportable encrypted filesystems - EncFS**
