@@ -1635,7 +1635,7 @@ Consider using [zap-args](#bash-hide-arguments) to hide the the arguments and /d
 <a id="dtrace"></a>
 **9.ii Sniff all SHELL sessions with dtrace**
 
-Especially useful for Solaris/SunOS and FreeBSD (pfSense). It uses kernel probes.
+Especially useful for Solaris/SunOS and FreeBSD (pfSense). It uses kernel probes to trace *all* sshd processes.
 
 Copy this "D Script" to the target system to a file named `d`:
 ```c
@@ -1648,8 +1648,8 @@ syscall::write:entry
 
 Start a dtrace and log to /tmp/.log:
 ```sh
-### Start probe as background process (csh & bash)
-(dtrace -sd >&/tmp/.log &)
+### Start kernel probe as background process.
+(dtrace -sd >/tmp/.log &)
 ```
 
 <a id="ssh-sniffing-strace"></a>
