@@ -152,7 +152,7 @@ screen -x MyName
 
 Alternatively if there is no Bash:
 ```sh
-cp `which nmap` syslogd
+cp "$(command -v nmap)" syslogd
 PATH=.:$PATH syslogd -T0 10.0.2.1/24
 ```
 In this example we execute *nmap* but let it appear with the name *syslogd* in *ps alxwww* process list.
