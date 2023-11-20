@@ -2,7 +2,7 @@
 
 # Script to quickly find juicy targets. Often used in combination with gsexecio to
 # retrieve information from all hosts:
-#  cat secrets.txt | parallel -j50 'cat ~/whatserver.sh | exec gsexecio {} >host_{}/whatserver.log 2>host_{}/whatserver.err'
+#  cat secrets.txt | parallel -j50 'cat whatserver.sh | exec gsexecio {} >whatserver-{}.log'
 
 # NOCOLOR=1  # un-comment this line to disable colors
 
