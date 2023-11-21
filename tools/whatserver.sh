@@ -84,6 +84,7 @@ addcn() {
     # [[ "$str" == *".local" ]] && return
     # [[ "$str" == *".headers" ]] && return
     [[ "$str" == *"foo."* ]] && return
+    [[ "$str" == *"localhost"* ]] && return  # also localhost4.localdomain4
     [[ "$str" == *"domain.com" ]] && return
     [[ "$str" == *"domain1.com" ]] && return
     [[ "$str" == *"domain2.com" ]] && return
@@ -158,12 +159,16 @@ uname -a
 date
 uptime
 id
-HTTPS https://ipinfo.io 2>/dev/null
-echo ""
+IFS="" ipinfo="$(HTTPS https://ipinfo.io 2>/dev/null)"
+ptrcn="${ipinfo#*  \"hostname\": \"}"
+ptrcn="${ptrcn%%\",*}"
+echo -e "$ipinfo\n"
+
 echo -e "${CY}>>>>> Addresses${CN}"
 echo "$inet"
 
 unset arr
+addcn "$ptrcn"
 addcn "$(hostname)"
 
 # Ngingx sites
@@ -203,17 +208,17 @@ done
 addcn "$(openssl s_client -showcerts -connect 0:443 2>/dev/null  </dev/null | openssl x509 -noout -subject  2>/dev/null | sed '/^subject/s/^.*CN.*=[ ]*//g')"
 
 # Assess /etc/hosts. Extract valid domains.
-IFS=$'\n' lines=($(grep -v '^#' /etc/hosts | grep -v -E '(^127\.|^255\.|localhost| ip6)'))
+IFS=$'\n' lines=($(grep -v '^#' /etc/hosts | grep -v -E '(^255\.| ip6)'))
 unset harr
 IFS=$'\n'
 for x in "${lines[@]}"; do
-    [[ "${inet:-BLAHBLAHNOTEXIST}" == *"$(echo "$x" | awk '{print $1;}')"* ]] && {
+    [[ "${inet:-BLAHBLAHNOTEXIST} 127.0.0.1" == *"$(echo "$x" | awk '{print $1;}')"* ]] && {
         # Save domains that are assigned to _this_ IP
         addline "$(echo "$x" | sed -E 's/[0-9.]+[ \t]+//')"
         continue
     }
     # Save all other domains in host array
-    IFS=" "$'\t' harr+=($(echo "$x" | sed -E 's/[0-9.]+[ \t]+//')) 
+    IFS=" "$'\t' harr+=($(echo "$x" | grep -vF localhost | sed -E 's/[0-9.]+[ \t]+//')) 
 done
 unset lines
 unset IFS
