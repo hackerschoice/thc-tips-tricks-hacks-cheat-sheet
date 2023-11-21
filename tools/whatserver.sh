@@ -3,6 +3,38 @@
 # Script to quickly find juicy targets. Often used in combination with gsexecio to
 # retrieve information from all hosts:
 #  cat secrets.txt | parallel -j50 'cat whatserver.sh | exec gsexecio {} >whatserver-{}.log'
+: <<-'COMMENT'
+
+# Extracting all domain names from all log files and displaying them with
+# GeoLocation and AS information (and converted to UTF-8)
+# This will only work on segfault.net (as it needs geoip and idn2)
+
+find . -name 'whatserver*.log' | while read fn; do
+        s=$(grep -F '  "org": ' "$fn")
+        s=${s##*: \"}
+        s=${s%\"*}
+        as=${s%% *}
+        name=${s#* }
+        name=${name//\\}
+        name=${name:0:32}
+        ip=$(grep -F '  "ip": ' "$fn")
+        ip=${ip##*: \"}
+        ip=${ip%\"*}
+        unset geoip
+        [[ -n $ip ]] && geoip=$(geoip "${ip}")
+        grep ^DOMAIN "$fn" | while read x; do
+	        x=${x//|}
+	        x=${x//$'\r'}
+	        unset origcn
+	        [[ "$x" == *"xn--"* ]] && {
+		        origcn=" [${x:7:40}]"
+		        x="DOMAIN $(idn2 -d "${x:7}" 2>/dev/null)"
+	        }
+	       echo "$as|${geoip:-N/A}|${ip:-N/A}|${x:0:48}${origcn}"
+	    done
+done | anew | column -t -s'|' -o' | '
+
+COMMENT
 
 # NOCOLOR=1  # un-comment this line to disable colors
 
@@ -25,6 +57,69 @@
     CDM="\e[0;35m" # magenta
     CDC="\e[0;36m" # cyan
     CUL="\e[4m"
+}
+
+### Certificates
+addcn() {
+    local IFS=" "
+    local str="${1,,}"
+    local regex="[^-a-z0-9.\*]"
+    local tld
+    str="${str//\"}"
+    str="${str// }"
+    str="${str//$'\r'}"
+    [[ -z $str ]] && return
+    tld="${str##*.}"
+    # [[ ${#tld} -gt 3 ]] && return # .blog,.agency,.social, ...
+    [[ ${#tld} -le 1 ]] && return # Not interested in .* .a and .x
+    [[ "$str" != *"."* ]] && return  # Not containing any .
+    [[ "$str" == *"@"* ]] && return  # Is an email
+    [[ "$str" == *"example.org" ]] && return
+    [[ "$str" == *"example.com" ]] && return
+    [[ "$str" == "entrust.netsecureservercertificationauthority" ]] && return # "Entrust.net Secure Server Certification Authority"
+    [[ "$str" == *".tld" ]] && return
+    [[ "$str" == *".wtf" ]] && return
+    # [[ "$str" == *".alias" ]] && return
+    [[ "$str" == *".if" ]] && return
+    # [[ "$str" == *".local" ]] && return
+    # [[ "$str" == *".headers" ]] && return
+    [[ "$str" == *"foo."* ]] && return
+    [[ "$str" == *"domain.com" ]] && return
+    [[ "$str" == *"domain1.com" ]] && return
+    [[ "$str" == *"domain2.com" ]] && return
+    [[ "$str" == *"site.com" ]] && return
+    [[ "$str" == *".host.org" ]] && return
+    [[ "$str" == *".nginx.org" ]] && return
+    [[ "$str" == *"server-1.biz" ]] && return
+    [[ "myforums.com headers.com isnot.org one.org two.org" == *"$str"* ]] && return
+    [[ "$str" =~ $regex ]] && return
+    [[ " ${arr[*]} " == *" $str "* ]] && return  # Already inside array
+    arr+=("$str")
+}
+
+# Line with multiple domain names
+addline() {
+    local IFS
+    local str="$1"
+    local names
+    local n
+    IFS=$'\t'" " names=(${str})
+    for n in "${names[@]}"; do
+        addcn "$n"
+    done
+}
+
+addcertfn() {
+    local fn="$1"
+    local str
+    [[ ! -f "$fn" ]] && return
+    [[ "$fn" == *_csr-* ]] && return  # Skip certificate requests
+    [[ "$(openssl x509 -noout -in "$fn" -ext basicConstraints 2>/dev/null)" == *"CA:TRUE"* ]] && return
+    str="$(openssl x509 -noout -in "$fn" -subject 2>/dev/null)"
+    [[ "$str" != "subject"* ]] && return
+    [[ "$str" != *"/CN"* ]] && return
+    str="$(echo "$str" | sed '/^subject/s/^.*CN.*=[ ]*//g')"
+    addcn "$str" "$fn"
 }
 
 HTTPS_curl() { curl -m 10 -fksSL "$*"; }
@@ -60,53 +155,48 @@ fi
 
 echo -e "${CW}>>>>> Info${CN}"
 uname -a
+date
 uptime
 id
-HTTPS https://ipinfo.io
+HTTPS https://ipinfo.io 2>/dev/null
 echo ""
 echo -e "${CY}>>>>> Addresses${CN}"
 echo "$inet"
 
+unset arr
+addcn "$(hostname)"
+
 # Ngingx sites
-IFS=$'\n' arr=($(hostname))
 [[ -d /etc/nginx ]] && {
-    IFS=$'\t'$'\n'" " arr=($(grep -r -F "server_name " /etc/nginx | sed 's/.*server_name[ ]\+\(.*\);/\1/g' | sort -u))
+    IFS=$'\n' lines=($(grep -r -E 'server_name .*;' /etc/nginx 2>/dev/null))
+    for str in "${lines[@]}"; do
+        str="${str#*server_name }"
+        str="${str%;*}"
+        addline "$str"
+    done
 }
 
 # Apache sites
 [[ -d /etc/httpd ]] && {
-    IFS=$'\t'$'\n'" " arr+=($(grep -r -E '(:*ServerName[ ]+|:*ServerAlias[ ]+)' /etc/httpd | grep -v ':[ ]*#' | sed 's/.*:.*Server[a-zA-Z]\+[ ]\+\(.*\)/\1/g' | sort -u))
-}
-
-### Certificates
-addcn() {
-    local str="$1"
-    [[ -z $str ]] && return
-    [[ "$str" != *"."* ]] && return  # Not containing any .
-    [[ "$str" == *"@"* ]] && return  # Is an email
-    [[ "${arr[*]}" == *"$str"* ]] && return
-    arr+=("$str")
-}
-
-addcert() {
-    local fn="$1"
-    local str
-    [[ "$(openssl x509 -noout -in "$fn" -ext basicConstraints 2>/dev/null)" == *"CA:TRUE"* ]] && return
-    str="$(openssl x509 -noout -in "$fn" -subject 2>/dev/null | sed '/^subject/s/^.*CN.*=[ ]*//g')"
-    addcn "$str"
+    IFS=$'\n' lines=($(grep -r -E ':*(ServerName|ServerAlias)[ ]+' /etc/httpd 2>/dev/null | grep -v ':[ ]*#'))
+    for str in "${lines[@]}"; do
+        str="${str#*ServerName }"
+        str="${str#*ServerAlias }"
+        addline "$str"
+    done
 }
 
 # Find where the certificates are stored:
-unset certs
+unset certsfn
 IFS=$'\n'
-[[ -d /etc/nginx ]] && certs=($(find /etc/nginx -name '*.conf*' -exec grep -F "ssl_certificate " {} \; 2>/dev/null | awk '{print $NF;}' | sed 's/;$//' | sort -u))
+[[ -d /etc/nginx ]] && certsfn=($(find /etc/nginx -name '*.conf*' -exec grep -F "ssl_certificate " {} \; 2>/dev/null | awk '{print $NF;}' | sed 's/;$//' | sort -u))
 
 # Any any file that sounds like a certificate
-cert+=($(find /etc -name '*.crt' -o -name '*.pem' 2>/dev/null))
+certsfn+=($(find /etc -name '*.crt' -o -name '*.pem' 2>/dev/null))
 
 # Add all found certificate-files
-for fn in "${lines[@]}"; do
-    addcert "$fn"
+for fn in "${certsfn[@]}"; do
+    addcertfn "$fn"
 done
 
 # Grab certificate from live server (in case we dont have read access to the file):
@@ -119,7 +209,7 @@ IFS=$'\n'
 for x in "${lines[@]}"; do
     [[ "${inet:-BLAHBLAHNOTEXIST}" == *"$(echo "$x" | awk '{print $1;}')"* ]] && {
         # Save domains that are assigned to _this_ IP
-        IFS=" "$'\t' arr+=($(echo "$x" | sed -E 's/[0-9.]+[ \t]+//'))
+        addline "$(echo "$x" | sed -E 's/[0-9.]+[ \t]+//')"
         continue
     }
     # Save all other domains in host array
@@ -159,7 +249,7 @@ if command -v ip >/dev/null; then
     echo -e "${CB}>>>>> LINK stats${CN}"
     ip -s link
     echo -e "${CB}>>>>> ARP table${CN}"
-    ip n sh
+    ip n sh | COL
 else
     command -v netstat >/dev/null && {
         echo -e "${CB}>>>>> ROUTING table${CN}"
@@ -177,3 +267,12 @@ command -v netstat >/dev/null && {
     echo -e "${CDG}>>>>> Listening UDP${CN}"
     netstat -anup
 }
+
+[[ -n "$(docker ps -aq 2>/dev/null)" ]] && {
+    echo -e "${CDR}>>>>> Docker Containers${CN}"
+    docker ps -a
+}
+
+echo -e "${CDR}>>>>> Process List${CN}"
+# Dont display kernel threads
+ps --ppid 2 -p 2 --deselect flwww
