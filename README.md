@@ -502,6 +502,8 @@ socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 
 Using [segfault.net](https://thc.org/segfault.net) (free):
 ```sh
+# Request a random public TCP port:
+curl sf/port
 echo "Your public IP:PORT is $(cat /config/self/reverse_ip):$(cat /config/self/reverse_port)"
 nc -vnlp $(cat /config/self/reverse_port)
 ```
@@ -510,6 +512,12 @@ Using [bore.pub](https://github.com/ekzhang/bore) (free):
 ```sh
 # Forward a random public TCP port to localhost:31337
 bore local 31337 --to bore.pub
+```
+
+using [serveo.net](https://serveo.net) (free):
+```sh
+# Forward a random public TCP port to localhost:31337
+ssh -R 0:localhost:31337 serveo.net
 ```
 
 See also [remote.moe](#revese-shell-remote-moe) (free) to forward raw TCP from the target to your workstation or [ngrok](https://ngrok.com/) (paid subscription) to forward a raw public TCP port.
