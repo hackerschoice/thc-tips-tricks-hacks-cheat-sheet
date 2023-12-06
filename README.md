@@ -2034,14 +2034,16 @@ Mindmaps & Knowledge
 1. https://github.com/ibraheemdev/modern-unix
 
 <a id="tmux"></a>
-**12.iii. tmux**
+**12.iii. Tmux Cheat Sheet**
+
 
 | | Tmux Cheat Sheet |
 | --- | --- |
-| Save Scrollback | ```Ctrl+b``` + ```:```, then type ```capture-pane -S -``` followed by ```Ctrl+b``` + ```:``` and type ```save-buffer filename.txt```. |
-| Attach | Start a new tmux, then type ```Ctrl+b``` + ```s``` and use ```LEFT```, ```RIGHT``` to expand and select any session. |
-| Logging | ```Ctrl+b``` + ```Shift + P``` to start and stop. |
-| Menu | ```Ctrl+b``` + ```>```. Then use ```Ctrl+b``` + ```UP```, ```DOWN```, ```LEFT``` or ```RIGHT``` to move between the panes. |
+| Save Scrollback | `Ctrl+b` + `:`, then type `capture-pane -S -` followed by `Ctrl+b` + `:` and type `save-buffer filename.txt`. |
+| Spy Scrollback | `tmux capture-pane -e -pS- -t 6.0` to capture pane 6, window 0 of a running tmux. Remove `-e` to save without colour. |
+| Logging | `Ctrl+b` + `Shift + P` to start and stop. |
+| Attach | Start a new tmux, then type `Ctrl+b` + `s` and use `LEFT`, `RIGHT` to preview and select any session. |
+| Menu | `Ctrl+b` + `>`. Then use `Ctrl+b` + `UP`, `DOWN`, `LEFT` or `RIGHT` to move between the panes. |
 
 <a id="useful-commands"></a>
 **12.iv. Useful commands**
