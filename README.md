@@ -100,7 +100,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 1. [Miscellaneous](#misc)
    1. [Tools of the trade](#tools)
    1. [Cool Linux commands](#cool-linux-commands)
-   1. [tmux](#tmux)
+   1. [tmux Cheat Sheet](#tmux)
    1. [Useful commands](#useful-commands)
 1. [Other Sites](#others)
     
