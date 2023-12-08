@@ -735,6 +735,11 @@ nmap -sCV -F -Pn --min-rate 10000 scanme.nmap.org
 nmap -A -F -Pn --min-rate 10000 --script vulners.nse --script-timeout=5s scanme.nmap.org
 ```
 
+Using bash:
+```shell
+timeout 5 bash -c "</dev/tcp/1.2.3.4/31337" && echo OPEN || echo CLOSED
+```
+
 ---
 <a id="bruteforce"></a>
 **3.viii. Crack Password hashes**
