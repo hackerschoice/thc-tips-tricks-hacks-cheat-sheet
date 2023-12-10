@@ -1554,7 +1554,7 @@ uname -a; lsb_release -a 2>/dev/null; cat /etc/*release /etc/issue* /proc/versio
 
 netstat if there is no netstat/ss/lsof:
 ```sh
-culr -fsSL https://raw.githubusercontent.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/master/tools/awk_netstat.sh | bash
+curl -fsSL https://raw.githubusercontent.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/master/tools/awk_netstat.sh | bash
 ```
 
 Speed check the system
