@@ -1586,6 +1586,14 @@ wfind() {
 # Usage: wfind /etc /var /usr 
 ```
 
+Find local passwords:
+```sh
+curl -fsSL https://github.com/praetorian-inc/noseyparker/releases/download/v0.16.0/noseyparker-v0.16.0-x86_64-unknown-linux-gnu.tar.gz | tar xvfz - --transform="flags=r;s|.*/||" --no-anchored  --wildcards noseyparker && \
+./noseyparker scan . && \
+./noseyparker report
+```
+(Or use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history)
+
 ---
 <a id="shell-hacks"></a>
 ## 8. Shell Hacks
