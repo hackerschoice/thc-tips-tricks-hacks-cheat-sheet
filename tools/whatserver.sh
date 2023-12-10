@@ -30,10 +30,9 @@ find . -name 'whatserver*.log' | while read fn; do
 		        origcn=" [${x:7:40}]"
 		        x="DOMAIN $(idn2 -d "${x:7}" 2>/dev/null)"
 	        }
-	       echo "$as|${geoip:-N/A}|${ip:-N/A}|${x:0:48}${origcn}"
+	       echo "$as|${geoip:-N/A}|${ip:-N/A}|${x:7:64}${origcn}"
 	    done
 done | anew | column -t -s'|' -o' | '
-
 COMMENT
 
 # NOCOLOR=1  # un-comment this line to disable colors
