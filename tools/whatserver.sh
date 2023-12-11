@@ -155,6 +155,7 @@ fi
 
 echo -e "${CW}>>>>> Info${CN}"
 uname -a
+hostnamectl 2>/dev/null
 date
 uptime
 id
