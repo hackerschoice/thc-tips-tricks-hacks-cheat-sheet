@@ -745,6 +745,10 @@ timeout 5 bash -c "</dev/tcp/1.2.3.4/31337" && echo OPEN || echo CLOSED
 <a id="bruteforce"></a>
 **3.viii. Crack Password hashes**
 
+ 1. [NTLM2password](https://ntlm.pw/) to crack (lookup) NTLM passwords
+ 2. [wpa-sec](https://wpa-sec.stanev.org) to crack (lookup) WPA PSK passwords
+
+HashCat is our go-to tool for everything else:
 ```shell
 hashcat --username -w3 my-hash /usr/share/wordlists/rockyou.txt
 ```
