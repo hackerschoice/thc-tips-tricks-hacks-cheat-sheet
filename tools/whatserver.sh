@@ -154,8 +154,10 @@ fi
 }
 
 echo -e "${CW}>>>>> Info${CN}"
-uname -a
-hostnamectl 2>/dev/null
+uname -a 2>/dev/null || cat /proc/version 2>/dev/null
+hostnamectl 2>/dev/null || lsb_release -a 2>/dev/null
+# || cat /etc/banner 2>/dev/null
+source /etc/os-release 2>/dev/null && echo "${PRETTY_NAME}"
 date
 uptime
 id
@@ -169,7 +171,7 @@ echo "$inet"
 
 unset arr
 addcn "$ptrcn"
-addcn "$(hostname)"
+addcn "$(hostname 2>/dev/null)"
 
 # Ngingx sites
 [[ -d /etc/nginx ]] && {
@@ -241,18 +243,29 @@ unset res
     [[ -n $str ]] && echo -e "${CDM}>>>>> SSH hosts accessed${CN}"
 }
 
+echo -e "${CDM}>>>>> Storage ${CN}"
+df -h 2>/dev/null | grep -v ^tmpfs
+
 echo -e "${CDM}>>>>> Last History${CN}"
 ls -al ~/.*history* 2>/dev/null
 
 echo -e "${CDM}>>>>> /home (top20)${CN}"
-ls -ld /root /home/* --sort=time | head -n20
+# BusyBox does not know --sort=time
+ls -ld -t /root /home/* 2>/dev/null | head -n20
+
+echo -e "${CDM}>>>>> Lastlog${CN}"
+lastlog 2>/dev/null | grep -vF 'Never logged in'
+
+echo -e "${CDM}>>>>> /root/${CN}"
+ls -lat /root/ 2>/dev/null
 
 # Output network information
 if command -v ip >/dev/null; then
     echo -e "${CB}>>>>> ROUTING table${CN}"
     ip route show | COL
     echo -e "${CB}>>>>> LINK stats${CN}"
-    ip -s link
+    # BusyBox does not support -s
+    { ip -s link || ip link show;} 2>/dev/null 
     echo -e "${CB}>>>>> ARP table${CN}"
     ip n sh | COL
 else
@@ -280,4 +293,9 @@ command -v netstat >/dev/null && {
 
 echo -e "${CDR}>>>>> Process List${CN}"
 # Dont display kernel threads
-ps --ppid 2 -p 2 --deselect flwww
+# BusyBox only supports "ps w"
+{ ps --ppid 2 -p 2 --deselect flwww || ps alxwww || ps w;} 2>/dev/null 
+#| grep -v MARKER-WHATSERVER
+
+# return with "success"
+exit 0
