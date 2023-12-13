@@ -2001,7 +2001,8 @@ Vulnerability Scanners
 DDoS
 1. [DeepNet](https://github.com/the-deepnet/ddos) - we despise DDoS but if we had to then this would be our choice.
 
-Static Binaries / Warez
+Static Binaries / pre-compiled Tools
+1. https://github.com/Azathothas/Toolpacks/tree/main from [hysp project](https://github.com/metis-os/hysp-pkgs)
 1. https://github.com/andrew-d/static-binaries/tree/master/binaries/linux/x86_64
 1. https://iq.thc.org/cross-compiling-exploits
 
