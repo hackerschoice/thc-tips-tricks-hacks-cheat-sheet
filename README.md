@@ -79,8 +79,6 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Restore the date of a file](#restore-timestamp)
    1. [Clean logfile](#shell-clean-logs)
    1. [Hide files from a User without root privileges](#shell-hide-files)
-   1. [Find out Linux Distro](#linux-info)
-   2. [Find +s binaries / Find writeable directories](#suid)
 1. [Crypto](#crypto)
    1. [Generate quick random Password](#gen-password)
    1. [Linux transportable encrypted filesystems](#crypto-filesystem)
@@ -1549,11 +1547,6 @@ Become root
 Get essential information about a host:
 ```sh
 curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh | bash
-```
-
-Find out the Linux Distribution
-```sh
-uname -a; lsb_release -a 2>/dev/null; cat /etc/*release /etc/issue* /proc/version /etc/hosts 2>/dev/null
 ```
 
 netstat if there is no netstat/ss/lsof:
