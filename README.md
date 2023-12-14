@@ -1634,11 +1634,12 @@ This will reset the logfile to 0 without having to restart syslogd etc:
 
 This will remove any line containing the IP `1.2.3.4` from the log file:
 ```sh
-#DEL=thc.org
-#DEL=${SSH_CLIENT%% *}
-DEL=1.2.3.4
-LOG=/var/log/auth.log
-IFS="" a=$(sed "/${DEL}/d" <"${LOG}") && echo "$a">"${LOG}"
+xlog() {
+    local a=$(sed "/${1:?}/d" <"${2:?}") && echo "$a" >"${2:?}"
+}
+xlog "1\.2\.3\.4" /var/log/auth.log
+# xlog "${SSH_CLIENT%% *}" /var/log/auth.log
+# xlog "^2023.* thc\.org" foo.log
 ```
 
 <a id="shell-hide-files"></a>
