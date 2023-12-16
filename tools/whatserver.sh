@@ -3,6 +3,12 @@
 # Script to quickly find juicy targets. Often used in combination with gsexecio to
 # retrieve information from all hosts:
 #  cat secrets.txt | parallel -j50 'cat whatserver.sh | exec gsexecio {} >whatserver-{}.log'
+#
+# Use `less -R whatserver.log` to display the log files with color.
+# Use `cat whatserver.log | sed -e 's/\x1b\[[0-9;]*m//g'` to remove colors.
+
+# NOCOLOR=1  # un-comment this line to disable colors
+
 : <<-'COMMENT'
 
 # Extracting all domain names from all log files and displaying them with
@@ -34,8 +40,6 @@ find . -name 'whatserver*.log' | while read fn; do
 	    done
 done | anew | column -t -s'|' -o' | '
 COMMENT
-
-# NOCOLOR=1  # un-comment this line to disable colors
 
 [[ -z $NOCOLOR ]] && {
     CY="\e[1;33m" # yellow
