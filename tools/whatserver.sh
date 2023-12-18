@@ -1,6 +1,9 @@
 #! /usr/bin/env bash
 
-# Script to quickly find juicy targets.
+# Script to quickly display essential server information. Qualtiy, not quantity.
+# - Extracts FQDN from certificates.
+# - Most recent activities / uses.
+#
 #  curl -fsSL https://thc.org/ws | bash | less -R
 #  curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh | bash | less -R
 
@@ -131,19 +134,22 @@ addcertfn() {
     addcn "$str" "$fn"
 }
 
-# Return <Virtualization>/<Container> or EMPTY if baremetal.
+# Return <Virtualization>/<Container> or EMPTY if baremetal. Mostly stolen from:
+#   virt-what
+#   systemd-detect-virt --vm
+#   systemd-detect-virt --container
 get_virt() {
     local str
     local cont
     local str_suffix
 
-    if grep -sqF docker "/proc/1/cgroup" &>/dev/null || grep -sqF " /docker/" "/proc/self/mountinfo" &>/dev/null || grep -sqF docker/overlay "/proc/self/mountinfo" &>/dev/null; then
+    if grep -sqF docker "/proc/1/cgroup" &>/dev/null || grep -sqF " /docker/" "/proc/self/mountinfo" || grep -sqF docker/overlay "/proc/self/mountinfo"; then
         cont="Docker"
-    elif tr '\000' '\n' <"/proc/1/environ" 2>/dev/null | grep -Eiq '^container=podman' || grep -sqF /libpod- "/proc/self/cgroup" 2>/dev/null; then
+    elif cat "/proc/1/environ" 2>/dev/null | tr '\000' '\n' | grep -Eiq '^container=podman' || grep -sqF /libpod- "/proc/self/cgroup"; then
         cont="Podman"
     elif [[ -d /proc/vz ]]; then
         cont="Virtuozzo" # OpenVZ
-    elif [ -e "/proc/1/environ" ] && tr '\000' '\n' <"/proc/1/environ" 2>/dev/null | grep -Eiq '^container=lxc'; then
+    elif cat "/proc/1/environ" 2>/dev/null | tr '\000' '\n' | grep -Eiq '^container=lxc'; then
         cont="LXC"
     elif [ -e /proc/cpuinfo ] && grep -q 'UML' "/proc/cpuinfo"; then
         cont="User Mode Linux"
@@ -151,6 +157,9 @@ get_virt() {
     [[ -n $cont ]] && str_suffix="/${cont}"
 
     [[ -d /proc/bc ]] && { echo "OpenVZ${str_suffix}"; return; }
+
+    str=$(uname -r)
+    { [[ $str == *"microsoft"* ]] || [[ $str == *"WSL"* ]]; } && { echo "Microsoft WSL${str_suffix}"; return; }
 
     str="$(cat /sys/class/dmi/id/product_name /sys/class/dmi/id/sys_vendor /sys/class/dmi/id/board_vendor /sys/class/dmi/id/bios_vendor /sys/class/dmi/id/product_version 2>/dev/null)"
     [[ -n $str ]] && {
@@ -195,15 +204,16 @@ else
 fi
 
 PATH="/usr/sbin:$PATH"
+IFS=$'\n'
 
 unset inet
 if command -v ip >/dev/null; then
-    IFS=$'\n' inet="$(ip a show)"
+    inet="$(ip a show)"
 elif command -v ifconfig >/dev/null; then
-    IFS=$'\n' inet="$(ifconfig)"
+    inet="$(ifconfig)"
 fi
 [[ -n $inet ]] && {
-    IFS=$'\n' inet=$(echo "$inet" | grep inet | grep -vF 'inet 127.' | grep -vF 'inet6 ::1' | awk '{print $2;}')
+    inet=$(echo "$inet" | grep inet | grep -vF 'inet 127.' | grep -vF 'inet6 ::1' | awk '{print $2;}')
 }
 
 echo -e "${CW}>>>>> Info${CN}"
@@ -213,14 +223,14 @@ str="$(get_virt)"
 [[ -n $str ]] && echo "Virtualization: $str"
 hostnamectl 2>/dev/null || lsb_release -a 2>/dev/null
 # || cat /etc/banner 2>/dev/null
-source /etc/os-release 2>/dev/null && echo "${PRETTY_NAME}"
-echo "Date  : $(date)"
-echo "Uptime: $(uptime)"
+source /etc/os-release 2>/dev/null && echo "Pretty Name: ${PRETTY_NAME}"
+echo "Date       : $(date)"
+echo "Uptime     : $(uptime)"
 id
 ipinfo="$(HTTPS https://ipinfo.io 2>/dev/null)" && {
     ptrcn="${ipinfo#*  \"hostname\": \"}"
     ptrcn="${ptrcn%%\",*}"
-    echo -e "$ipinfo\n"
+    echo -e "$ipinfo"
 }
 
 echo -e "${CY}>>>>> Addresses${CN}"
@@ -232,7 +242,7 @@ addcn "$(hostname 2>/dev/null)"
 
 # Ngingx sites
 [[ -d /etc/nginx ]] && {
-    IFS=$'\n' lines=($(grep -r -E 'server_name .*;' /etc/nginx 2>/dev/null))
+    lines=($(grep -r -E 'server_name .*;' /etc/nginx 2>/dev/null))
     for str in "${lines[@]}"; do
         str="${str#*server_name }"
         str="${str%;*}"
@@ -242,7 +252,7 @@ addcn "$(hostname 2>/dev/null)"
 
 # Apache sites
 [[ -d /etc/httpd ]] && {
-    IFS=$'\n' lines=($(grep -r -E ':*(ServerName|ServerAlias)[ ]+' /etc/httpd 2>/dev/null | grep -v ':[ ]*#'))
+    lines=($(grep -r -E ':*(ServerName|ServerAlias)[ ]+' /etc/httpd 2>/dev/null | grep -v ':[ ]*#'))
     for str in "${lines[@]}"; do
         str="${str#*ServerName }"
         str="${str#*ServerAlias }"
@@ -284,18 +294,22 @@ unset IFS
 
 IFS=$'\n' res=($(printf "%s\n" "${arr[@]}" | sort -u))
 unset arr
-echo -e "${CY}>>>>> Domain Names${CN} (${#res[@]})"
-[[ ${#res[@]} -gt 0 ]] && printf "DOMAIN %s\n" "${res[@]}"
+[[ ${#res[@]} -gt 0 ]] && {
+    echo -e "${CY}>>>>> Domain Names${CN} (${#res[@]})"
+    printf "DOMAIN %s\n" "${res[@]}"
+}
 
 IFS=$'\n' res=($(printf "%s\n" "${harr[@]}" | sort -u))
 unset harr
-echo -e "${CY}>>>>> Other hosts (from /etc/hosts)${CN} (${#res[@]})"
-[[ ${#res[@]} -gt 0 ]] && printf "HOST  %s\n" "${res[@]}" | sort -u
+[[ ${#res[@]} -gt 0 ]] && {
+    echo -e "${CY}>>>>> Other hosts (from /etc/hosts)${CN} (${#res[@]})"
+    printf "HOST  %s\n" "${res[@]}" | sort -u
+}
 unset res
 
 [[ -f ~/.ssh/known_hosts ]] && {
     echo -e "${CDM}>>>>> Last SSH usage${CN}"
-    ls -l --time=atime ~/.ssh/known_hosts
+    command ls -ltu ~/.ssh/known_hosts
     IFS="" str="$(grep -v '^|' ~/.ssh/known_hosts | cut -f1 -d" " | cut -f1 -d,)"
     [[ -n $str ]] && echo -e "${CDM}>>>>> SSH hosts accessed${CN}"
 }
@@ -310,11 +324,20 @@ echo -e "${CDM}>>>>> /home (top20)${CN}"
 # BusyBox does not know --sort=time
 ls -Lld -t /root /home/* 2>/dev/null | head -n20
 
-echo -e "${CDM}>>>>> Lastlog${CN}"
-lastlog 2>/dev/null | grep -vF 'Never logged in'
+str=$(w -o -h 2>/dev/null | head -n100)
+[[ -n $str ]] && {
+    echo -e "${CDM}>>>>> Online${CN}"
+    echo "$str"
+}
+
+str=$(lastlog 2>/dev/null | tail -n+2 | grep -vF 'Never logged in')
+[[ -n $str ]] && {
+    echo -e "${CDM}>>>>> Lastlog${CN}"
+    echo "$str"
+}
 
 echo -e "${CDM}>>>>> /root/${CN}"
-ls -lat /root/ 2>/dev/null
+ls -lat /root/ 2>/dev/null | head -n 100
 
 # Output network information
 if command -v ip >/dev/null; then
@@ -337,10 +360,16 @@ else
 fi
 
 command -v netstat >/dev/null && {
-    echo -e "${CDG}>>>>> Listening TCP${CN}"
-    netstat -antp | grep LISTEN
-    echo -e "${CDG}>>>>> Listening UDP${CN}"
-    netstat -anup
+    str=$(netstat -antp | grep LISTEN)
+    [[ -n $str ]] && {
+        echo -e "${CDG}>>>>> Listening TCP${CN}"
+        echo "$str"
+    }
+    str=$(netstat -anup | grep ^udp)
+    [[ -n $str ]] && {
+        echo -e "${CDG}>>>>> Listening UDP${CN}"
+        echo "$str"
+    }
 }
 
 [[ -n "$(docker ps -aq 2>/dev/null)" ]] && {
@@ -351,8 +380,10 @@ command -v netstat >/dev/null && {
 echo -e "${CDR}>>>>> Process List${CN}"
 # Dont display kernel threads
 # BusyBox only supports "ps w"
-{ ps --ppid 2 -p 2 --deselect flwww || ps alxwww || ps w;} 2>/dev/null 
+{ ps --ppid 2 -p 2 --deselect flwww || ps alxwww || ps w;} 2>/dev/null | head -n 500
 #| grep -v MARKER-WHATSERVER
 
+# use "|head -n-1" to not display this line
+echo -e "${CW}>>>>> 📖 Please help to make this tool better - https://t.me/thcorg${CN} 😘"
 # return with "success"
 exit 0
