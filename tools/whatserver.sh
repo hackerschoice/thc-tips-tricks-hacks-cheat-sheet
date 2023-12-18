@@ -12,6 +12,8 @@
 
 # NOCOLOR=1  # un-comment this line to disable colors
 
+# Some ideas by slav and from virt-what
+
 : <<-'COMMENT'
 
 # Extracting all domain names from all log files and displaying them with
