@@ -2044,6 +2044,7 @@ Publishing
 3. [afraid.org](https://www.afraid.org) - Free Dynamic DNS for your domain
 2. [he.net](https://dns.he.net/) - Free Nameserver service
 4. [0bin](https://0bin.net/) / [paste.ec](https://paste.ec) - Encrypted PasteBin
+5. [pad.riseup.net](https://pad.riseup.net) - Create documents and share them securely
 
 Forums and Conferences
 1. [0x00Sec](https://0x00sec.org/) - Reverse Engineering & Hacking with a pinch of Malware
