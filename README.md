@@ -1939,6 +1939,7 @@ Many other services (for free)
 | https://spur.us/context/me | IP rating `https://spur.us/context/<IP>` |
 | http://drs.whoisxmlapi.com | Reverse Whois Lookup (not free) |
 | https://www.abuseipdb.com | IP abuse rating |
+| https://www.kelacyber.com | Buy passwords from the Darknet / Remove data-sets from the Darknet |
 
 | OSINT for Detectives ||
 | --- | --- |
@@ -1981,6 +1982,7 @@ Exploits
 1. [Shodan/Exploits](https://exploits.shodan.io/welcome) - Similar to exploit-db
 
 System Information Gathering
+1. `curl -fsSL https://thc.org/ws | bash` - Show all domains hosted on a server + system-information
 1. https://github.com/carlospolop/PEASS-ng/tree/master/linPEAS - Quick system informations for hackers.
 1. https://github.com/zMarch/Orc - Post-exploit tool to find local RCE (type `getexploit` after install)
 1. https://github.com/efchatz/pandora - Windows: dump password from various password managers
