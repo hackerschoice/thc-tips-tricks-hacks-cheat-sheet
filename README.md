@@ -2082,13 +2082,14 @@ Mindmaps & Knowledge
 
 | | Tmux Cheat Sheet |
 | --- | --- |
-| SaveScrollback | `Ctrl+b` + `:`, then type `capture-pane -S -` followed by `Ctrl+b` + `:` and type `save-buffer filename.txt`. |
+| Max Buffer | `Ctrl-b` + `:` + `set-option -g history-limit 65535` |
+| SaveScrollback | `Ctrl-b` + `:` + `capture-pane -S -` followed by `Ctrl-b` + `:` + `save-buffer filename.txt`. |
 | SpyScrollback | `tmux capture-pane -e -pS- -t 6.0` to capture pane 6, window 0 of a running tmux. Remove `-e` to save without colour. |
 | Clear | `tmux send-keys -R C-l \; clear-history -t6.0` to clear screen and delete scrollback history. |
-| Logging | `Ctrl+b` + `Shift + P` to start and stop. |
+| Logging | `Ctrl-b` + `:` + `bind-key P pipe-pane -o "exec cat >>$HOME/'#W-#S-tmux.log'" \; display-message 'Logging to $HOME/#W-#S-tmux.log'`<BR>Press `Ctrl-b` + `Shift + P` to start and stop. |
 | HiddenTmux | `cd /dev/shm && zapper -fa '/usr/sbin/apache2 -k start' tmux -S .$'\t'cache`<BR>To attach to your session do <BR>`cd /dev/shm && zapper -fa '/usr/sbin/apache2 -k start' tmux -S .$'\t'cache attach` |
-| Attach | Start a new tmux, then type `Ctrl+b` + `s` and use `LEFT`, `RIGHT` to preview and select any session. |
-| Menu | `Ctrl+b` + `>`. Then use `Ctrl+b` + `UP`, `DOWN`, `LEFT` or `RIGHT` to move between the panes. |
+| Attach | Start a new tmux, then type `Ctrl-b` + `s` and use `LEFT`, `RIGHT` to preview and select any session. |
+| Menu | `Ctrl-b` + `>`. Then use `Ctrl-b` + `UP`, `DOWN`, `LEFT` or `RIGHT` to move between the panes. |
 
 <a id="useful-commands"></a>
 **13.iv. Useful commands**
