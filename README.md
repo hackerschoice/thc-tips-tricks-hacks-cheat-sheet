@@ -1544,9 +1544,9 @@ Become root
 ## 7. Host Recon
 ---
 
-Get essential information about a host:
+Get [essential information](https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/blob/master/tools/whatserver.sh) about a host:
 ```sh
-curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh | bash
+curl -fsSL https://thc.org/ws | bash
 ```
 
 netstat if there is no netstat/ss/lsof:
