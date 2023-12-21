@@ -1939,7 +1939,6 @@ Many other services (for free)
 | https://spur.us/context/me | IP rating `https://spur.us/context/<IP>` |
 | http://drs.whoisxmlapi.com | Reverse Whois Lookup (not free) |
 | https://www.abuseipdb.com | IP abuse rating |
-| https://www.kelacyber.com | Buy passwords from the Darknet / Remove data-sets from the Darknet |
 
 | OSINT for Detectives ||
 | --- | --- |
