@@ -182,6 +182,8 @@ get_virt() {
 
     # No Virtualization but inside a container
     [[ -n $cont ]] && { echo "$cont"; return; }
+
+    return 255
 }
 
 HTTPS_curl() { curl -m 10 -fksSL "$*"; }
@@ -219,8 +221,16 @@ fi
 echo -e "${CW}>>>>> Info${CN}"
 uname -a 2>/dev/null || cat /proc/version 2>/dev/null
 # Retrieve virtualization method
-str="$(get_virt)"
-[[ -n $str ]] && echo "Virtualization: $str"
+str="$(get_virt)" && echo "Virtualization: $str"
+ncpu=$(nproc 2>/dev/null)
+[[ -e /proc/cpuinfo ]] && {
+    [[ -z $ncpu ]] && ncpu=$(grep -c '^model name' /proc/cpuinfo)
+    cpu=$(grep -m1 '^model name' /proc/cpuinfo | cut -f2 -d:)
+}
+mem=$(free -h | grep ^Mem | awk '{print $2;}')
+echo "CPU           : ${ncpu:-0}x${cpu} / ${mem} RAM"
+unset mem cpu ncpu
+
 hostnamectl 2>/dev/null || lsb_release -a 2>/dev/null
 # || cat /etc/banner 2>/dev/null
 source /etc/os-release 2>/dev/null && echo "Pretty Name: ${PRETTY_NAME}"
@@ -316,6 +326,7 @@ unset res
 
 echo -e "${CDM}>>>>> Storage ${CN}"
 df -h 2>/dev/null | grep -v ^tmpfs
+
 
 echo -e "${CDM}>>>>> Last History${CN}"
 ls -al ~/.*history* 2>/dev/null
