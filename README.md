@@ -2086,7 +2086,7 @@ Mindmaps & Knowledge
 | SaveScrollback | `Ctrl-b` + `:` + `capture-pane -S -` followed by `Ctrl-b` + `:` + `save-buffer filename.txt`. |
 | SpyScrollback | `tmux capture-pane -e -pS- -t 6.0` to capture pane 6, window 0 of a running tmux. Remove `-e` to save without colour. |
 | Clear | `tmux send-keys -R C-l \; clear-history -t6.0` to clear screen and delete scrollback history. |
-| Logging | `Ctrl-b` + `:` + `bind-key P pipe-pane -o "exec cat >>$HOME/'#W-#S-tmux.log'" \; display-message 'Logging to $HOME/#W-#S-tmux.log'`<BR>Press `Ctrl-b` + `Shift + P` to start and stop. |
+| Logging | `Ctrl-b` + `:` + `bind-key P pipe-pane -o "exec cat >>$HOME/'tmux-#W-#S.log'" \; display-message 'Toggling ~/tmux-#W-#S.log'`<BR>Press `Ctrl-b` + `Shift + P` to start and stop. |
 | HiddenTmux | `cd /dev/shm && zapper -fa '/usr/sbin/apache2 -k start' tmux -S .$'\t'cache`<BR>To attach to your session do <BR>`cd /dev/shm && zapper -fa '/usr/sbin/apache2 -k start' tmux -S .$'\t'cache attach` |
 | Attach | Start a new tmux, then type `Ctrl-b` + `s` and use `LEFT`, `RIGHT` to preview and select any session. |
 | Menu | `Ctrl-b` + `>`. Then use `Ctrl-b` + `UP`, `DOWN`, `LEFT` or `RIGHT` to move between the panes. |
