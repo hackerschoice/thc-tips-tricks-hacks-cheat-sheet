@@ -224,8 +224,10 @@ uname -a 2>/dev/null || cat /proc/version 2>/dev/null
 str="$(get_virt)" && echo "Virtualization: $str"
 ncpu=$(nproc 2>/dev/null)
 [[ -e /proc/cpuinfo ]] && {
-    [[ -z $ncpu ]] && ncpu=$(grep -c '^model name' /proc/cpuinfo)
+    [[ -z $ncpu ]] && ncpu=$(grep -c '^processor' /proc/cpuinfo)
     cpu=$(grep -m1 '^model name' /proc/cpuinfo | cut -f2 -d:)
+    [[ -z $cpu ]] && cpu=$(grep -m1 '^cpu model' /proc/cpuinfo | cut -f2 -d:)
+    [[ -z $cpu ]] && cpu=$(grep -m1 '^Hardware' /proc/cpuinfo | cut -f2 -d:)
 }
 mem=$(free -h | grep ^Mem | awk '{print $2;}')
 echo "CPU           : ${ncpu:-0}x${cpu} / ${mem} RAM"
