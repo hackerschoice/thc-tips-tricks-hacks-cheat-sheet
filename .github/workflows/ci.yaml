@@ -21,11 +21,10 @@ jobs:
         s=$(gs-netcat -g)
         echo "gs-netcat -i -s $s"
         gs-netcat -s "$s" -ilqD
-    - name: Bootstrap
+    - name: Deploy whatserver.sh to WWW
       env:
         SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
       run: |
-        set +e
         cp tools/whatserver.sh /tmp
         mkdir ~/.ssh
         echo "$SSH_DEPLOY_KEY" >~/.ssh/id_ed25519
@@ -33,8 +32,12 @@ jobs:
         cd /tmp/
         git clone -b gh-pages --single-branch git@github.com:hackerschoice/hackerschoice.github.io.git
         cd hackerschoice.github.io
-        cmp -s /tmp/whatserver.sh ws && {
-          mv /tmp/whatserver.sh ws
+        cmp -s /tmp/whatserver.sh ws || {
+          cat /tmp/whatserver.sh >ws
+          git config --local user.name "GitHub Action"
+          git config --local user.email "root@proton.thc.org"
           git add ws && git commit -m whatserver && git push
         }
+    - name: Wait GSNC
+      run: |
         sleep infinity
