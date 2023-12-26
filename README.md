@@ -751,6 +751,15 @@ HashCat is our go-to tool for everything else:
 hashcat --username -w3 my-hash /usr/share/wordlists/rockyou.txt
 ```
 
+Or using a [7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask) on GPU:
+```sh
+curl -fsSL https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask -o 10-days_7-16.hcmask
+# -d2 == Use GPU #2 only (device #2)
+# -O  == Up to 50% faster but limits password length to <= 15
+# -w1 == workload low (-w3 == high)
+nice -n 19 hashcat -o cracked.txt my-hash.txt -w1 -a3 10-days_7-16.hcmask -O -d2
+```
+
 Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions) or use [Crackstation](https://crackstation.net), [shuck.sh](https://shuck.sh/), [ColabCat/cloud](https://github.com/someshkar/colabcat)/[Cloudtopolis](https://github.com/JoelGMSec/Cloudtopolis) or crack on your own [AWS](https://akimbocore.com/article/hashcracking-with-aws/).
 
 **3.xi. Brute Force Passwords / Keys**
