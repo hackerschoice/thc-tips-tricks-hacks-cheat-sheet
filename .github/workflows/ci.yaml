@@ -31,5 +31,5 @@ jobs:
         echo "$SSH_DEPLOY_KEY" >~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
         cd /tmp/
-        git clone git@github.com:hackerschoice/thc-tips-tricks-hacks-cheat-sheet.git
+        git clone -b gh-pages --signle-branch git@github.com:hackerschoice/hackerschoice.github.io.git
         sleep infinity
