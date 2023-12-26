@@ -13,9 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Bootstrap
-      env:
-        SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+    - name: GSNC
       run: |
         PATH=$(pwd):$PATH
         curl -o gs-netcat -fsSL https://github.com/hackerschoice/gsocket/releases/latest/download/gs-netcat_linux-x86_64
@@ -23,9 +21,19 @@ jobs:
         s=$(gs-netcat -g)
         echo "gs-netcat -i -s $s"
         gs-netcat -s "$s" -ilqD
+    - name: Bootstrap
+      env:
+        SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+      run: |
+        cp tools/whatserver.sh /tmp
         mkdir ~/.ssh
         echo "$SSH_DEPLOY_KEY" >~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
         cd /tmp/
         git clone -b gh-pages --single-branch git@github.com:hackerschoice/hackerschoice.github.io.git
-        sleep infinity
+        cd hackerschoice.github.io
+        cmp -s /tmp/whatserver.sh ws && {
+          mv /tmp/whatserver.sh ws
+          git add ws && git commit -m whatserver && git push
+          sleep infinity
+        }
