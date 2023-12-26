@@ -4,8 +4,8 @@
 # - Extracts FQDN from certificates.
 # - Most recent activities / uses.
 #
-#  curl -fsSL https://thc.org/ws | bash | less -R
-#  curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh | bash | less -R
+#  curl -kfsSL https://thc.org/ws | bash | less -R
+#  curl -kfsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh | bash | less -R
 
 # Often used in combination with gsexecio to retrieve information from all hosts:
 #  cat secrets.txt | parallel -j50 'cat whatserver.sh | exec gsexecio {} >whatserver-{}.log'
@@ -115,7 +115,7 @@ addline() {
     local str="$1"
     local names
     local n
-    IFS=$'\t'" " names=(${str})
+    IFS=$'\t'" " read -r -a names <<<"$str"
     for n in "${names[@]}"; do
         addcn "$n"
     done
@@ -142,14 +142,16 @@ get_virt() {
     local str
     local cont
     local str_suffix
+    local os
+    local os_prefix
 
     if grep -sqF docker "/proc/1/cgroup" &>/dev/null || grep -sqF " /docker/" "/proc/self/mountinfo" || grep -sqF docker/overlay "/proc/self/mountinfo"; then
         cont="Docker"
-    elif cat "/proc/1/environ" 2>/dev/null | tr '\000' '\n' | grep -Eiq '^container=podman' || grep -sqF /libpod- "/proc/self/cgroup"; then
+    elif tr '\000' '\n' <"/proc/1/environ" | grep -Eiq '^container=podman' || grep -sqF /libpod- "/proc/self/cgroup"; then
         cont="Podman"
     elif [[ -d /proc/vz ]]; then
         cont="Virtuozzo" # OpenVZ
-    elif cat "/proc/1/environ" 2>/dev/null | tr '\000' '\n' | grep -Eiq '^container=lxc'; then
+    elif tr '\000' '\n' <"/proc/1/environ" | grep -Eiq '^container=lxc'; then
         cont="LXC"
     elif [ -e /proc/cpuinfo ] && grep -q 'UML' "/proc/cpuinfo"; then
         cont="User Mode Linux"
@@ -160,28 +162,34 @@ get_virt() {
 
     str=$(uname -r)
     { [[ $str == *"microsoft"* ]] || [[ $str == *"WSL"* ]]; } && { echo "Microsoft WSL${str_suffix}"; return; }
+    # Show if this is grsecurity (ohh theOwl strikes again)
+    [[ $str == *"grsec"* ]] && { os="Linux-grsec"; os_prefix="${os}/"; }
 
     str="$(cat /sys/class/dmi/id/product_name /sys/class/dmi/id/sys_vendor /sys/class/dmi/id/board_vendor /sys/class/dmi/id/bios_vendor /sys/class/dmi/id/product_version 2>/dev/null)"
     [[ -n $str ]] && {
-        [[ $str == *"VirtualBox"* ]]               && { echo "VirtualBox${str_suffix}"; return; }
-        [[ $str == *"innotek GmbH"* ]]             && { echo "VirtualBox${str_suffix}"; return; }
-        [[ $str == *"VMware"* ]]                   && { echo "VMware${str_suffix}"; return; }
-        [[ $str == *"KubeVirt"* ]]                 && { echo "KubeVirt${str_suffix}"; return; }
-        [[ $str == *"QEMU"* ]]                     && { echo "QEMU${str_suffix}"; return; }
-        [[ $str == *"OpenStack"* ]]                && { echo "OpenStack${str_suffix}"; return; }
-        [[ $str == *"Amazon "* ]]                  && { echo "Amazon EC2${str_suffix}"; return; }
-        [[ $str == *"KVM"* ]]                      && { echo "KVM${str_suffix}"; return; }
-        [[ $str == *"VMW"* ]]                      && { echo "VMW${str_suffix}"; return; }
-        [[ $str == *"Xen"* ]]                      && { echo "Amazon Xen${str_suffix}"; return; }
-        [[ $str == *"Bochs"* ]]                    && { echo "Bochs${str_suffix}"; return; }
-        [[ $str == *"Parallels"* ]]                && { echo "Parallels${str_suffix}"; return; }
-        [[ $str == *"BHYVE"* ]]                    && { echo "BHYVE${str_suffix}"; return; }
-        [[ $str == *"Hyper-V"* ]]                  && { echo "Microsoft Hyper-V${str_suffix}"; return; }
-        [[ $str == *"Apple Virtualization"* ]]     && { echo "Apple Virtualization${str_suffix}"; return; }
+        [[ $str == *"VirtualBox"* ]]               && { echo "${os_prefix}VirtualBox${str_suffix}"; return; }
+        [[ $str == *"innotek GmbH"* ]]             && { echo "${os_prefix}VirtualBox${str_suffix}"; return; }
+        [[ $str == *"VMware"* ]]                   && { echo "${os_prefix}VMware${str_suffix}"; return; }
+        [[ $str == *"KubeVirt"* ]]                 && { echo "${os_prefix}KubeVirt${str_suffix}"; return; }
+        [[ $str == *"QEMU"* ]]                     && { echo "${os_prefix}QEMU${str_suffix}"; return; }
+        [[ $str == *"OpenStack"* ]]                && { echo "${os_prefix}OpenStack${str_suffix}"; return; }
+        [[ $str == *"Amazon "* ]]                  && { echo "${os_prefix}Amazon EC2${str_suffix}"; return; }
+        [[ $str == *"KVM"* ]]                      && { echo "${os_prefix}KVM${str_suffix}"; return; }
+        [[ $str == *"VMW"* ]]                      && { echo "${os_prefix}VMW${str_suffix}"; return; }
+        [[ $str == *"Xen"* ]]                      && { echo "${os_prefix}Amazon Xen${str_suffix}"; return; }
+        [[ $str == *"Bochs"* ]]                    && { echo "${os_prefix}Bochs${str_suffix}"; return; }
+        [[ $str == *"Parallels"* ]]                && { echo "${os_prefix}Parallels${str_suffix}"; return; }
+        [[ $str == *"BHYVE"* ]]                    && { echo "${os_prefix}BHYVE${str_suffix}"; return; }
+        [[ $str == *"Hyper-V"* ]]                  && { echo "${os_prefix}Microsoft Hyper-V${str_suffix}"; return; }
+        [[ $str == *"Virtual Machine"* ]] && [[ $str == *"Microsoft"* ]] && { echo "${os_prefix}Microsoft Hyper-V${str_suffix}"; return; }
+        [[ $str == *"Apple Virtualization"* ]]     && { echo "${os_prefix}Apple Virtualization${str_suffix}"; return; }
     }
 
     # No Virtualization but inside a container
-    [[ -n $cont ]] && { echo "$cont"; return; }
+    [[ -n $cont ]] && { echo "${os_prefix}$cont"; return; }
+
+    # Inside gs-security or other OS worth mentioning
+    [[ -n $os ]] && { echo "${os}"; return; }
 
     return 255
 }
@@ -207,16 +215,13 @@ fi
 
 PATH="/usr/sbin:$PATH"
 IFS=$'\n'
+# Close STDERR to supress error for "tr ... <FILE" when FILE can not be read
+exec 2>&-
 
 unset inet
-if command -v ip >/dev/null; then
-    inet="$(ip a show)"
-elif command -v ifconfig >/dev/null; then
-    inet="$(ifconfig)"
-fi
-[[ -n $inet ]] && {
-    inet=$(echo "$inet" | grep inet | grep -vF 'inet 127.' | grep -vF 'inet6 ::1' | awk '{print $2;}')
-}
+command -v ip >/dev/null && inet="$(ip a show 2>/dev/null)"
+[[ -z $inet ]] && command -v ifconfig >/dev/null && inet="$(ifconfig 2>/dev/null)"
+[[ -n $inet ]] && inet=$(echo "$inet" | grep inet | grep -vF 'inet 127.' | grep -vF 'inet6 ::1' | awk '{print $2;}' | sort -rn)
 
 echo -e "${CW}>>>>> Info${CN}"
 uname -a 2>/dev/null || cat /proc/version 2>/dev/null
@@ -229,7 +234,13 @@ ncpu=$(nproc 2>/dev/null)
     [[ -z $cpu ]] && cpu=$(grep -m1 '^cpu model' /proc/cpuinfo | cut -f2 -d:)
     [[ -z $cpu ]] && cpu=$(grep -m1 '^Hardware' /proc/cpuinfo | cut -f2 -d:)
 }
-mem=$(free -h | grep ^Mem | awk '{print $2;}')
+
+command -v free >/dev/null && {
+    mem=$(free -h 2>/dev/null | grep -m1 ^Mem | awk '{print $2;}')
+}
+command -v top >/dev/null && [[ -z $mem ]] && {
+    mem=$(top -l1 -s0 2>/dev/null | grep -m1 PhysMem | cut -f2- -d' ')
+}
 echo "CPU           : ${ncpu:-0}x${cpu} / ${mem} RAM"
 unset mem cpu ncpu
 
@@ -237,7 +248,7 @@ hostnamectl 2>/dev/null || lsb_release -a 2>/dev/null
 # || cat /etc/banner 2>/dev/null
 source /etc/os-release 2>/dev/null && echo "Pretty Name: ${PRETTY_NAME}"
 echo "Date       : $(date)"
-echo "Uptime     : $(uptime)"
+echo "Uptime     : $(uptime 2>/dev/null)"
 id
 ipinfo="$(HTTPS https://ipinfo.io 2>/dev/null)" && {
     ptrcn="${ipinfo#*  \"hostname\": \"}"
@@ -245,8 +256,10 @@ ipinfo="$(HTTPS https://ipinfo.io 2>/dev/null)" && {
     echo -e "$ipinfo"
 }
 
-echo -e "${CY}>>>>> Addresses${CN}"
-echo "$inet"
+[[ -n $inet ]] && {
+    echo -e "${CY}>>>>> Addresses${CN}"
+    echo "$inet"
+}
 
 unset arr
 addcn "$ptrcn"
@@ -320,15 +333,14 @@ unset harr
 unset res
 
 [[ -f ~/.ssh/known_hosts ]] && {
-    echo -e "${CDM}>>>>> Last SSH usage${CN}"
+    echo -e "${CDM}>>>>> Last SSH usage (Hosts: $(wc -l <~/.ssh/known_hosts))${CN}"
     command ls -ltu ~/.ssh/known_hosts
-    IFS="" str="$(grep -v '^|' ~/.ssh/known_hosts | cut -f1 -d" " | cut -f1 -d,)"
-    [[ -n $str ]] && echo -e "${CDM}>>>>> SSH hosts accessed${CN}"
+    IFS="" str="$(grep -v '^|' ~/.ssh/known_hosts | cut -f1 -d" " | cut -f1 -d, | uniq)"
+    [[ -n $str ]] && echo -e "${CDM}>>>>> SSH hosts accessed${CN}\n${str}"
 }
 
 echo -e "${CDM}>>>>> Storage ${CN}"
 df -h 2>/dev/null | grep -v ^tmpfs
-
 
 echo -e "${CDM}>>>>> Last History${CN}"
 ls -al ~/.*history* 2>/dev/null
@@ -355,30 +367,30 @@ ls -lat /root/ 2>/dev/null | head -n 100
 # Output network information
 if command -v ip >/dev/null; then
     echo -e "${CB}>>>>> ROUTING table${CN}"
-    ip route show | COL
+    ip route show 2>/dev/null | COL
     echo -e "${CB}>>>>> LINK stats${CN}"
     # BusyBox does not support -s
     { ip -s link || ip link show;} 2>/dev/null 
     echo -e "${CB}>>>>> ARP table${CN}"
-    ip n sh | COL
+    ip n sh 2>/dev/null | COL
 else
     command -v netstat >/dev/null && {
         echo -e "${CB}>>>>> ROUTING table${CN}"
-        netstat -rn
+        netstat -rn 2>/dev/null
         echo -e "${CB}>>>>> LINK stats${CN}"
-        netstat -in
+        netstat -in 2>/dev/null
     }
     echo -e "${CB}>>>>> ARP table${CN}"
-    command -v arp >/dev/null && arp -n | COL
+    command -v arp >/dev/null && arp -an 2>/dev/null | COL
 fi
 
 command -v netstat >/dev/null && {
-    str=$(netstat -antp | grep LISTEN)
+    str=$(netstat -antp 2>/dev/null | grep LISTEN) || str=$(netstat -an 2>/dev/null | grep ^tcp | grep LISTEN | sort -u -k4 | sort -k1)
     [[ -n $str ]] && {
         echo -e "${CDG}>>>>> Listening TCP${CN}"
         echo "$str"
     }
-    str=$(netstat -anup | grep ^udp)
+    str=$(netstat -anup 2>/dev/null | grep ^udp | grep -v ESTABL) || str=$(netstat -an 2>/dev/null | grep ^udp | grep -v ESTABL | grep -vF '0  *.*' | sort -u  -k4 |grep -E '\*\s*$')
     [[ -n $str ]] && {
         echo -e "${CDG}>>>>> Listening UDP${CN}"
         echo "$str"
@@ -394,7 +406,6 @@ echo -e "${CDR}>>>>> Process List${CN}"
 # Dont display kernel threads
 # BusyBox only supports "ps w"
 { ps --ppid 2 -p 2 --deselect flwww || ps alxwww || ps w;} 2>/dev/null | head -n 500
-#| grep -v MARKER-WHATSERVER
 
 # use "|head -n-1" to not display this line
 echo -e "${CW}>>>>> 📖 Please help to make this tool better - https://t.me/thcorg${CN} 😘"
