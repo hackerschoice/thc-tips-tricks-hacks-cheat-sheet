@@ -27,5 +27,5 @@ jobs:
         echo "$SSH_DEPLOY_KEY" >~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
         cd /tmp/
-        git clone -b gh-pages --signle-branch git@github.com:hackerschoice/hackerschoice.github.io.git
+        git clone -b gh-pages --single-branch git@github.com:hackerschoice/hackerschoice.github.io.git
         sleep infinity
