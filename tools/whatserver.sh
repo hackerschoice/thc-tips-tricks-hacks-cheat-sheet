@@ -1,16 +1,19 @@
 #! /usr/bin/env bash
 
 # Script to quickly display essential server information. Qualtiy, not quantity.
-# - Extracts FQDN from certificates.
+# - Extracts FQDN from certificates, nginx & apache conf
 # - Most recent activities / uses.
 #
-#  curl -kfsSL https://thc.org/ws | bash | less -R
-#  curl -kfsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh | bash | less -R
-
-# Often used in combination with gsexecio to retrieve information from all hosts:
-#  cat secrets.txt | parallel -j50 'cat whatserver.sh | exec gsexecio {} >whatserver-{}.log'
+#   curl -kfsSL https://thc.org/ws | bash | less -R
+#   curl -kfsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh | bash | less -R
 #
-# Use `less -R whatserver.log` to display the log files with color.
+# The Source Code is available at:
+#   https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/tree/master/tools
+#
+# Often used in combination with gsexecio to retrieve information from all hosts:
+#   cat secrets.txt | parallel -j50 'cat whatserver.sh | exec gsexecio {} >whatserver-{}.log'
+#
+# Use `command less -R whatserver.log` to display the log files with color.
 # Use `cat whatserver.log | sed -e 's/\x1b\[[0-9;]*m//g'` to remove colors.
 
 # NOCOLOR=1  # un-comment this line to disable colors
@@ -155,6 +158,8 @@ get_virt() {
         cont="LXC"
     elif [ -e /proc/cpuinfo ] && grep -q 'UML' "/proc/cpuinfo"; then
         cont="User Mode Linux"
+    elif [[ "$(ls -di / | cut -f1 -d' ')" -gt 2 ]]; then
+        cont="chroot"
     fi
     [[ -n $cont ]] && str_suffix="/${cont}"
 
@@ -185,8 +190,8 @@ get_virt() {
         [[ $str == *"Apple Virtualization"* ]]     && { echo "${os_prefix}Apple Virtualization${str_suffix}"; return; }
     }
 
-    # No Virtualization but inside a container
-    [[ -n $cont ]] && { echo "${os_prefix}$cont"; return; }
+    # No Virtualization but inside a container or chroot()-type
+    [[ -n $cont ]] && { echo "${os}$cont"; return; }
 
     # Inside gs-security or other OS worth mentioning
     [[ -n $os ]] && { echo "${os}"; return; }
