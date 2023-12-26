@@ -4,7 +4,8 @@ on:
     branches:
       - master
     paths:
-      - tools/**
+      - tools/whatserver.sh
+      # - tools/**
   workflow_dispatch:
 
 jobs:
