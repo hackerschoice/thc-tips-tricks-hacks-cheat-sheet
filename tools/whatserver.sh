@@ -241,14 +241,14 @@ command -v free >/dev/null && {
 command -v top >/dev/null && [[ -z $mem ]] && {
     mem=$(top -l1 -s0 2>/dev/null | grep -m1 PhysMem | cut -f2- -d' ')
 }
-echo "CPU           : ${ncpu:-0}x${cpu} / ${mem} RAM"
+echo "CPU           : ${ncpu:-0}x${cpu:-???} / ${mem:-???} RAM"
 unset mem cpu ncpu
 
 hostnamectl 2>/dev/null || lsb_release -a 2>/dev/null
 # || cat /etc/banner 2>/dev/null
 source /etc/os-release 2>/dev/null && echo "Pretty Name: ${PRETTY_NAME}"
 echo "Date       : $(date)"
-echo "Uptime     : $(uptime 2>/dev/null)"
+command -v uptime >/dev/null && echo "Uptime     : $(uptime 2>/dev/null)"
 id
 ipinfo="$(HTTPS https://ipinfo.io 2>/dev/null)" && {
     ptrcn="${ipinfo#*  \"hostname\": \"}"
