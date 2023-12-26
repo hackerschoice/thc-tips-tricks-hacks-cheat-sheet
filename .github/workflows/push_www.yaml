@@ -1,8 +1,10 @@
 name: Auto Deploy to WWW
 on:
   push:
-   branches:
-     - master
+    branches:
+      - master
+    paths:
+      - tools/**
   workflow_dispatch:
 
 jobs:
