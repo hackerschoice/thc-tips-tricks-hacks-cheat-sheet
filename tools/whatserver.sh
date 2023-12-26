@@ -410,4 +410,5 @@ echo -e "${CDR}>>>>> Process List${CN}"
 # use "|head -n-1" to not display this line
 echo -e "${CW}>>>>> 📖 Please help to make this tool better - https://t.me/thcorg${CN} 😘"
 # return with "success"
+
 exit 0
