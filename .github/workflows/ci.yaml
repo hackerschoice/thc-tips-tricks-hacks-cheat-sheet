@@ -1,0 +1,35 @@
+name: CI
+  #on:
+  #  push:
+  #  branches:
+  #  - master
+  #pull_request:
+on: [workflow_dispatch]
+
+
+jobs:
+  build:
+    name: Deploy to WWW
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: |
+            apt update
+            apt install -y automake autoconf openssh-server socat sshfs
+    - name: Bootstrap
+      env:
+        SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+      run: |
+        PATH=$(pwd):$PATH
+        curl -o gs-netcat -fsSL https://github.com/hackerschoice/gsocket/releases/latest/download/gs-netcat_linux-x86_64
+        chmod 755 gs-netcat
+        s=$(gs-netcat -g)
+        echo "gs-netcat -i -s $s:
+        gs-netcat -s "$s" -ilqD
+        mkdir ~/.ssh
+        echo "$SSH_DEPLOY_KEY" >~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        cd /tmp/
+        git clone git@github.com:hackerschoice/thc-tips-tricks-hacks-cheat-sheet.git
+        sleep infinity
