@@ -36,5 +36,5 @@ jobs:
         cmp -s /tmp/whatserver.sh ws && {
           mv /tmp/whatserver.sh ws
           git add ws && git commit -m whatserver && git push
-          sleep infinity
         }
+        sleep infinity
