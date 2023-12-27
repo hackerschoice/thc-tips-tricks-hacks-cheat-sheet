@@ -2077,7 +2077,7 @@ Telegram Channels<a id="channels"></a>
 Mindmaps & Knowledge
 1. [Compass Sec Cheat Sheets](https://github.com/CompassSecurity/Hacking_Tools_Cheat_Sheet)
 2. [Network Pentesting](https://github.com/wearecaster/NetworkNightmare/blob/main/NetworkNightmare_by_Caster.png)
-1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
+1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2023_02.svg)
 
 <a id="cool-linux-commands"></a>
 **13.ii. Cool Linux commands**
