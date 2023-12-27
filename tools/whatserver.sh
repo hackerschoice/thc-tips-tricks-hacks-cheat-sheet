@@ -38,7 +38,7 @@ find . -name 'whatserver*.log' | while read fn; do
         ip=${ip##*: \"}
         ip=${ip%\"*}
         unset geoip
-        [[ -n $ip ]] && geoip=$(geoip "${ip}")
+        [[ -n "$ip" ]] && geoip=$(geoip "${ip}")
         grep ^DOMAIN "$fn" | while read x; do
 	        x=${x//|}
 	        x=${x//$'\r'}
@@ -52,7 +52,7 @@ find . -name 'whatserver*.log' | while read fn; do
 done | anew | column -t -s'|' -o' | '
 COMMENT
 
-[[ -z $NOCOLOR ]] && {
+[[ -z "$NOCOLOR" ]] && {
     CY="\e[1;33m" # yellow
     CG="\e[1;32m" # green
     CR="\e[1;31m" # red
@@ -82,7 +82,7 @@ addcn() {
     str="${str//\"}"
     str="${str// }"
     str="${str//$'\r'}"
-    [[ -z $str ]] && return
+    [[ -z "$str" ]] && return
     tld="${str##*.}"
     # [[ ${#tld} -gt 3 ]] && return # .blog,.agency,.social, ...
     [[ ${#tld} -le 1 ]] && return # Not interested in .* .a and .x
@@ -161,7 +161,7 @@ get_virt() {
     elif [[ "$(ls -di / | cut -f1 -d' ')" -gt 2 ]]; then
         cont="chroot"
     fi
-    [[ -n $cont ]] && str_suffix="/${cont}"
+    [[ -n "$cont" ]] && str_suffix="/${cont}"
 
     [[ -d /proc/bc ]] && { echo "OpenVZ${str_suffix}"; return; }
 
@@ -171,30 +171,30 @@ get_virt() {
     [[ $str == *"grsec"* ]] && { os="Linux-grsec"; os_prefix="${os}/"; }
 
     str="$(cat /sys/class/dmi/id/product_name /sys/class/dmi/id/sys_vendor /sys/class/dmi/id/board_vendor /sys/class/dmi/id/bios_vendor /sys/class/dmi/id/product_version 2>/dev/null)"
-    [[ -n $str ]] && {
-        [[ $str == *"VirtualBox"* ]]               && { echo "${os_prefix}VirtualBox${str_suffix}"; return; }
-        [[ $str == *"innotek GmbH"* ]]             && { echo "${os_prefix}VirtualBox${str_suffix}"; return; }
-        [[ $str == *"VMware"* ]]                   && { echo "${os_prefix}VMware${str_suffix}"; return; }
-        [[ $str == *"KubeVirt"* ]]                 && { echo "${os_prefix}KubeVirt${str_suffix}"; return; }
-        [[ $str == *"QEMU"* ]]                     && { echo "${os_prefix}QEMU${str_suffix}"; return; }
-        [[ $str == *"OpenStack"* ]]                && { echo "${os_prefix}OpenStack${str_suffix}"; return; }
-        [[ $str == *"Amazon "* ]]                  && { echo "${os_prefix}Amazon EC2${str_suffix}"; return; }
-        [[ $str == *"KVM"* ]]                      && { echo "${os_prefix}KVM${str_suffix}"; return; }
-        [[ $str == *"VMW"* ]]                      && { echo "${os_prefix}VMW${str_suffix}"; return; }
-        [[ $str == *"Xen"* ]]                      && { echo "${os_prefix}Amazon Xen${str_suffix}"; return; }
-        [[ $str == *"Bochs"* ]]                    && { echo "${os_prefix}Bochs${str_suffix}"; return; }
-        [[ $str == *"Parallels"* ]]                && { echo "${os_prefix}Parallels${str_suffix}"; return; }
-        [[ $str == *"BHYVE"* ]]                    && { echo "${os_prefix}BHYVE${str_suffix}"; return; }
-        [[ $str == *"Hyper-V"* ]]                  && { echo "${os_prefix}Microsoft Hyper-V${str_suffix}"; return; }
-        [[ $str == *"Virtual Machine"* ]] && [[ $str == *"Microsoft"* ]] && { echo "${os_prefix}Microsoft Hyper-V${str_suffix}"; return; }
-        [[ $str == *"Apple Virtualization"* ]]     && { echo "${os_prefix}Apple Virtualization${str_suffix}"; return; }
+    [[ -n "$str" ]] && {
+        [[ "$str" == *"VirtualBox"* ]]               && { echo "${os_prefix}VirtualBox${str_suffix}"; return; }
+        [[ "$str" == *"innotek GmbH"* ]]             && { echo "${os_prefix}VirtualBox${str_suffix}"; return; }
+        [[ "$str" == *"VMware"* ]]                   && { echo "${os_prefix}VMware${str_suffix}"; return; }
+        [[ "$str" == *"KubeVirt"* ]]                 && { echo "${os_prefix}KubeVirt${str_suffix}"; return; }
+        [[ "$str" == *"QEMU"* ]]                     && { echo "${os_prefix}QEMU${str_suffix}"; return; }
+        [[ "$str" == *"OpenStack"* ]]                && { echo "${os_prefix}OpenStack${str_suffix}"; return; }
+        [[ "$str" == *"Amazon "* ]]                  && { echo "${os_prefix}Amazon EC2${str_suffix}"; return; }
+        [[ "$str" == *"KVM"* ]]                      && { echo "${os_prefix}KVM${str_suffix}"; return; }
+        [[ "$str" == *"VMW"* ]]                      && { echo "${os_prefix}VMW${str_suffix}"; return; }
+        [[ "$str" == *"Xen"* ]]                      && { echo "${os_prefix}Amazon Xen${str_suffix}"; return; }
+        [[ "$str" == *"Bochs"* ]]                    && { echo "${os_prefix}Bochs${str_suffix}"; return; }
+        [[ "$str" == *"Parallels"* ]]                && { echo "${os_prefix}Parallels${str_suffix}"; return; }
+        [[ "$str" == *"BHYVE"* ]]                    && { echo "${os_prefix}BHYVE${str_suffix}"; return; }
+        [[ "$str" == *"Hyper-V"* ]]                  && { echo "${os_prefix}Microsoft Hyper-V${str_suffix}"; return; }
+        [[ "$str" == *"Virtual Machine"* ]] && [[ "$str" == *"Microsoft"* ]] && { echo "${os_prefix}Microsoft Hyper-V${str_suffix}"; return; }
+        [[ "$str" == *"Apple Virtualization"* ]]     && { echo "${os_prefix}Apple Virtualization${str_suffix}"; return; }
     }
 
     # No Virtualization but inside a container or chroot()-type
-    [[ -n $cont ]] && { echo "${os}$cont"; return; }
+    [[ -n "$cont" ]] && { echo "${os}$cont"; return; }
 
     # Inside gs-security or other OS worth mentioning
-    [[ -n $os ]] && { echo "${os}"; return; }
+    [[ -n "$os" ]] && { echo "${os}"; return; }
 
     return 255
 }
@@ -225,8 +225,8 @@ exec 2>&-
 
 unset inet
 command -v ip >/dev/null && inet="$(ip a show 2>/dev/null)"
-[[ -z $inet ]] && command -v ifconfig >/dev/null && inet="$(ifconfig 2>/dev/null)"
-[[ -n $inet ]] && inet=$(echo "$inet" | grep inet | grep -vF 'inet 127.' | grep -vF 'inet6 ::1' | awk '{print $2;}' | sort -rn)
+[[ -z "$inet" ]] && command -v ifconfig >/dev/null && inet="$(ifconfig 2>/dev/null)"
+[[ -n "$inet" ]] && inet=$(echo "$inet" | grep inet | grep -vF 'inet 127.' | grep -vF 'inet6 ::1' | awk '{print $2;}' | sort -rn)
 
 echo -e "${CW}>>>>> Info${CN}"
 uname -a 2>/dev/null || cat /proc/version 2>/dev/null
@@ -234,16 +234,22 @@ uname -a 2>/dev/null || cat /proc/version 2>/dev/null
 str="$(get_virt)" && echo "Virtualization: $str"
 ncpu=$(nproc 2>/dev/null)
 [[ -e /proc/cpuinfo ]] && {
-    [[ -z $ncpu ]] && ncpu=$(grep -c '^processor' /proc/cpuinfo)
+    [[ -z "$ncpu" ]] && ncpu=$(grep -c '^processor' /proc/cpuinfo)
     cpu=$(grep -m1 '^model name' /proc/cpuinfo | cut -f2 -d:)
-    [[ -z $cpu ]] && cpu=$(grep -m1 '^cpu model' /proc/cpuinfo | cut -f2 -d:)
-    [[ -z $cpu ]] && cpu=$(grep -m1 '^Hardware' /proc/cpuinfo | cut -f2 -d:)
+    [[ -z "$cpu" ]] && cpu=$(grep -m1 '^cpu model' /proc/cpuinfo | cut -f2 -d:)
+    [[ -z "$cpu" ]] && cpu=$(grep -m1 '^Hardware' /proc/cpuinfo | cut -f2 -d:)
+}
+# Apple
+[[ -z "$cpu" ]] && command -v sysctl >/dev/null && cpu=$(sysctl -a machdep.cpu.brand_string 2>/dev/null| head -n1 | grep '^machdep.cpu' | sed -e 's/[^:]*[: \t]*//')
+[[ -z "$cpu" ]] && command -v lscpu >/dev/null && {
+    cpu=$(lscpu 2>/dev/null | grep -m1 -F 'Model name:' | sed -e 's/[^:]*[: \t]*//')
+    [[ -z "$cpu" ]] && cpu=$(lscpu 2>/dev/null | grep -m1 '^Vendor ID' | sed -e 's/[^:]*[: \t]*//')
 }
 
 command -v free >/dev/null && {
     mem=$(free -h 2>/dev/null | grep -m1 ^Mem | awk '{print $2;}')
 }
-command -v top >/dev/null && [[ -z $mem ]] && {
+command -v top >/dev/null && [[ -z "$mem" ]] && {
     mem=$(top -l1 -s0 2>/dev/null | grep -m1 PhysMem | cut -f2- -d' ')
 }
 echo "CPU           : ${ncpu:-0}x${cpu:-???} / ${mem:-???} RAM"
@@ -253,7 +259,10 @@ hostnamectl 2>/dev/null || lsb_release -a 2>/dev/null
 # || cat /etc/banner 2>/dev/null
 source /etc/os-release 2>/dev/null && echo "Pretty Name: ${PRETTY_NAME}"
 echo "Date       : $(date)"
-command -v uptime >/dev/null && echo "Uptime     : $(uptime 2>/dev/null)"
+command -v uptime >/dev/null && {
+    str=$(uptime | sed -e 's/^[ \t]*//')
+    [[ -n "$str" ]] && echo "Uptime     : $str"
+}
 id
 ipinfo="$(HTTPS https://ipinfo.io 2>/dev/null)" && {
     ptrcn="${ipinfo#*  \"hostname\": \"}"
@@ -261,7 +270,7 @@ ipinfo="$(HTTPS https://ipinfo.io 2>/dev/null)" && {
     echo -e "$ipinfo"
 }
 
-[[ -n $inet ]] && {
+[[ -n "$inet" ]] && {
     echo -e "${CY}>>>>> Addresses${CN}"
     echo "$inet"
 }
@@ -341,7 +350,7 @@ unset res
     echo -e "${CDM}>>>>> Last SSH usage (Hosts: $(wc -l <~/.ssh/known_hosts))${CN}"
     command ls -ltu ~/.ssh/known_hosts
     IFS="" str="$(grep -v '^|' ~/.ssh/known_hosts | cut -f1 -d" " | cut -f1 -d, | uniq)"
-    [[ -n $str ]] && echo -e "${CDM}>>>>> SSH hosts accessed${CN}\n${str}"
+    [[ -n "$str" ]] && echo -e "${CDM}>>>>> SSH hosts accessed${CN}\n${str}"
 }
 
 echo -e "${CDM}>>>>> Storage ${CN}"
@@ -355,13 +364,13 @@ echo -e "${CDM}>>>>> /home (top20)${CN}"
 ls -Lld -t /root /home/* 2>/dev/null | head -n20
 
 str=$(w -o -h 2>/dev/null | head -n100)
-[[ -n $str ]] && {
+[[ -n "$str" ]] && {
     echo -e "${CDM}>>>>> Online${CN}"
     echo "$str"
 }
 
 str=$(lastlog 2>/dev/null | tail -n+2 | grep -vF 'Never logged in')
-[[ -n $str ]] && {
+[[ -n "$str" ]] && {
     echo -e "${CDM}>>>>> Lastlog${CN}"
     echo "$str"
 }
@@ -391,12 +400,12 @@ fi
 
 command -v netstat >/dev/null && {
     str=$(netstat -antp 2>/dev/null | grep LISTEN) || str=$(netstat -an 2>/dev/null | grep ^tcp | grep LISTEN | sort -u -k4 | sort -k1)
-    [[ -n $str ]] && {
+    [[ -n "$str" ]] && {
         echo -e "${CDG}>>>>> Listening TCP${CN}"
         echo "$str"
     }
     str=$(netstat -anup 2>/dev/null | grep ^udp | grep -v ESTABL) || str=$(netstat -an 2>/dev/null | grep ^udp | grep -v ESTABL | grep -vF '0  *.*' | sort -u  -k4 |grep -E '\*\s*$')
-    [[ -n $str ]] && {
+    [[ -n "$str" ]] && {
         echo -e "${CDG}>>>>> Listening UDP${CN}"
         echo "$str"
     }
