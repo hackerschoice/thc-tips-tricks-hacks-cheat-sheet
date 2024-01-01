@@ -1583,7 +1583,7 @@ wfind() {
     arr=("$@")
     while [[ ${#arr[@]} -gt 0 ]]; do
         dir=${arr[${#arr[@]}-1]}
-        unset 'arr[${#arr[@]}-1]'
+        unset "arr[${#arr[@]}-1]"
         find "$dir"  -maxdepth 1 -type d -writable -ls 2>/dev/null
         IFS=$'\n' arr+=($(find "$dir" -mindepth 1 -maxdepth 1 -type d ! -writable 2>/dev/null))
     done
