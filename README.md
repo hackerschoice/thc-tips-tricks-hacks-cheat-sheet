@@ -1613,10 +1613,9 @@ shred -z foobar.txt
 
 ```sh
 ## SHRED without shred command
-shred()
-{
+shred() {
     [[ -z $1 || ! -f "$1" ]] && { echo >&2 "shred [FILE]"; return 255; }
-    dd bs=1k count=$(du -sk ${1:?} | cut -f1) if=/dev/urandom >"$1"
+    dd status=none bs=1k count=$(du -sk ${1:?} | cut -f1) if=/dev/urandom >"$1"
     rm -f "${1:?}"
 }
 shred foobar.txt
