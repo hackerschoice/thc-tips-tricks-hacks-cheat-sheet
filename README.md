@@ -1994,7 +1994,7 @@ OpSec
 5. [EFF](https://www.eff.org/) - Clever advise for freedom figthers.
 
 Exploits
-1. [SploitScan](https://github.com/xaitax/SploitScan) - Exploit Score & PoC search
+1. [SploitScan](https://github.com/xaitax/SploitScan) - Exploit Score & PoC search (by xaitax)
 1. [Traitor](https://github.com/liamg/traitor) - Tries various exploits/vulnerabilities to gain root (LPE)
 1. [PacketStorm](https://packetstormsecurity.com) - Our favorite site ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
 1. [ExploitDB](https://www.exploit-db.com) - Also includes metasploit db and google hacking db
