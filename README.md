@@ -1424,7 +1424,7 @@ python -c 'import pty; pty.spawn("/bin/bash")'
 stty raw -echo opost; fg
 ```
 
-```
+```sh
 # On target host
 export SHELL=/bin/bash
 export TERM=xterm-256color
