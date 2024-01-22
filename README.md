@@ -1470,7 +1470,7 @@ or
 bash -c "$(wget --no-check-certificate -qO- https://gsocket.io/x)"
 ```
 
-or deploy gsocket by running their own deployment server:
+or deploy gsocket by running your own deployment server:
 ```sh
 LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/xs)"  # Notice '/xs' instead of '/x'
 ```
