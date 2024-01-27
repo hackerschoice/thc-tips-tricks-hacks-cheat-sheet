@@ -749,7 +749,7 @@ timeout 5 bash -c "</dev/tcp/1.2.3.4/31337" && echo OPEN || echo CLOSED
 
 HashCat is our go-to tool for everything else:
 ```shell
-hashcat --username -w3 my-hash /usr/share/wordlists/rockyou.txt
+hashcat my-hash /usr/share/wordlists/rockyou.txt
 ```
 
 Or using a [7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask) on GPU:
