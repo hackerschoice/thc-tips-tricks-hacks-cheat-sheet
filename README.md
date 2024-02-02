@@ -1609,13 +1609,21 @@ wfind() {
 # Usage: wfind /etc /var /usr 
 ```
 
-Find local passwords:
+Find local passwords (using noseyparker):
 ```sh
 curl -fsSL https://github.com/praetorian-inc/noseyparker/releases/download/v0.16.0/noseyparker-v0.16.0-x86_64-unknown-linux-gnu.tar.gz | tar xvfz - --transform="flags=r;s|.*/||" --no-anchored  --wildcards noseyparker && \
 ./noseyparker scan . && \
 ./noseyparker report
 ```
 (Or use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history)
+
+Using `grep`:
+```sh
+# Find passwords (without garbage).
+grep -HEronasir  '.{16}password.{,64}' .
+# Find TLS or OpenSSH keys:
+grep -r -F -- " PRIVATE KEY-----" .
+```
 
 ---
 <a id="shell-hacks"></a>
