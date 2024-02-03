@@ -1,6 +1,7 @@
 <!-- Use `grip 8080` to render the markdown locally -->
 # THC's favourite Tips, Tricks & Hacks (Cheat Sheet)
 
+https://thc.org/tips  
 https://tinyurl.com/thctips
 
 A collection of our favourite tricks. Many of those tricks are not from us. We merely collect them.
