@@ -607,17 +607,14 @@ DSTIP=1.2.3.4
 DPORT=443
 echo 1 >/proc/sys/net/ipv4/ip_forward
 
-iptables -t mangle -I PREROUTING -p tcp --dport ${FPORT:?} -m addrtype --dst-type LOCAL -j MARK --set-mark 1188 
-iptables -t mangle -I PREROUTING -j CONNMARK --restore-mark
+iptables -t mangle -C PREROUTING -j CONNMARK --restore-mark || iptables -t mangle -I PREROUTING -j CONNMARK --restore-mark
+iptables -t mangle -A PREROUTING -p tcp --dport ${FPORT:?} -m addrtype --dst-type LOCAL -j MARK --set-mark 1188 
 
 iptables -t nat -I PREROUTING -p tcp -m mark --mark 1188 -j DNAT --to ${DSTIP:?}:${DPORT:?}
 iptables -I FORWARD -m mark --mark 1188 -j ACCEPT
 
 iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
 iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
-
-iptables -t mangle -I INPUT -m mark --mark 1188 -j ACCEPT
-iptables -t mangle -I INPUT -j CONNMARK --restore-mark
 ```
 
 We use this trick to reach the gsocket-relay-network (or TOR) from deep inside firewalled networks.
