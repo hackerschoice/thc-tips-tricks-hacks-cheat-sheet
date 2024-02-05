@@ -81,7 +81,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Clean logfile](#shell-clean-logs)
    1. [Hide files from a User without root privileges](#shell-hide-files)
    1. [Make a file immutable](#perm-files)
-   1. [Change user without sudo/su]
+   1. [Change user without sudo/su](#nosudo)
 1. [Crypto](#crypto)
    1. [Generate quick random Password](#gen-password)
    1. [Linux transportable encrypted filesystems](#crypto-filesystem)
@@ -1712,6 +1712,7 @@ touch /var/www/cgi/blah.cgi
 mount -o bind,ro /boot/backdoor.cgi /var/www/cgi/blah.cgi
 ```
 
+<a id="nosudo"></a>
 **8.vi. Change user without sudo/su**
 
 Needed for taking screenshots of X11 sessions (aka `xwd -root -display :0 | convert - jpg:screenshot.jpg`)
