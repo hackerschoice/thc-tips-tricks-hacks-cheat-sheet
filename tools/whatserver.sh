@@ -247,7 +247,7 @@ ncpu=$(nproc 2>/dev/null)
 }
 
 command -v free >/dev/null && {
-    mem=$(free -h 2>/dev/null | grep -m1 ^Mem | awk '{print $2;}')
+    mem=$(LANG=C free -h 2>/dev/null | grep -m1 ^Mem | awk '{print $2;}')
 }
 command -v top >/dev/null && [[ -z "$mem" ]] && {
     mem=$(top -l1 -s0 2>/dev/null | grep -m1 PhysMem | cut -f2- -d' ')
