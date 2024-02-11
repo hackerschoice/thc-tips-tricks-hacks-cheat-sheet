@@ -751,7 +751,7 @@ HashCat is our go-to tool for everything else:
 hashcat my-hash /usr/share/wordlists/rockyou.txt
 ```
 
-Or using a [7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask) on GPU:
+Or using a [10-days 7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask) on GPU:
 ```sh
 curl -fsSL https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask -o 10-days_7-16.hcmask
 # -d2 == Use GPU #2 only (device #2)
@@ -759,8 +759,13 @@ curl -fsSL https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010
 # -w1 == workload low (-w3 == high)
 nice -n 19 hashcat -o cracked.txt my-hash.txt -w1 -a3 10-days_7-16.hcmask -O -d2
 ```
+Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions).
 
-Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions) or use [Crackstation](https://crackstation.net), [shuck.sh](https://shuck.sh/), [ColabCat/cloud](https://github.com/someshkar/colabcat)/[Cloudtopolis](https://github.com/JoelGMSec/Cloudtopolis) or crack on your own [AWS](https://akimbocore.com/article/hashcracking-with-aws/).
+Be aware that `$6$` hashes are SLOW. Even the [1-minute 7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/01%20instant_1-minute/1-minute_7-16.hcmask) would take many days on a 8xRTX4090 cluster to complete.
+
+Rent a GPU-Cluster at [vast.ai](https://www.vast.ai) and use [dizcza/docker-hashcat](https://hub.docker.com/r/dizcza/docker-hashcat) ([read more](https://adamsvoboda.net/password-cracking-in-the-cloud-with-hashcat-vastai/)).
+
+Otherwise, use [Crackstation](https://crackstation.net), [shuck.sh](https://shuck.sh/), [ColabCat/cloud](https://github.com/someshkar/colabcat)/[Cloudtopolis](https://github.com/JoelGMSec/Cloudtopolis) or crack on your own [AWS](https://akimbocore.com/article/hashcracking-with-aws/) instances.
 
 **3.xi. Brute Force Passwords / Keys**
 
