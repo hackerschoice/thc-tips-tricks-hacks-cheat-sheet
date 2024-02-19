@@ -1071,7 +1071,7 @@ gs-netcat >"FILENAME"  # When prompted, enter the SECRET from the sender
 #### Download from Server to Receiver:
 ```sh
 ## Spawn a temporary HTTP server and share the current working directory.
-python -m http.server 8080
+python -m http.server 8080 # --bind 127.0.0.1
 ```
 
 ```sh
