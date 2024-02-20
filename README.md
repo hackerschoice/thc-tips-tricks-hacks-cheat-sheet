@@ -1159,6 +1159,7 @@ The same encrypted (OpenSSL):
 
 Receiver:
 ```posh
+# use rsa:2048 if ed25519 is not supported (e.g. rsync connection error)
 openssl req -subj '/CN=example.com/O=EL/C=XX' -new -newkey ed25519 -days 14 -nodes -x509 -keyout ssl.key -out ssl.crt
 cat ssl.key ssl.crt >ssl.pem
 rm -f ssl.key ssl.crt
