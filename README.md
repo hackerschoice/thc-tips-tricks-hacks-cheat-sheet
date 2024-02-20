@@ -751,7 +751,7 @@ HashCat is our go-to tool for everything else:
 hashcat my-hash /usr/share/wordlists/rockyou.txt
 ```
 
-Or using a [10-days 7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask) on GPU:
+Or using a [10-days 7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/) on GPU:
 ```sh
 curl -fsSL https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask -o 10-days_7-16.hcmask
 # -d2 == Use GPU #2 only (device #2)
