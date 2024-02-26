@@ -10,7 +10,10 @@
 # IP address that is not assigned to any other host on the local network.
 # Your nmap-scans will appear as if originating from 'nowhere'.
 #
-# Ghost LAN & WAN taffic by default.
+# This tool will fail on some VPS providers (like AWS) who don't allow
+# ghost-IPs (IPs not registered to your server).
+#
+# Ghost-route LAN & WAN taffic by default.
 #
 # GHOST_IP_LAN=
 #     The Ghost IP to use for traffic towards the LAN [default=1.0.0.2].
@@ -80,9 +83,16 @@ err() {
 ghost_find_gw() {
 	local arr
 	local IFS
+    local l
 	IFS=" " arr=($(ip route show match "1.1.1.1"))
     gw_dev="${arr[@]:4:1}"
 	gw_ip="${arr[@]:2:1}"
+
+    # Get the device IP:
+    l="$(ip addr show dev "$gw_dev" | grep -m1 'inet '))"
+    l="${l##*inet }"
+    l="${l%% *}"
+    gw_dev_ip="${l%%/*}"
 }
 
 ghost_find_other() {
@@ -148,6 +158,7 @@ ghost_find_single() {
 ghost_init() {
     local IFS=" "
     local classid="0xF0110011"
+    local ipt_cgroup="cgroup2"
 
     [ -t 1 ] && {
         CDR="\e[0;31m" # red
@@ -160,7 +171,15 @@ ghost_init() {
         CN="\e[0m"     # none
     }
 
+    command -v iptables >/dev/null || { err "iptables: command not found. Try ${CDC}apt install iptables${CN}"; return 255; }
     GHOST_NAME="${GHOST_NAME:-update}"
+
+    # Some iptables use '-m cgroup' when it should be '-m cgroup2'
+    # https://www.spinics.net/lists/netdev/msg352495.html
+    iptables -m "$ipt_cgroup" -h &>/dev/null || {
+        ipt_cgroup="cgroup"
+        iptables -m "$ipt_cgroup" -h &>/dev/null || { err "cgroup not supported by iptables [${CF}iptables -m cgroup -h${CN}]."; return 255; }
+    }
 
     # Check for cgroup v1
     cg_root="/sys/fs/cgroup/net_cls"
@@ -173,7 +192,7 @@ ghost_init() {
     [ ! -f "${cg_rootv2}/cgroup.procs" ] && cg_rootv2="/sys/fs/cgroup/unified"
     [ ! -f "${cg_rootv2}/cgroup.procs" ] && cg_rootv2="$(mount -t cgroup2 | head -n1 | grep -oP '^cgroup2 on \K\S+')"
     [ ! -f "${cg_rootv2}/cgroup.procs" ] && unset cg_rootv2
-    [ -n "$cg_rootv2" ] && { cg_root="${cg_rootv2}"; ipt_args=("-m" "cgroup" "--path" "${GHOST_NAME:?}"); }
+    [ -n "$cg_rootv2" ] && { cg_root="${cg_rootv2}"; ipt_args=("-m" "$ipt_cgroup" "--path" "${GHOST_NAME:?}"); }
 
     # ZSH/BASH compat (see notes above)
     ipt_args=($(echo "$GHOST_IPT") "${ipt_args[@]}")
@@ -217,10 +236,13 @@ ghost_find_local() {
     for n in {0..10}; do
         # .0, .1 , .254, .255 should not be tried.
         d=$((RANDOM % 252 + 2))
-        ping -4 -c2 -i1 -W2 -w2 -A -q "$ipp.$d" &>/dev/null || break
+        ping -4 -c2 -i1 -W2 -w2 -A -q "$ipp.$d" &>/dev/null || {
+            str="$(arp -n "$ipp.$d")"
+            [[ "$str" == *"incomplete"* ]] && break
+        }
+        unset d
     done
-    str="$(arp -n "$ipp.$d")"
-    [[ "$str" != *"incomplete"* ]] && { echo "Error. IP $ipp.$d is used: $str"; return; }
+    [ -z "$d" ] && return
     ghost_ip="$ipp.$d"
     echo -e "--> Using unused IP ${CDY}${ghost_ip}${CN}. Set ${CDC}GHOST_IP_${mode}=<IP>${CN} otherwise."
 }
@@ -245,7 +267,7 @@ ghost_single() {
         return 255
     }
 
-    iptnat -I POSTROUTING -o "${single_dev:?}"                  -m state --state NEW,ESTABLISHED    "${ipt_args[@]}" -j SNAT --to "${ghost_ip:?}"
+    iptnat -I POSTROUTING -o "${single_dev:?}"                  -m state --state NEW,ESTABLISHED    "${ipt_args[@]}" -j SNAT --to "${ghost_ip:?}" || return
     # NO longer needed because we used -m state for outgoing.
     # iptnat -I PREROUTING  -i "${single_dev:?}" -d "${ghost_ip}" -m state --state ESTABLISHED,RELATED                 -j DNAT --to "${single_dev_ip:?}"
 
@@ -272,7 +294,8 @@ ghost_lan() {
     [ -n "$GHOST_IP_LAN" ] && {
         ghost_ip="${GHOST_IP_LAN}"
         ghost_find_single
-        ghost_single "LAN" && return
+        ghost_single "LAN"
+        return
     }
 
     ghost_find_other
@@ -283,7 +306,7 @@ ghost_lan() {
     # ghost_ip_default="104.17.25.14" # cdnjs.cloudflare.com
     ghost_ip="${GHOST_IP_LAN:-1.0.0.2}"
 
-    iptnat -I POSTROUTING ! -o "${gw_dev:?}" -m state --state NEW,ESTABLISHED "${ipt_args[@]}" -j SNAT --to "${ghost_ip:?}"
+    iptnat -I POSTROUTING ! -o "${gw_dev:?}" -m state --state NEW,ESTABLISHED "${ipt_args[@]}" -j SNAT --to "${ghost_ip:?}" || return
     n=0
     for d in "${ghost_all_dev[@]}"; do
         devip="${ghost_all_dev_ip[@]:$n:1}"
@@ -303,55 +326,67 @@ ghost_up2() {
 
     ghost_find_gw || return
 
-    [ "$GHOST_IP_LAN" != "-1" ] && ghost_lan
+    [ "$GHOST_IP_LAN" != "-1" ] && { ghost_lan || return; }
 
     [ "$GHOST_IP_WAN" != "-1" ] && {
         ghost_ip="${GHOST_IP_WAN}"
         single_dev="$gw_dev"
-        single_dev_ip="$gw_ip"
+        single_dev_ip="$gw_dev_ip"
      
         ghost_single "WAN"
+        return
     }
 
     return 0
 }
 
 ghost_up() {
-    ghost_up2 || return
+    ghost_up2
+
+    # We cant exit yet if LAN or WAN was a success.
+    if [ "${#GHOST_UNDO_CMD[@]}" -le 0 ]; then
+        err "No WAN/LAN found. Check ${CDC}GHOST_IP_WAN=${CN} and ${CDC}GHOST_IP_LAN=${CN}."
+        return
+    fi
+
     [ -n "$GHOST_IPT" ] && echo -e "Traffic matching: ${CDG}${GHOST_IPT}${CN}"
 
     if [ -n $sourced ]; then
         echo "$$" >"${cg_root:?}/${GHOST_NAME}/cgroup.procs"
+        GHOST_PS_BAK="$PS1"
+        [ -n "$GHOST_PS_BAK" ] && PS1="$(echo "$PS1" | sed 's/\\h/\\h-GHOST/g')"
         echo -e "\
---> Your current shell (${SHELL##*/}/$$) and any new process started
+--> Your current shell (${SHELL##*/}/$$) and any further process started
     from this shell are now ghost-routed.
 --> To ghost-route new connections of an already running process:
-    ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}"
-        echo -e "To UNDO type ${CDC}ghost_down${CN} or:"
+    ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}
+To UNDO type ${CDC}ghost_down${CN} or:${CF}"
+        echo "PS1='$GHOST_PS_BAK'"
     else
         echo -e "\
 --> To ghost-route the current shell and all processes started from
     this shell:
     ${CDC}"'echo "$$"  >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}
 --> To ghost-route new connections of an already running process:
-    ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}"
-        echo -e "To UNDO type:"
+    ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}
+To UNDO type:${CF}"
     fi
 
-    echo -en "${CF}"
     for c in "${GHOST_UNDO_CMD[@]}"; do
         echo "$c";
     done
-    [ -n $sourced ] && echo "unset GHOST_UNDO_CMD"
+    [ -n $sourced ] && echo "unset GHOST_UNDO_CMD GHOST_PS_BAK"
     echo -en "${CN}"
 }
 
 ghost_down() {
     local c
 
+    [ -n "$GHOST_PS_BAK" ] && PS1="$GHOST_PS_BAK"
     for c in "${GHOST_UNDO_CMD[@]}"; do
         eval "$c"
     done
+    unset GHOST_PS_BAK
     unset GHOST_UNDO_CMD
 }
 
