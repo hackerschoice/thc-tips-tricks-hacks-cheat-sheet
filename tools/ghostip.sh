@@ -77,14 +77,14 @@
 # Some ideas stolen from novpn:
 # https://gist.github.com/kriswebdev/a8d291936fe4299fb17d3744497b1170
 
-if [ -n $ZSH_EVAL_CONTEXT ]; then
-    [[ $ZSH_EVAL_CONTEXT =~ :file$ ]] && sourced=1 || sourced=0
+if [ -n "$ZSH_EVAL_CONTEXT" ]; then
+    [[ "$ZSH_EVAL_CONTEXT" =~ :file$ ]] && sourced=1
 else
-    (return 0 2>/dev/null) && sourced=1 || sourced=0
+    (return 0 2>/dev/null) && sourced=1
 fi
 
 err() {
-	echo -e >&2 "${CDR}ERROR: ${CN}$@"
+	echo -e >&2 "${CDR}ERROR: ${CN}$*"
 }
 
 # Find the Internet facing GW
@@ -94,7 +94,7 @@ ghost_find_gw() {
     local l
 	IFS=" " arr=($(ip route show match "1.1.1.1"))
     gw_dev="${arr[@]:4:1}"
-	gw_ip="${arr[@]:2:1}"
+	# gw_ip="${arr[@]:2:1}"
 
     # Get the device IP:
     l="$(ip addr show dev "$gw_dev" | grep -m1 'inet '))"
@@ -105,7 +105,6 @@ ghost_find_gw() {
 
 ghost_find_other() {
 	local arr
-	local a
 	local IFS
 	local d
 	local i
@@ -344,8 +343,6 @@ ghost_lan() {
 ghost_up2() {
     local ghost_ip
 
-    ghost_down
-
     ghost_find_gw || return
 
     [ "$GHOST_IP_LAN" != "-1" ] && { ghost_lan || return; }
@@ -364,6 +361,8 @@ ghost_up2() {
 
 ghost_up() {
     local is_error
+
+    ghost_down
     ghost_up2
 
     [ -n "$is_error" ] && {
@@ -380,22 +379,25 @@ ghost_up() {
 
     [ -n "$GHOST_IPT" ] && echo -e "Traffic matching: ${CDG}${GHOST_IPT}${CN}"
 
-    if [ -n $sourced ]; then
+    if [ -n "$sourced" ]; then
         echo "$$" >"${cg_root:?}/${GHOST_NAME}/cgroup.procs"
-        GHOST_PS_BAK="$PS1"
-        [ -n "$GHOST_PS_BAK" ] && PS1="$(echo "$PS1" | sed 's/\\h/\\h-GHOST/g')"
+        [[ "$PS1" != *$'\n'* ]] && {
+            GHOST_PS_BAK="$PS1"
+            PS1="${PS1//\\h/\\h-GHOST}"
+            [ "$PS1" == "$GHOST_PS_BAK" ] && unset GHOST_PS_BAK
+        }
         echo -e "\
 --> Your current shell (${SHELL##*/}/$$) and any further process started
     from this shell are now ghost-routed.
 --> To ghost-route new connections of an already running process:
     ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}
 To UNDO type ${CDC}ghost_down${CN} or:${CF}"
-        echo "PS1='$GHOST_PS_BAK'"
+        [ -n "$GHOST_PS_BAK" ] && echo "PS1='$GHOST_PS_BAK'"
     else
         echo -e "\
 --> To ghost-route the current shell and all processes started from
     this shell:
-    ${CDC}"'echo "$$"  >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}
+    ${CDC}"'echo "$$" >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}
 --> To ghost-route new connections of an already running process:
     ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}
 To UNDO type:${CF}"
@@ -404,7 +406,7 @@ To UNDO type:${CF}"
     for c in "${GHOST_UNDO_CMD[@]}"; do
         echo "$c";
     done
-    [ -n $sourced ] && echo "unset GHOST_UNDO_CMD GHOST_PS_BAK"
+    [ -n "$sourced" ] && echo "unset GHOST_UNDO_CMD GHOST_PS_BAK"
     echo -en "${CN}"
 }
 
