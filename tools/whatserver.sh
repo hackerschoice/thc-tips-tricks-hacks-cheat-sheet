@@ -148,7 +148,8 @@ get_virt() {
     local os
     local os_prefix
 
-    if grep -sqF docker "/proc/1/cgroup" &>/dev/null || grep -sqF " /docker/" "/proc/self/mountinfo" || grep -sqF docker/overlay "/proc/self/mountinfo"; then
+    # old way: grep -sqF " /docker/" "/proc/self/mountinfo"
+    if grep -sqF docker "/proc/1/cgroup" &>/dev/null || grep -F -m1 ' / / r' "/proc/self/mountinfo" | grep -sqF "docker"; then
         cont="Docker"
     elif tr '\000' '\n' <"/proc/1/environ" | grep -Eiq '^container=podman' || grep -sqF /libpod- "/proc/self/cgroup"; then
         cont="Podman"
