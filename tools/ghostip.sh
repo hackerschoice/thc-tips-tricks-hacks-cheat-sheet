@@ -234,7 +234,7 @@ iptnat() {
     unset IFS
     GHOST_UNDO_CMD+=("iptables -t nat -D $*")
     iptables -t nat -C "$@" 2>/dev/null && return
-    iptables -t nat "$ins" "$@"
+    iptables -t nat "$ins" "$@" || return
 }
 
 # Find an unused IP Address on the LAN
@@ -289,7 +289,7 @@ ghost_single() {
         return 255
     }
 
-    iptnat -I POSTROUTING -o "${single_dev:?}"                  -m state --state NEW,ESTABLISHED    "${ipt_args[@]}" -j SNAT --to "${ghost_ip:?}" || return
+    iptnat -I POSTROUTING -o "${single_dev:?}"                  -m state --state NEW,ESTABLISHED    "${ipt_args[@]}" -j SNAT --to "${ghost_ip:?}" || { is_error=1; return; }
     # NO longer needed because we used -m state for outgoing.
     # iptnat -I PREROUTING  -i "${single_dev:?}" -d "${ghost_ip}" -m state --state ESTABLISHED,RELATED                 -j DNAT --to "${single_dev_ip:?}"
 
@@ -328,7 +328,7 @@ ghost_lan() {
     # ghost_ip_default="104.17.25.14" # cdnjs.cloudflare.com
     ghost_ip="${GHOST_IP_LAN:-1.0.0.2}"
 
-    iptnat -I POSTROUTING ! -o "${gw_dev:?}" -m state --state NEW,ESTABLISHED "${ipt_args[@]}" -j SNAT --to "${ghost_ip:?}" || return
+    iptnat -I POSTROUTING ! -o "${gw_dev:?}" -m state --state NEW,ESTABLISHED "${ipt_args[@]}" -j SNAT --to "${ghost_ip:?}" || { is_error=1; return; }
     n=0
     for d in "${ghost_all_dev[@]}"; do
         devip="${ghost_all_dev_ip[@]:$n:1}"
@@ -363,7 +363,14 @@ ghost_up2() {
 }
 
 ghost_up() {
+    local is_error
     ghost_up2
+
+    [ -n "$is_error" ] && {
+        ghost_down
+        err "Oops. This did not work..."
+        return
+    }
 
     # We cant exit yet if LAN or WAN was a success.
     if [ "${#GHOST_UNDO_CMD[@]}" -le 0 ]; then
@@ -406,7 +413,7 @@ ghost_down() {
 
     [ -n "$GHOST_PS_BAK" ] && PS1="$GHOST_PS_BAK"
     for c in "${GHOST_UNDO_CMD[@]}"; do
-        eval "$c"
+        eval "$c" &>/dev/null
     done
     unset GHOST_PS_BAK
     unset GHOST_UNDO_CMD
