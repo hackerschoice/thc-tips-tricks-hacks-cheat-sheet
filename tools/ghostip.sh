@@ -6,12 +6,20 @@
 #
 # A Linux tool to use a non existing IP address (aka GHOST-IP).
 #
-# A typical use case it to use use nmap from a host but with an
-# IP address that is not assigned to any other host on the local network.
-# Your nmap-scans will appear as if originating from 'nowhere'.
+# A typical use case is to attack a target with nmap [et al.] from a host
+# but using an IP address that is not assigned to that host.
+# The nmap-scans will originate from the non-existing source IP (untraceable).
 #
-# This tool will fail on some VPS providers (like AWS) who don't allow
-# ghost-IPs (IPs not registered to your server).
+# Using it on a HOST: It uses an ununsed IP within the same network range. All
+# traffic will orginate from the Ghost-IP.
+#
+# Using it on a ROUTER: It uses 1.0.0.2 to access any workstation with the
+# LAN. The workstation will see the traffic originating from 1.0.0.2, whereas
+# it really originates from the router (e.g. nmap running on the router, not
+# on 1.0.0.2).
+#
+# This tool will fail on some VPS providers (like AWS) which don't allow
+# ghost-IPs (IPs not registered to the host).
 #
 # Ghost-route LAN & WAN taffic by default.
 #
