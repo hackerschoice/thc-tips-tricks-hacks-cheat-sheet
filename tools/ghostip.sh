@@ -179,6 +179,9 @@ ghost_init() {
         CN="\e[0m"     # none
     }
 
+    [ -z "$UID" ] && UID=$(id -u)
+    [ "$UID" -ne 0 ] && { err "Must be root. Try ${CDC}sudo bash${CN} first."; return 255; }
+
     command -v iptables >/dev/null || { err "iptables: command not found. Try ${CDC}apt install iptables${CN}"; return 255; }
     GHOST_NAME="${GHOST_NAME:-update}"
 
@@ -196,15 +199,26 @@ ghost_init() {
     ipt_args=("-m" "cgroup" "--cgroup" "$classid")
 
     # Check for cgroup v2
-    cg_rootv2="/sys/fs/cgroup"
-    [ ! -f "${cg_rootv2}/cgroup.procs" ] && cg_rootv2="/sys/fs/cgroup/unified"
-    [ ! -f "${cg_rootv2}/cgroup.procs" ] && cg_rootv2="$(mount -t cgroup2 | head -n1 | grep -oP '^cgroup2 on \K\S+')"
-    [ ! -f "${cg_rootv2}/cgroup.procs" ] && unset cg_rootv2
-    [ -n "$cg_rootv2" ] && { cg_root="${cg_rootv2}"; ipt_args=("-m" "$ipt_cgroup" "--path" "${GHOST_NAME:?}"); }
+    # First check if Userland tools support cgroup2
+    if iptables -m "$ipt_cgroup" --help 2>&1 | grep -m1 -q -- --path; then
+        cg_rootv2="/sys/fs/cgroup"
+        [ ! -f "${cg_rootv2}/cgroup.procs" ] && cg_rootv2="/sys/fs/cgroup/unified"
+        [ ! -f "${cg_rootv2}/cgroup.procs" ] && cg_rootv2="$(mount -t cgroup2 | head -n1 | grep -oP '^cgroup2 on \K\S+')"
+        [ ! -f "${cg_rootv2}/cgroup.procs" ] && unset cg_rootv2
+        [ -n "$cg_rootv2" ] && {
+            cg_root="${cg_rootv2}"
+            ipt_args=("-m" "$ipt_cgroup" "--path" "${GHOST_NAME:?}")
+        }
+    else
+        [ -z "$cg_root" ] && {
+            err "iptables expect cgroup1 but kernel does not support cgroup1"
+            return 255
+        }
+    fi
 
     # ZSH/BASH compat (see notes above)
     ipt_args=($(echo "$GHOST_IPT") "${ipt_args[@]}")
-    [ -z "$cg_root" ] && { err "No cgroup v1 or v2 found. Not possible to isolate an app to a ghost-IP."; return; }
+    [ -z "$cg_root" ] && { err "No cgroup v1 or v2 found. Not possible to isolate an app to a ghost-IP."; return 255; }
 
     mkdir -p "${cg_root}/${GHOST_NAME}" 2>/dev/null
     [ -z "$cg_rootv2" ] && echo "$classid" >"${cg_root}/${GHOST_NAME}/net_cls.classid"
