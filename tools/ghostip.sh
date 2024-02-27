@@ -4,23 +4,37 @@
 # ======
 # source <(curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/ghostip.sh)
 #
-# A Linux tool to use a non existing IP address (aka GHOST-IP).
+# A Linux tool to use a non existing IP address (aka GHOST-IP). It temporarily
+# re-configures the current running shell: Any application started from that shell
+# will use a Ghost-IP.
 #
 # A typical use case is to attack a target with nmap [et al.] from a host
 # but using an IP address that is not assigned to that host.
 # The nmap-scans will originate from the non-existing source IP (untraceable).
 #
-# Using it on a HOST: It uses an ununsed IP within the same network range. All
-# traffic will orginate from the Ghost-IP.
+# Using it on a HOST/LAN-Spoofing: It uses an unused IP (aka Ghost-IP) from
+# the LAN's network range. All traffic will orginate from that Ghost-IP.
 #
-# Using it on a ROUTER: It uses 1.0.0.2 to access any workstation with the
-# LAN. The workstation will see the traffic originating from 1.0.0.2, whereas
-# it really originates from the router (e.g. nmap running on the router, not
-# on 1.0.0.2).
+# Using it on a ROUTER/WAN-Spooing: It uses 1.0.0.2 to access any workstation
+# within the LAN. The workstation will see the traffic originating from
+# 1.0.0.2, whereas it really originates from the router (e.g. nmap running on
+# the router, not on the spoofed IP of 1.0.0.2).
 #
 # This tool will fail on some VPS providers (like AWS) which don't allow
 # ghost-IPs (IPs not registered to the host).
 #
+# Practiacal Scenarios:
+# =====================
+# We have access to a workstation. We like to scan the internal
+# network but without the target seeing our workstation's IP address.
+#
+# We have access to a router. We like to scan the internal network
+# (or multiple internal networks) but without the target seeing
+# that the scan comes from within the internal network (we make it appear
+# as if comming from 1.0.0.2 - an exteranl IP address).
+#
+# Notes:
+# ======
 # Ghost-route LAN & WAN taffic by default.
 #
 # GHOST_IP_LAN=
@@ -35,7 +49,7 @@
 #
 # Complex Examples:
 # =================
-# Example 1: Ghost-route traffic towards _all_ LAN,
+# Example 1: Ghost-route traffic towards _all_ LANs,
 #     appearing from 1.0.0.2 [default]
 #     $ GHOST_IP_WAN=-1 source ./ghostip.sh
 #
