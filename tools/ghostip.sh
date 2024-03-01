@@ -98,17 +98,17 @@ else
 fi
 
 err() {
-	echo -e >&2 "${CDR}ERROR: ${CN}$*"
+    echo -e >&2 "${CDR}ERROR: ${CN}$*"
 }
 
 # Find the Internet facing GW
 ghost_find_gw() {
-	local arr
-	local IFS
+    local arr
+    local IFS
     local l
-	IFS=" " arr=($(ip route show match "1.1.1.1"))
+    IFS=" " arr=($(ip route show match "1.1.1.1"))
     gw_dev="${arr[@]:4:1}"
-	# gw_ip="${arr[@]:2:1}"
+    # gw_ip="${arr[@]:2:1}"
 
     # Get the device IP:
     l="$(ip addr show dev "$gw_dev" | grep -m1 'inet '))"
@@ -118,42 +118,42 @@ ghost_find_gw() {
 }
 
 ghost_find_other() {
-	local arr
-	local IFS
-	local d
-	local i
+    local arr
+    local IFS
+    local d
+    local i
 
     unset ghost_all_dev
     unset ghost_all_dev_ip
 
     [ "$GHOST_IP_LAN" == "-1" ] && return
 
-	IFS=$'\n' arr=($(ip addr show))
-	for l in "${arr[@]}"; do
-		[[ "$l" =~ ^[0-9]+: ]] && {
-			unset d
-			unset i
-			[[ "$l" != *"state UP"* ]] && continue
+    IFS=$'\n' arr=($(ip addr show))
+    for l in "${arr[@]}"; do
+        [[ "$l" =~ ^[0-9]+: ]] && {
+            unset d
+            unset i
+            [[ "$l" != *"state UP"* ]] && continue
             [[ "$l" == *" master "* ]] && continue # Bridge master / veth
-			d="${l#*:}"
-			d="${d%%:*}"
-			d="${d// /}"
-			# Main Internet dev
-			[ "$d" == "$gw_dev" ] && unset d
-			[ "$d" == "lo" ] && unset d
-			continue
-		}
-		[ -z "$d" ] && continue
-		[[ "$l" == *"inet "* ]] && {
+            d="${l#*:}"
+            d="${d%%:*}"
+            d="${d// /}"
+            # Main Internet dev
+            [ "$d" == "$gw_dev" ] && unset d
+            [ "$d" == "lo" ] && unset d
+            continue
+        }
+        [ -z "$d" ] && continue
+        [[ "$l" == *"inet "* ]] && {
             l="${l##*inet }"
-			i="${l%% *}"
-			i="${i%%/*}"
-			[ -z "$i" ] && continue
-			ghost_all_dev+=("$d")
-			ghost_all_dev_ip+=("$i")
-			unset d
-		}
-	done
+            i="${l%% *}"
+            i="${i%%/*}"
+            [ -z "$i" ] && continue
+            ghost_all_dev+=("$d")
+            ghost_all_dev_ip+=("$i")
+            unset d
+        }
+    done
 }
 
 ghost_find_single() {
@@ -253,7 +253,7 @@ iptnat() {
 # Find an unused IP Address on the LAN
 ghost_find_local() {
     local arr
-	local IFS
+    local IFS
     local str
     local cidr
     local ipp
@@ -271,7 +271,8 @@ ghost_find_local() {
     for n in {0..10}; do
         # .0, .1 , .254, .255 should not be tried.
         d=$((RANDOM % 252 + 2))
-        ping -4 -c2 -i1 -W2 -w2 -A -q "$ipp.$d" &>/dev/null || {
+        # ping -4 not supported on older versions
+        ping -c2 -i1 -W2 -w2 -A -q "$ipp.$d" &>/dev/null || {
             str="$(arp -n "$ipp.$d")"
             [[ "$str" == *"incomplete"* ]] && break
         }
