@@ -401,6 +401,8 @@ ghost_up() {
             PS1="${PS1//\\h/\\h-GHOST}"
             [ "$PS1" == "$GHOST_PS_BAK" ] && unset GHOST_PS_BAK
         }
+        # sfwg support
+        export TYPE=wiretap
         echo -e "\
 --> Your current shell (${SHELL##*/}/$$) and any further process started
     from this shell are now ghost-routed.
