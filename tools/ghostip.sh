@@ -423,7 +423,7 @@ To UNDO type:${CF}"
     for c in "${GHOST_UNDO_CMD[@]}"; do
         echo "$c";
     done
-    [ -n "$sourced" ] && echo "unset GHOST_UNDO_CMD GHOST_PS_BAK"
+    [ -n "$sourced" ] && echo "unset GHOST_UNDO_CMD GHOST_PS_BAK TYPE"
     echo -en "${CN}"
 }
 
