@@ -640,7 +640,7 @@ source <(curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat
 ```
 
 This also works in combination with:
- * [Segfault's ROOT Servers](https://thc.org/segfault/wg): Will connect your ROOT Server to the TARGET NETWORK and using a Ghost IP inside the taget network.
+ * [Segfault's ROOT Servers](https://thc.org/segfault/wireguard): Will connect your ROOT Server to the TARGET NETWORK and using a Ghost IP inside the taget network.
  * [QEMU Tunnels](https://securelist.com/network-tunneling-with-qemu/111803/): As above, but less secure.
 
 ---
