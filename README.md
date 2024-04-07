@@ -1985,15 +1985,16 @@ Trusted VPN Providers
 
 Virtual Private Servers
 1. https://www.hetzner.com - Cheap
-2. https://hivecloud.pw - No KYC. Bullet Proof. Accepts Crypto.
-1. https://dmzhost.co - Ignore most abuse requests
-2. https://alexhost.com - No KYC. Bullet Proof. DMCA free zone
-3. https://basehost.eu - Ignores court orders
+2. https://dmzhost.co - Ignore most abuse requests
+3. https://alexhost.com - No KYC. Bullet Proof. DMCA free zone
 4. https://buyvm.net - Warez best friend
 5. https://serverius.net - Used by gangsters
 6. https://1984.hosting - Privacy
 7. https://bithost.io - Reseller for DigitalOcean, Linode, Hetzner and Vultr (accepts Crypto)
 8. https://www.privatelayer.com - Swiss based.
+9. https://lowendstock.com/deals/ - Cheapest Limited VPS Special Offers 
+
+> https://looking.house/ - You can ping yourself from the presented hosters or check the speed
 
 See [other KYC Free Services](https://kycnot.me/) ([.onion](http://kycnotmezdiftahfmc34pqbpicxlnx3jbf5p7jypge7gdvduu7i6qjqd.onion/))
 
