@@ -13,7 +13,7 @@
 # The nmap-scans will originate from the non-existing source IP (untraceable).
 #
 # Using it on a HOST/LAN-Spoofing: It uses an unused IP (aka Ghost-IP) from
-# the LAN's network range. All traffic will orginate from that Ghost-IP.
+# the LAN's network range. All traffic will originate from that Ghost-IP.
 #
 # Using it on a ROUTER/WAN-Spooing: It uses 1.0.0.2 to access any workstation
 # within the LAN. The workstation will see the traffic originating from
@@ -37,29 +37,37 @@
 # ======
 # Ghost-route LAN & WAN taffic by default.
 #
-# GHOST_IP_LAN=
-#     The Ghost IP to use for traffic towards the LAN [default=1.0.0.2].
-#     If set to a LAN address then ghost a single LAN interface only.
-#     -1 to disable LAN ghosting.
-#
 # GHOST_IP_WAN=
-#     An unused IP address on the WAN facing Interface.
+#     An unused IP address on the WAN facing Interface (the default route).
+#     For HOSTS (not routers) this is a unused IP address of the LAN.
 #     Find an IP Address automatcially if not set [default].
 #     -1 to disable WAN ghosting.
 #
-# Complex Examples:
-# =================
-# Example 1: Ghost-route traffic towards _all_ LANs,
+# GHOST_IP_LAN=
+#     The Ghost IP to use for traffic towards the LAN [default=1.0.0.2].
+#     Only needed when GhostIP is used on a ROUTER (which typicallly has
+#     a WAN and a LAN interface).
+#     If set to a LAN address then ghost a single LAN interface only.
+#     -1 to disable LAN ghosting.
+#
+# On a single host (not a router) only the GHOST_IP_WAN= is used.
+#
+# Complex Examples for HOSTS:
+# ===========================
+# Example 1: Ghost-route traffic towards the LAN & WAN:
+#    appearing from 192.168.0.222 (an unused local LAN IP):
+#    $ GHOST_IP_WAN=192.168.0.222 GHOST_IP_LAN=-1 source ./ghostip.sh
+#
+#
+# Complex Examples for ROUTERS:
+# =============================
+# Example 2: Ghost-route traffic towards _all_ LANs,
 #     appearing from 1.0.0.2 [default]
 #     $ GHOST_IP_WAN=-1 source ./ghostip.sh
 #
-# Example 2: Ghost-route traffic towards _one_ specific LAN,
+# Example 3: Ghost-route traffic towards _one_ specific LAN,
 #    appearing from 172.17.0.99 (an unused local LAN IP):
 #    $ GHOST_IP_WAN=-1 GHOST_IP_LAN=172.17.0.99 source ./ghostip.sh
-#
-# Example 3: Ghost-route traffic towards the WAN,
-#    appearing from 192.168.0.222 (an unused local LAN IP):
-#    $ GHOST_IP_WAN=192.168.0.222 GHOST_IP_LAN=-1 source ./ghostip.sh
 #
 # GHOST_NAME=update
 #     The name of the cgroup. Must not exist.
@@ -250,6 +258,16 @@ iptnat() {
     iptables -t nat "$ins" "$@" || return
 }
 
+if command -v arp >/dev/null; then
+    is_arp_bad() { [[ "$(arp -n "$1")" == *"incomplete"* ]] && return; }
+else
+    is_arp_bad() {
+        local str="$(ip neig sh "$1")"
+        [[ "$str" == *"INCOMPLETE"* ]] && return
+        [[ "$str" == *"FAILED"* ]] && return
+    }
+fi
+
 # Find an unused IP Address on the LAN
 ghost_find_local() {
     local arr
@@ -273,8 +291,7 @@ ghost_find_local() {
         d=$((RANDOM % 252 + 2))
         # ping -4 not supported on older versions
         ping -c2 -i1 -W2 -w2 -A -q "$ipp.$d" &>/dev/null || {
-            str="$(arp -n "$ipp.$d")"
-            [[ "$str" == *"incomplete"* ]] && break
+            is_arp_bad "$ipp.$d" && break
         }
         unset d
     done
@@ -308,8 +325,8 @@ ghost_single() {
     # iptnat -I PREROUTING  -i "${single_dev:?}" -d "${ghost_ip}" -m state --state ESTABLISHED,RELATED                 -j DNAT --to "${single_dev_ip:?}"
 
     # Block anyone connecting to our Ghost-IP:
-    # We dont want to show in the INPUT chain. Instead route all invalid to 0.0.0.0 (/dev/null):
-    iptnat -I PREROUTING  -i "${single_dev}" -d "${ghost_ip}" -m state --state NEW -j DNAT --to 0.0.0.0
+    # We dont want to show in the INPUT chain. Instead route all invalid to 255.255.255.255 (linux will drop them):
+    iptnat -I PREROUTING  -i "${single_dev}" -d "${ghost_ip}" -m state --state NEW -j DNAT --to 255.255.255.255
 
     # We must respond to ARP request to our Ghost-IP. The simplest is to add
     # the Ghost-IP to the same network interface. An alternative would be to
