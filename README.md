@@ -1660,7 +1660,7 @@ find  / -xdev -type f -perm /6000  -ls 2>/dev/null
 ```
 
 Find all writeable directories:
-```sh
+```bash
 wfind() {
     local arr dir
 
@@ -1676,11 +1676,11 @@ wfind() {
 # Usage: wfind /etc /var /usr 
 ```
 
-Find local passwords (using noseyparker):
+Find local passwords (using [noseyparker](https://github.com/praetorian-inc/noseyparker):
 ```sh
-curl -fsSL https://github.com/praetorian-inc/noseyparker/releases/download/v0.16.0/noseyparker-v0.16.0-x86_64-unknown-linux-gnu.tar.gz | tar xvfz - --transform="flags=r;s|.*/||" --no-anchored  --wildcards noseyparker && \
-./noseyparker scan . && \
-./noseyparker report
+curl -o np -fsSL https://github.com/hackerschoice/binary/raw/main/tools/noseyparker-x86_64-static
+./np scan . && \
+./np report
 ```
 (Or use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history)
 
@@ -1690,6 +1690,20 @@ Using `grep`:
 grep -HEronasi  '.{16}password.{,64}' .
 # Find TLS or OpenSSH keys:
 grep -r -F -- " PRIVATE KEY-----" .
+```
+
+Find Subdomains in files:
+```bash
+find_subdomains() {
+	local d="${1}"
+	local rexf='[0-9a-z.-]{0,64}'"${d}"
+	local rex="$rexf"'([^a-z0-9]{1}|$)'
+	[ $# -le 0 ] && { echo -en >&2 "Extract sub-domains from all files (or stdin)\nUsage  : find_subdomains <apex-domain> <file>\nExample: find_subdomain \.com | anew"; return; }
+	shift 1
+	[ $# -le 0 ] && [ -t 0 ] && set -- .
+	command -v rg >/dev/null && { rg -oaIN --no-heading "$rex" "$@" | grep -Eo "$rexf"; return; }
+	grep -Eaohr "$rex" "$@" | grep -Eo "$rexf"
+}
 ```
 
 ---
@@ -1734,10 +1748,8 @@ This will reset the logfile to 0 without having to restart syslogd etc:
 
 This will remove any line containing the IP `1.2.3.4` from the log file:
 ```sh
-xlog() {
-    local a=$(sed "/${1:?}/d" <"${2:?}") && echo "$a" >"${2:?}"
-}
-xlog "1\.2\.3\.4" /var/log/auth.log
+xlog() { local a=$(sed "/${1:?}/d" <"${2:?}") && echo "$a" >"${2:?}"; }
+# xlog "1\.2\.3\.4" /var/log/auth.log
 # xlog "${SSH_CLIENT%% *}" /var/log/auth.log
 # xlog "^2023.* thc\.org" foo.log
 ```
