@@ -1687,7 +1687,7 @@ curl -fsSL https://github.com/praetorian-inc/noseyparker/releases/download/v0.16
 Using `grep`:
 ```sh
 # Find passwords (without garbage).
-grep -HEronasir  '.{16}password.{,64}' .
+grep -HEronasi  '.{16}password.{,64}' .
 # Find TLS or OpenSSH keys:
 grep -r -F -- " PRIVATE KEY-----" .
 ```
