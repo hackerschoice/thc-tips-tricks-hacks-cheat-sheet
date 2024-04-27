@@ -1888,7 +1888,7 @@ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.
 <a id="session-sniffing"></a>
 **10.i Sniff a user's SHELL session**
 
-Records the user's keystrokes to `~/.config/.pty/.@*`. Useful when not root and needing to capture the sudo/ssh/git credentials of the user. 
+A 1-liner for `~/.bashrc` to sniff the user's keystrokes and save them to `~/.config/.pty/.@*`. Useful when not root and needing to capture the sudo/ssh/git credentials of the user. 
 
 Cut & paste the following and follow the instructions:
 ```sh
