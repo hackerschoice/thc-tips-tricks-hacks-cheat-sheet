@@ -2069,7 +2069,8 @@ Many other services (for free)
 
 | OSINT Hacker Tools ||
 | --- | --- |
-| https://osint.sh | Free. Subdomain Finder, DNS History, Public S3 Buckets, Reverse IP, Certificate Search and much more |
+| https://api.c99.nl | (PAID) Subdomain Finder, Phone-Lookup, CF Resolver, WAF Detector, IP2Host, and more...for $25/year. |  
+| https://osint.sh | Free. Subdomain Finder, DNS History, Public S3 Buckets, Reverse IP, Certificate Search, and more |
 | https://cli.fyi | Free. curl/json interface to many services. Try `curl cli.fyi/me` or `curl cli.fyi/thc.org`. |
 | https://check-your-website.server-daten.de | Free. TLS/DNS/Security check a domain. |
 | https://hackertarget.com/ip-tools/ | Free OSINT Service (Reverse IP, MTR, port scan, CMS scans, Vulnerability Scans, API support) |
