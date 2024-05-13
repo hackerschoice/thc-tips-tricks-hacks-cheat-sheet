@@ -2069,7 +2069,7 @@ Many other services (for free)
 
 | OSINT Hacker Tools ||
 | --- | --- |
-| https://api.c99.nl | Free: [Subdomain Finder](https://subdomainfinder.c99.nl), (PAID) Phone-Lookup, CF Resolver, WAF Detector, IP2Host, and more...for $25/year. |  
+| https://api.c99.nl | Free: [Subdomain Finder](https://subdomainfinder.c99.nl), PAID: Phone-Lookup, CF Resolver, WAF Detector, IP2Host, and more...for $25/year. |  
 | https://osint.sh | Free. Subdomain Finder, DNS History, Public S3 Buckets, Reverse IP, Certificate Search, and more |
 | https://cli.fyi | Free. curl/json interface to many services. Try `curl cli.fyi/me` or `curl cli.fyi/thc.org`. |
 | https://check-your-website.server-daten.de | Free. TLS/DNS/Security check a domain. |
