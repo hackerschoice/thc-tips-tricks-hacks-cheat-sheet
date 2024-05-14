@@ -1700,11 +1700,11 @@ find_subdomains() {
 	[ $# -le 0 ] && { echo -en >&2 "Extract sub-domains from all files (or stdin)\nUsage  : find_subdomains <apex-domain> <file>\nExample: find_subdomain \.com | anew"; return; }
 	shift 1
 	[ $# -le 0 ] && [ -t 0 ] && set -- .
-	command -v rg >/dev/null && { rg -oaIN --no-heading "$rex" "$@" | grep -Eo "$rexf"; return; }
+	command -v rg >/dev/null && { rg -oaIN --no-heading "$rex" "$@" | grep -Eao "$rexf"; return; }
 	grep -Eaohr "$rex" "$@" | grep -Eo "$rexf"
 }
-# find_subdomain foobar.com
-# find_subdomain @gmail.com
+# find_subdomain foobar.com | anew
+# find_subdomain @gmail.com | anew
 ```
 
 ---
