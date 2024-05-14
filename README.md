@@ -1678,8 +1678,9 @@ wfind() {
 Find local passwords (using [noseyparker](https://github.com/praetorian-inc/noseyparker)):
 ```sh
 curl -o np -fsSL https://github.com/hackerschoice/binary/raw/main/tools/noseyparker-x86_64-static
+chmod 700 np && \
 ./np scan . && \
-./np report
+./np report --color=always | less -R
 ```
 (Or use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history)
 
