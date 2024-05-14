@@ -1693,17 +1693,18 @@ grep -r -F -- " PRIVATE KEY-----" .
 
 Find Subdomains or emails in files:
 ```bash
+resolv() { while read -r x; do r="$(getent hosts "$x")" || continue; echo "${r%% *}"$'\t'"${x}"; done; }
 find_subdomains() {
-	local d="${1}"
+	local d="${1//./\\.}"
 	local rexf='[0-9a-zA-Z_.-]{0,64}'"${d}"
 	local rex="$rexf"'([^0-9a-zA-Z_]{1}|$)'
-	[ $# -le 0 ] && { echo -en >&2 "Extract sub-domains from all files (or stdin)\nUsage  : find_subdomains <apex-domain> <file>\nExample: find_subdomain \.com | anew"; return; }
+	[ $# -le 0 ] && { echo -en >&2 "Extract sub-domains from all files (or stdin)\nUsage  : find_subdomains <apex-domain> <file>\nExample: find_subdomain .com | anew"; return; }
 	shift 1
 	[ $# -le 0 ] && [ -t 0 ] && set -- .
 	command -v rg >/dev/null && { rg -oaIN --no-heading "$rex" "$@" | grep -Eao "$rexf"; return; }
 	grep -Eaohr "$rex" "$@" | grep -Eo "$rexf"
 }
-# find_subdomain foobar.com | anew
+# find_subdomain .foobar.com | anew | resolv
 # find_subdomain @gmail.com | anew
 ```
 
