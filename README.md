@@ -1800,9 +1800,10 @@ mount -o bind,ro /boot/backdoor.cgi /var/www/cgi/blah.cgi
 
 Needed for taking screenshots of X11 sessions (aka `xwd -root -display :0 | convert - jpg:screenshot.jpg`)
 ```bash
-U=$(id -u UserName) ### <-- Set UserName
-H="$(grep "$U" /etc/passwd | cut -d: -f6)"
-HOME="${H:-/tmp}" python3 -c "import os;os.setuid(${U:?});os.execl('/bin/bash', '-bash')"
+NAME="UserName"  ### <-- Set UserName
+U=$(id -u ${NAME:?}) \
+&& H="$(grep "$U" /etc/passwd | cut -d: -f6)" \
+&& HOME="${H:-/tmp}" python3 -c "import os;os.setuid(${U:?});os.execl('/bin/bash', '-bash')"
 # change -bash to bash to not make this a login shell.
 ```
 
