@@ -1687,7 +1687,7 @@ chmod 700 np && \
 Using `grep`:
 ```sh
 # Find passwords (without garbage).
-grep -HEronasi  '.{16}password.{,64}' .
+grep -HEronasi  '.{,16}password.{,64}' .
 # Find TLS or OpenSSH keys:
 grep -r -F -- " PRIVATE KEY-----" .
 ```
