@@ -602,7 +602,7 @@ More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvese
 <a id="iptables"></a>
 **3.iii.c Bouncing traffic with iptables**
 
-Use the host 192.168.0.100 as a Jump-Host: Forward any connection from anywhere to 192.168.0.100:53 onwards to 1.2.3.4:443.
+Bounce through a host/router without needing to run a userland proxy or forwarder:
 ```sh
 ipfwinit() {
     echo 1 >/proc/sys/net/ipv4/ip_forward
