@@ -2185,7 +2185,6 @@ Tools
 1. https://tmate.io/ - Share A screen with others
 
 Callback / Canary / Command & Control
-1. http://dnslog.cn
 1. https://app.interactsh.com
 1. https://api.telegram.org
 1. https://webhook.site
