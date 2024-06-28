@@ -14,6 +14,7 @@
 # Environment variables:
 #    XHOME=         Set custom XHOME directory instead of /dev/shm/.$'\t''~?$:?'
 #
+# https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/blob/master/tools/hackshell.sh
 # 2024 by theM0ntarCann0n & skpr
 
 CY="\033[1;33m" # yellow
@@ -30,6 +31,7 @@ CDC="\033[0;36m" # cyan
 CF="\033[2m"    # faint
 CN="\033[0m"    # none
 CW="\033[1;37m"
+
 
 ### Functions to keep in memory
 HS_ERR() { echo -e >&2 "${CR}ERROR: ${CDR}$*${CN}"; }
@@ -93,6 +95,7 @@ notime() {
     "$@"
     date --set="$now" >/dev/null || return
 }
+
 
 # Presever mtime, ctime and birth-time as best as possible.
 # notime_cp <src> <dst>
@@ -204,6 +207,8 @@ hs_exit() {
 hs_init() {
     local a
     local prg="$1"
+
+    [ -z "$BASH" ] && { HS_ERR "Needs BASH"; return 255; }
     [ "${prg##*\.}" = "sh" ] && { HS_ERR "Use ${CDC}source $prg${CDR} instead"; exit 255; }
 
     [ -z "$UID" ] && UID="$(id -u)"
@@ -232,13 +237,13 @@ hs_init_alias() {
 }
 
 ### Programm
-hs_init "$0"
+hs_init "$0" || return #zsh shall bail. bash continues
 hs_init_alias
 
 export HISTFILE="/dev/null"
 export BASH_HISTORY="/dev/null"
 export LANG=C.UTF-8
-locale -a 2>/dev/null|grep -Fqim1 C.UTF-8 || export LANG=C
+locale -a 2>/dev/null|grep -Fqim1 C.UTF || export LANG=C
 export LESSHISTFILE=-
 export REDISCLI_HISTFILE=/dev/null
 export MYSQL_HISTFILE=/dev/null
