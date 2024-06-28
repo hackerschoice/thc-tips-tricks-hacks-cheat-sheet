@@ -40,11 +40,14 @@ xlog() { local a=$(sed "/${1:?}/d" <"${2:?}") && echo "$a" >"${2:?}"; }
 xsu() {
     local name="${1:?}"
     local u g h
+    local cmd="python"
+
+    command -v python3 >/dev/null && cmd="python3"
     [ $UID -ne 0 ] && { HS_ERR "Need root"; return; }
     u=$(id -u ${name:?}) || return
     g=$(id -g ${name:?}) || return
-    h="$(grep "$U" /etc/passwd | cut -d: -f6)" || return
-    HOME="${h:-/tmp}" python3 -c "import os;os.setgid(${g:?});os.setuid(${u:?});os.execlp('bash', 'bash')"
+    h="$(grep "^${name}:" /etc/passwd | cut -d: -f6)" || return
+    HOME="${h:-/tmp}" "$cmd" -c "import os;os.setgid(${g:?});os.setuid(${u:?});os.execlp('bash', 'bash')"
 }
 
 xtmux() {
