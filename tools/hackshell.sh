@@ -183,7 +183,7 @@ command -v shred >/dev/null || shred() {
 
 # Keep this seperate because this actually creates data.
 mk() {
-    mkdir -p "${XHOME}" 2>/dev/null
+    mkdir -p "${XHOME:?}" 2>/dev/null
     export HOME="${XHOME}"
     echo -e "${CDM}HOME set to ${CDY}${XHOME}${CN} ${CF}[will auto-destruct on exit]${CN}"
     echo -e "Undo with ${CDC}export HOME='${_HS_HOME_ORIG}'${CN}"
@@ -197,25 +197,32 @@ bin() {
 }
 
 hs_exit() {
-    [ -n "$XHOME" ] && rm -rf "${XHOME:?}"
-    cd /tmp
+    cd /tmp || cd /dev/shm || cd /
+    [ -n "$XHOME" ] && [ -d "$XHOME" ] && rm -rf "${XHOME:?}"
     [ -t 1 ] && echo -e "${CW}>>>>> 📖 More tips at https://thc.lorg/tips${CN} 😘"
     kill -9 $$
 }
+
+[ -z "$BASH" ] && TRAPEXIT() { hs_exit; } #zsh
 
 ### Functions (temporary)
 hs_init() {
     local a
     local prg="$1"
 
-    [ -z "$BASH" ] && { HS_ERR "Needs BASH"; return 255; }
-    [ "${prg##*\.}" = "sh" ] && { HS_ERR "Use ${CDC}source $prg${CDR} instead"; exit 255; }
-
+    [ -z "$BASH" ] && { HS_WARN "Shell is not BASH. Try:
+${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chmod 700 bash && exec bash -il'"; }
+    [ -n "$BASH" ] && [ "${prg##*\.}" = "sh" ] && { HS_ERR "Use ${CDC}source $prg${CDR} instead"; sleep 2; exit 255; }
     [ -z "$UID" ] && UID="$(id -u)"
     [ -n "$_HS_HOME_ORIG" ] && export HOME="$_HS_HOME_ORIG"
     export _HS_HOME_ORIG="$HOME"
 
-    trap hs_exit EXIT SIGHUP SIGTERM SIGPIPE
+    if [ -n "$BASH" ]; then
+        trap hs_exit EXIT SIGHUP SIGTERM SIGPIPE
+    else
+        trap hs_exit SIGHUP SIGTERM SIGPIPE
+    fi
+
     HS_SSH_OPT=()
     command -v ssh >/dev/null && {
         [[ $(ssh -V 2>&1) == OpenSSH_[67]* ]] && a="no"
@@ -237,10 +244,11 @@ hs_init_alias() {
 }
 
 ### Programm
-hs_init "$0" || return #zsh shall bail. bash continues
+hs_init "$0"
 hs_init_alias
 
-export HISTFILE="/dev/null"
+unset HISTFILE
+[ -n "$BASH" ] && export HISTFILE="/dev/null"
 export BASH_HISTORY="/dev/null"
 export LANG=C.UTF-8
 locale -a 2>/dev/null|grep -Fqim1 C.UTF || export LANG=C
@@ -248,7 +256,6 @@ export LESSHISTFILE=-
 export REDISCLI_HISTFILE=/dev/null
 export MYSQL_HISTFILE=/dev/null
 export T=.$'\t''~?$?'
-# export T=.$'\t''~?$:?'
 TMPDIR="/tmp"
 [ -d "/var/tmp" ] && TMPDIR="/var/tmp"
 [ -d "/dev/shm" ] && TMPDIR="/dev/shm"
