@@ -1811,12 +1811,19 @@ mount -o bind,ro /boot/backdoor.cgi /var/www/cgi/blah.cgi
 
 Needed for taking screenshots of X11 sessions (aka `xwd -root -display :0 | convert - jpg:screenshot.jpg`)
 ```bash
-# NAME="UserName"  ### <-- Set UserName
-U=$(id -u ${NAME:?}) \
-G=$(id -g ${NAME:?}) \
-&& H="$(grep "^${NAME}:" /etc/passwd | cut -d: -f6)" \
-&& HOME="${H:-/tmp}" python3 -c "import os;os.setgid(${G:?});os.setuid(${U:?});os.execlp('bash', 'bash')"
-# change bash to -bash to make this a login shell.
+xsu() {
+    local name="${1:?}"
+    local u g h
+    local cmd="python"
+
+    command -v python3 >/dev/null && cmd="python3"
+    [ $UID -ne 0 ] && { HS_ERR "Need root"; return; }
+    u=$(id -u ${name:?}) || return
+    g=$(id -g ${name:?}) || return
+    h="$(grep "^${name}:" /etc/passwd | cut -d: -f6)" || return
+    HOME="${h:-/tmp}" "$cmd" -c "import os;os.setgid(${g:?});os.setuid(${u:?});os.execlp('bash', 'bash')"
+}
+# xsu user
 ```
 
 ---
