@@ -55,12 +55,14 @@ xtmux() {
 }
 
 xssh() {
+
     local ttyp
-    echo -e "\e[0;35mTHC says: pimp up your prompt: Cut & Paste the following into your remote shell:\e[0;36m"
-    echo -e "PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'\e[0m"
+    echo -e "May need to cut & paste:${CDC}
+reset -I
+PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'
+"'stty -echo;printf "\\033[18t";read -t5 -rdt R;stty sane $(echo "$R"|awk -F";" '"'"'{ printf "rows "$3" cols "$2; }'"'"')'"${CN}"
     ttyp=$(stty -g)
     stty raw -echo opost
-    # ssh -oUpdateHostKeys=no -oStrictHostKeyChecking="${a:-accept-new}" -T \
     ssh "${HS_SSH_OPT[@]}" -T \
         "$@" \
         "unset SSH_CLIENT SSH_CONNECTION; TERM=xterm-256color HISTFILE=/dev/null BASH_HISTORY=/dev/null exec -a [ntp] script -qc 'exec -a [uid] bash -i' /dev/null"
