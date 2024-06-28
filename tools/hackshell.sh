@@ -7,9 +7,9 @@
 # useful static binaries.
 #
 # Usage (memory only):
-#     source <(curl -fL https://thc.org/hs)
+#     source <(curl -SsfL https://thc.org/hs)
 # Usage with downloading binaries:
-#     BIN=1 source <(curl -fL https://thc.org/hs)
+#     BIN=1 source <(curl -SsfL https://thc.org/hs)
 #
 # Environment variables:
 #    XHOME=         Set custom XHOME directory instead of /dev/shm/.$'\t''~?$:?'
