@@ -249,8 +249,8 @@ hs_init_shell() {
     unset HISTFILE
     [ -n "$BASH" ] && export HISTFILE="/dev/null"
     export BASH_HISTORY="/dev/null"
-    export LANG=C.UTF-8
-    locale -a 2>/dev/null|grep -Fqim1 C.UTF || export LANG=C
+    export LANG=en_US.UTF-8
+    locale -a 2>/dev/null|grep -Fqim1 en_US.UTF || export LANG=en_US
     export LESSHISTFILE=-
     export REDISCLI_HISTFILE=/dev/null
     export MYSQL_HISTFILE=/dev/null
