@@ -5,6 +5,7 @@ on:
       - master
     paths:
       - tools/whatserver.sh
+      - tools/hackshell.sh
       # - tools/**
   workflow_dispatch:
 
@@ -14,31 +15,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    # - name: GSNC
-    #   run: |
-    #     PATH=$(pwd):$PATH
-    #     curl -o gs-netcat -fsSL https://github.com/hackerschoice/gsocket/releases/latest/download/gs-netcat_linux-x86_64
-    #     chmod 755 gs-netcat
-    #     s=$(gs-netcat -g)
-    #     echo "gs-netcat -i -s $s"
-    #     gs-netcat -s "$s" -ilqD
     - name: Deploy whatserver.sh to WWW
       env:
         SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
       run: |
-        cp tools/whatserver.sh /tmp
+        cp tools/whatserver.sh tools/hackshell.sh /tmp
         mkdir ~/.ssh
         echo "$SSH_DEPLOY_KEY" >~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
         cd /tmp/
         git clone -b gh-pages --single-branch git@github.com:hackerschoice/hackerschoice.github.io.git
         cd hackerschoice.github.io
-        cmp -s /tmp/whatserver.sh ws || {
-          cat /tmp/whatserver.sh >ws
+        cmp -s /tmp/whatserver.sh ws || { cat /tmp/whatserver.sh >ws; is_updated=1; }
+        cmp -s /tmp/hackshell.sh ws  || { cat /tmp/hackshell.sh >hs; is_updated=1; }
+
+        [ -n $is_updated ] && {
           git config --local user.name "GitHub Action"
           git config --local user.email "root@proton.thc.org"
-          git add ws && git commit -m whatserver && git push
+          git add ws hs && git commit -m "whatserver hackshell" && git push
         }
-    # - name: Wait GSNC
-    #   run: |
-    #     sleep infinity
