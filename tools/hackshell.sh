@@ -243,32 +243,31 @@ hs_init_alias() {
     alias screen="screen -ln"
 }
 
-### Programm
-hs_init "$0"
-hs_init_alias
+hs_init_shell() {
+    unset HISTFILE
+    [ -n "$BASH" ] && export HISTFILE="/dev/null"
+    export BASH_HISTORY="/dev/null"
+    export LANG=C.UTF-8
+    locale -a 2>/dev/null|grep -Fqim1 C.UTF || export LANG=C
+    export LESSHISTFILE=-
+    export REDISCLI_HISTFILE=/dev/null
+    export MYSQL_HISTFILE=/dev/null
+    export T=.$'\t''~?$?'
+    TMPDIR="/tmp"
+    [ -d "/var/tmp" ] && TMPDIR="/var/tmp"
+    [ -d "/dev/shm" ] && TMPDIR="/dev/shm"
+    export TMPDIR
+    [ -z "$XHOME" ] && export XHOME="${TMPDIR}/${T}"
 
-unset HISTFILE
-[ -n "$BASH" ] && export HISTFILE="/dev/null"
-export BASH_HISTORY="/dev/null"
-export LANG=C.UTF-8
-locale -a 2>/dev/null|grep -Fqim1 C.UTF || export LANG=C
-export LESSHISTFILE=-
-export REDISCLI_HISTFILE=/dev/null
-export MYSQL_HISTFILE=/dev/null
-export T=.$'\t''~?$?'
-TMPDIR="/tmp"
-[ -d "/var/tmp" ] && TMPDIR="/var/tmp"
-[ -d "/dev/shm" ] && TMPDIR="/dev/shm"
-export TMPDIR
-[ -z "$XHOME" ] && export XHOME="${TMPDIR}/${T}"
+    export PATH=".:${PATH}"
+    # PS1='USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \e[36m\u\e[m@\e[32m\h:\e[33;1m\w \e[0;31m\$\e[m '
+    PS1='\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ '
+    # echo -e "${CDM}Change your prompt with ${CDC}"; echo -n "    PS1='\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ '"; echo -e "${CN}"
+}
 
-export PATH=".:${PATH}"
-# PS1='USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \e[36m\u\e[m@\e[32m\h:\e[33;1m\w \e[0;31m\$\e[m '
-PS1='\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ '
-# echo -e "${CDM}Change your prompt with ${CDC}"; echo -n "    PS1='\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ '"; echo -e "${CN}"
-
-# Output help
-echo -en "\
+xhelp() {
+    # Output help
+    echo -en "\
 ${CDC} xlog '1\.2\.3\.4' /var/log/auth.log   ${CDM}Cleanse log file
 ${CDC} xsu username                          ${CDM}Switch user
 ${CDC} xtmux                                 ${CDM}Start 'hidden' tmux
@@ -279,9 +278,19 @@ ${CDC} shred file                            ${CDM}Securely delete a file
 ${CDC} notime <file> rm -f foo.dat           ${CDM}Exec ${CDC}command${CDM} at mtime of <file>
 ${CDC} notime_cp <src> <dst>                 ${CDM}Copy file. Keep birth-time, ctime, mtime & atime
 ${CDC} find_subdomain .foobar.com            ${CDM}Search files for sub-domain
-${CDC} bin                                   ${CDM}Download useful static binaries"
-echo -e "${CN}"
+${CDC} bin                                   ${CDM}Download useful static binaries
+${CDC} xhelp                                 ${CDM}This help"
+    echo -e "${CN}"
+}
 
+
+### Programm
+hs_init "$0"
+hs_init_alias
+hs_init_shell
+xhelp
+
+### Finishing
 str=""
 [ -z "$BIN" ] && {
     echo -e "Type ${CDC}mk${CN} to use HOME=${CDY}${XHOME}${CN}"
@@ -290,5 +299,5 @@ str=""
 echo -e ">>> ${CG}Setup complete. ${CF}${str}${CN}"
 
 # unset all functions that are no longer needed.
-unset -f hs_init hs_init_alias
-unset BIN str
+unset -f hs_init hs_init_alias hs_init_shell
+unset BIN str SSH_CONNECTION SSH_CLIENT
