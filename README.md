@@ -610,6 +610,9 @@ ipfwinit() {
     iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
     iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
 }
+ipfw() {
+    iptables -t nat -A PREROUTING -p tcp --dport "${1:?}" -m mark --mark 1188 -j DNAT --to ${2:?}:${3:?}
+}
 ipfwinit                             # Allow EVERY IP to bounce
 # ipfwinit "1.2.3.4/16" "6.6.0.0/16" # Only allow these SOURCE IP's to bounce
 ```
