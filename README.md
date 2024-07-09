@@ -122,6 +122,32 @@ Make BASH less noisy. Disables *~/.bash_history* and [many other things](tools/h
 source <(curl -SsfL https://thc.org/hs)
 ```
 
+It does much more but most importantly this:
+```sh
+unset HISTFILE
+[ -n "$BASH" ] && export HISTFILE="/dev/null"
+export BASH_HISTORY="/dev/null"
+export LANG=en_US.UTF-8
+locale -a 2>/dev/null|grep -Fqim1 en_US.UTF || export LANG=en_US
+export LESSHISTFILE=-
+export REDISCLI_HISTFILE=/dev/null
+export MYSQL_HISTFILE=/dev/null
+TMPDIR="/tmp"
+[ -d "/var/tmp" ] && TMPDIR="/var/tmp"
+[ -d "/dev/shm" ] && TMPDIR="/dev/shm"
+export TMPDIR
+export PATH=".:${PATH}"
+if [[ "$SHELL" == *"zsh" ]]; then
+    PS1='%F{red}%n%f@%F{cyan}%m %F{magenta}%~ %(?.%F{green}.%F{red})%#%f '
+else
+    PS1='\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ '
+fi
+alias wget='wget --no-hsts'
+alias vi="vi -i NONE"
+alias vim="vim -i NONE"
+alias screen="screen -ln"
+```
+
 Bonus tip:
 Any command starting with a " " (space) will [not get logged to history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
 ```
