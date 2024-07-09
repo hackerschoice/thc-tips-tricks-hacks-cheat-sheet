@@ -2118,6 +2118,16 @@ Many other services (for free)
 <a id="osint"></a>
 ## 12. Intelligence Gathering
 
+
+Find sub domains from TLS Database:
+```sh
+crt() {
+    [ $# -ne 1 ] && { echo >&2 "crt <domain-name>"; return 255; }
+    curl -s "https://crt.sh/?q=${1:?}&output=json" --compressed | jq -r '.[].common_name,.[].name_value' | anew | sed 's/^\*\.//g' | tr '[:upper:]' '[:lower:]'
+}
+# Usage: crt <domain>
+```
+
 | OSINT Hacker Tools ||
 | --- | --- |
 | https://api.c99.nl | Free: [Subdomain Finder](https://subdomainfinder.c99.nl), PAID: Phone-Lookup, CF Resolver, WAF Detector, IP2Host, and more...for $25/year. |  
