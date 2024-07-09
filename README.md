@@ -2118,6 +2118,13 @@ Many other services (for free)
 <a id="osint"></a>
 ## 12. Intelligence Gathering
 
+Reverse DNS from multiple public databases:
+```sh
+rdns () {
+    curl "https://lookup.segfault.net/api/v1/download?ip_address=${1:?}&limit=10&apex_domain=${2}" | column -t -s,
+}
+# rdns <IP>
+```
 
 Find sub domains from TLS Database:
 ```sh
@@ -2125,7 +2132,7 @@ crt() {
     [ $# -ne 1 ] && { echo >&2 "crt <domain-name>"; return 255; }
     curl -s "https://crt.sh/?q=${1:?}&output=json" --compressed | jq -r '.[].common_name,.[].name_value' | anew | sed 's/^\*\.//g' | tr '[:upper:]' '[:lower:]'
 }
-# Usage: crt <domain>
+# crt <domain>
 ```
 
 | OSINT Hacker Tools ||
