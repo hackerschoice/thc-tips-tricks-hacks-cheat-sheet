@@ -396,7 +396,7 @@ else
         netstat -in 2>/dev/null
     }
     echo -e "${CB}>>>>> ARP table${CN}"
-    command -v arp >/dev/null && arp -an 2>/dev/null | COL
+    command -v arp >/dev/null && arp -an 2>/dev/null || cat /proc/net/arp | COL
 fi
 
 command -v netstat >/dev/null && {
