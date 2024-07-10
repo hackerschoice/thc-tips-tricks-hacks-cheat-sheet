@@ -472,7 +472,7 @@ hs_init() {
     local str
 
     [ -z "$BASH" ] && { HS_WARN "Shell is not BASH. Try:
-${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chmod 700 bash && exec bash -il'"; }
+${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chmod 700 bash && exec bash -il'"; sleep 2; }
     [ -n "$BASH" ] && [ "${prg##*\.}" = "sh" ] && { HS_ERR "Use ${CDC}source $prg${CDR} instead"; sleep 2; exit 255; }
     [ -z "$UID" ] && UID="$(id -u)"
     [ -n "$_HS_HOME_ORIG" ] && export HOME="$_HS_HOME_ORIG"
