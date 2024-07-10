@@ -2222,7 +2222,7 @@ DDoS
 1. [DeepNet](https://github.com/the-deepnet/ddos) - we despise DDoS but if we had to then this would be our choice.
 
 Static Binaries / pre-compiled Tools
-1. https://bin/ajam.dev ([github](https://github.com/Azathothas/Toolpacks/tree/main), [hysp project](https://github.com/metis-os/hysp-pkgs))
+1. https://bin.ajam.dev ([github](https://github.com/Azathothas/Toolpacks/tree/main), [hysp project](https://github.com/metis-os/hysp-pkgs))
 1. https://github.com/andrew-d/static-binaries/tree/master/binaries/linux/x86_64
 2. https://lolbas-project.github.io/ (Windows)
 1. https://iq.thc.org/cross-compiling-exploits
