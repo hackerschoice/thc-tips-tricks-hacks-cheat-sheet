@@ -122,6 +122,32 @@ Make BASH less noisy. Disables *~/.bash_history* and [many other things](tools/h
 source <(curl -SsfL https://thc.org/hs)
 ```
 
+It does much more but most importantly this:
+```sh
+unset HISTFILE
+[ -n "$BASH" ] && export HISTFILE="/dev/null"
+export BASH_HISTORY="/dev/null"
+export LANG=en_US.UTF-8
+locale -a 2>/dev/null|grep -Fqim1 en_US.UTF || export LANG=en_US
+export LESSHISTFILE=-
+export REDISCLI_HISTFILE=/dev/null
+export MYSQL_HISTFILE=/dev/null
+TMPDIR="/tmp"
+[ -d "/var/tmp" ] && TMPDIR="/var/tmp"
+[ -d "/dev/shm" ] && TMPDIR="/dev/shm"
+export TMPDIR
+export PATH=".:${PATH}"
+if [[ "$SHELL" == *"zsh" ]]; then
+    PS1='%F{red}%n%f@%F{cyan}%m %F{magenta}%~ %(?.%F{green}.%F{red})%#%f '
+else
+    PS1='\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ '
+fi
+alias wget='wget --no-hsts'
+alias vi="vi -i NONE"
+alias vim="vim -i NONE"
+alias screen="screen -ln"
+```
+
 Bonus tip:
 Any command starting with a " " (space) will [not get logged to history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
 ```
@@ -2092,6 +2118,23 @@ Many other services (for free)
 <a id="osint"></a>
 ## 12. Intelligence Gathering
 
+Reverse DNS from multiple public databases:
+```sh
+rdns () {
+    curl -fsSL "https://lookup.segfault.net/api/v1/download?ip_address=${1:?}&limit=10&apex_domain=${2}" | column -t -s,
+}
+# rdns <IP>
+```
+
+Find sub domains from TLS Database:
+```sh
+crt() {
+    [ $# -ne 1 ] && { echo >&2 "crt <domain-name>"; return 255; }
+    curl -fsSL "https://crt.sh/?q=${1:?}&output=json" --compressed | jq -r '.[].common_name,.[].name_value' | anew | sed 's/^\*\.//g' | tr '[:upper:]' '[:lower:]'
+}
+# crt <domain>
+```
+
 | OSINT Hacker Tools ||
 | --- | --- |
 | https://api.c99.nl | Free: [Subdomain Finder](https://subdomainfinder.c99.nl), PAID: Phone-Lookup, CF Resolver, WAF Detector, IP2Host, and more...for $25/year. |  
@@ -2179,7 +2222,7 @@ DDoS
 1. [DeepNet](https://github.com/the-deepnet/ddos) - we despise DDoS but if we had to then this would be our choice.
 
 Static Binaries / pre-compiled Tools
-1. https://bin/ajam.dev ([github](https://github.com/Azathothas/Toolpacks/tree/main), [hysp project](https://github.com/metis-os/hysp-pkgs))
+1. https://bin.ajam.dev ([github](https://github.com/Azathothas/Toolpacks/tree/main), [hysp project](https://github.com/metis-os/hysp-pkgs))
 1. https://github.com/andrew-d/static-binaries/tree/master/binaries/linux/x86_64
 2. https://lolbas-project.github.io/ (Windows)
 1. https://iq.thc.org/cross-compiling-exploits
