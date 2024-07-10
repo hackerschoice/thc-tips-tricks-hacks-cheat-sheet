@@ -274,11 +274,14 @@ hide() {
 hs_mkhome() {
     [ -d "${XHOME}" ] && return 255
     mkdir -p "${XHOME:?}" 2>/dev/null || return
-    echo -e ">>> Using ${CDY}${XHOME}${CN}. ${CF}[will auto-destruct on exit]${CN}"
+    echo -e ">>> Using ${CDY}XHOME=${XHOME}${CN}. ${CF}[will auto-destruct on exit]${CN}"
+    echo -e ">>> Type ${CDC}cdx${CN} to change to your hidden ${CDY}\"\${XHOME}\"${CN} directory"
     echo -e ">>> Type ${CDC}keep${CN} to disable auto-destruct on exit."
     # [[ "$PATH" == "$XHOME"* ]] || export PATH="${XHOME}:$PATH"
     export PATH="${XHOME}:$PATH"
 }
+
+cdx() { cd "${XHOME}"; }
 
 # Keep this seperate because this actually creates data.
 mk() {
