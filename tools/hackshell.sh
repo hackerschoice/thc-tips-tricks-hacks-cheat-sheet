@@ -407,7 +407,7 @@ loot() {
         loot_bitrix "$fn"
     done
 
-    find /var/www -maxdepth 6 -type f -wholename "*/bitrix/.settings.php" | while read -r fn; do
+    find /var/www -maxdepth 6 -type f -wholename "*/bitrix/.settings.php" 2>/dev/null | while read -r fn; do
         loot_bitrix "$fn"
     done
 
