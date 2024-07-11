@@ -278,6 +278,7 @@ hide() {
 
 _hs_xhome_init() {
     [[ "$PATH" != *"$XHOME"* ]] && export PATH="${XHOME}:$PATH"
+    command -v curl >/dev/null && curl --help curl | grep -i proto-default && alias curl="--proto-default https"
 }
 
 hs_mkxhome() {
@@ -310,16 +311,19 @@ keep() {
 }
 
 np() {
+    local cmdl=()
     command -v noseyparker >/dev/null || { HS_ERR "Not found: noseyparker. Type ${CDC}bin noseyparker${CDR} first."; return 255;}
     [ -t 1 ] && {
         HS_WARN "Use ${CDC}np $*| less -R${CN} instead."
         return;
     }
+    command -v nice >/dev/null && cmdl=("nice" "-n19")
+    cmdl+=("noseyparker")
 	local d="/tmp/.np-${UID}-$$"
 	[ -d "${d}" ] && rm -rf "${d:?}"
 	[ $# -le 0 ] && set - .
-	NP_DATASTORE="$d" noseyparker -q scan "$1" >&2 || return
-	NP_DATASTORE="$d" noseyparker report --color=always
+	NP_DATASTORE="$d" "${cmdl[@]}" -q scan "$@" >&2 || return
+	NP_DATASTORE="$d" "${cmdl[@]}" report --color=always
 	rm -rf "${d:?}"
 }
 
@@ -417,13 +421,16 @@ bin() {
 }
 
 loot_sshkey() {
-    local str="${CF}password protected"
+    local str
     local fn="${1:?}"
 
     [ ! -s "${fn}" ] && return
     grep -Fqam1 'PRIVATE KEY' "${fn}" || return
 
-    setsid -w ssh-keygen -y -f "${fn}" </dev/null &>/dev/null && str="${CDR}NO PASSWORD"
+    [ -n "$_HS_SETSID_WAIT" ] && {
+        str="${CF}password protected"
+        setsid -w ssh-keygen -y -f "${fn}" </dev/null &>/dev/null && str="${CDR}NO PASSWORD"
+    }
     echo -e "${CB}SSH-Key ${CDY}${fn}${CN} ${str}${CDY}${CF}"
     cat "$fn"
     echo -en "${CN}"
@@ -545,7 +552,8 @@ hs_init_dl() {
         dl() { 
             local opts=()
             [ -n "$UNSAFE" ] && opts=("-k")
-            curl -fsSL "${opts[@]}" --proto-default https --connect-timeout 7 --retry 3 "${1:?}"
+            # curl -fsSL "${opts[@]}" --proto-default https --connect-timeout 7 --retry 3 "${1:?}"
+            curl -fsSL "${opts[@]}" --connect-timeout 7 --retry 3 "${1:?}"
         }
     elif command -v wget >/dev/null; then
         _HS_SSL_ERR="is not trusted"
@@ -581,6 +589,8 @@ ${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chm
         trap hs_exit SIGHUP SIGTERM SIGPIPE
     fi
 
+    setsid --help | grep -Fqm1 -- --wait && _HS_SETSID_WAIT=1
+
     HS_SSH_OPT=()
     command -v ssh >/dev/null && {
         str="$(ssh -V 2>&1)"
@@ -594,6 +604,24 @@ ${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chm
     hs_init_dl
 }
 
+_scan_single() {
+    local opt=("${2}")
+
+    [ -f "$2" ] && opt=("-iL" "$2")
+    nmap -Pn -p"${1}" --open --host-timeout 5s -n -oG - "${opt[@]}" | grep -F Ports
+}
+
+# scan <port> <IP or file>
+scan() {
+    local port="${1:?}"
+
+    shift 1
+    command -v nmap >/dev/null || { HR_ERR "Not found: nmap. Try ${CDC}bin nmap${CDR} first"; return 255; }
+    for ip in "$@"; do
+        _scan_single "$port" "$ip"
+    done
+}
+
 hs_init_alias() {
     alias ssh="ssh ${HS_SSH_OPT[*]}"
     alias scp="scp ${HS_SSH_OPT[*]}"
@@ -601,6 +629,7 @@ hs_init_alias() {
     alias vi="vi -i NONE"
     alias vim="vim -i NONE"
     alias screen="screen -ln"
+    command -v curl >/dev/null && curl --help curl | grep -i proto-default && alias curl="--proto-default https"
 }
 
 hs_init_shell() {
@@ -648,6 +677,7 @@ ${CDC} notime_cp <src> <dst>                 ${CDM}Copy file. Keep birth-time, c
 ${CDC} find_subdomain .foobar.com            ${CDM}Search files for sub-domain
 ${CDC} crt foobar.com                        ${CDM}Query crt.sh for all sub-domains
 ${CDC} rdns 1.2.3.4                          ${CDM}Reverse DNS from multiple public databases
+${CDC} scan <port> [<IP or file> ...]        ${CDM}TCP Scan a port + IP
 ${CDC} hide <pid>                            ${CDM}Hide a process
 ${CDC} np <directory>                        ${CDM}Display secrets with NoseyParker ${CN}${CF}[try |less -R]
 ${CDC} loot                                  ${CDM}Display common secrets
