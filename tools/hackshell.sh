@@ -635,6 +635,15 @@ hs_init_alias() {
     alias vi="vi -i NONE"
     alias vim="vim -i NONE"
     alias screen="screen -ln"
+
+    alias l='ls -Alh'
+    alias lt='ls -Alhrt'
+    alias lss='ls -AlhrS'
+    alias psg='ps alxwww | grep -i -E'
+    alias lsg='ls -Alh --color=always | grep -i -E'
+    alias cd..='cd ..'
+    alias ..='cd ..'
+
     command -v curl >/dev/null && curl --help curl | grep -i proto-default && alias curl="--proto-default https"
 }
 
