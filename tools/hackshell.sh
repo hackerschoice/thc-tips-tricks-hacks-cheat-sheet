@@ -279,7 +279,7 @@ hide() {
 
 _hs_xhome_init() {
     [[ "$PATH" != *"$XHOME"* ]] && export PATH="${XHOME}:$PATH"
-    command -v curl >/dev/null && curl --help curl | grep -i proto-default && alias curl="--proto-default https"
+    hs_init_alias_curl
 }
 
 hs_mkxhome() {
@@ -686,11 +686,23 @@ ${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chm
     hs_init_dl
 }
 
+_hs_dep() {
+    command -v "${1:?}" >/dev/null || { HS_ERR "Not found: ${1}. Try ${CDC}bin ${1}${CDR} first"; return 255; }
+}
+
+# Show common name of remote server
+cn() {
+    _hs_dep openssl || return
+    _hs_dep sed || return
+    timeout 2 openssl s_client -showcerts -connect "${1:?}:${2:-443}" 2>/dev/null  </dev/null | openssl x509 -noout -subject  2>/dev/null | sed '/^subject/s/^.*CN.*=[ ]*//g'
+}
+
 _scan_single() {
     local opt=("${2}")
 
     [ -f "$2" ] && opt=("-iL" "$2")
-    nmap -Pn -p"${1}" --open -T4 -n -oG - "${opt[@]}" | grep -F Ports
+    # Redirect "Unable to find nmap-services" to /dev/null
+    nmap -Pn -p"${1}" --open -T4 -n -oG - "${opt[@]}" 2>/dev/null | grep -F Ports
 }
 
 # scan <port> <IP or file> ...
@@ -698,10 +710,14 @@ scan() {
     local port="${1:?}"
 
     shift 1
-    command -v nmap >/dev/null || { HR_ERR "Not found: nmap. Try ${CDC}bin nmap${CDR} first"; return 255; }
+    _hs_dep nmap
     for ip in "$@"; do
         _scan_single "$port" "$ip"
     done
+}
+
+hs_init_alias_curl() {
+    command -v curl >/dev/null && curl --help curl | grep -iqm1 proto-default && alias curl="curl --proto-default https"
 }
 
 hs_init_alias() {
@@ -720,7 +736,7 @@ hs_init_alias() {
     alias cd..='cd ..'
     alias ..='cd ..'
 
-    command -v curl >/dev/null && curl --help | grep -i proto-default && alias curl="curl --proto-default https"
+    hs_init_alias_curl
 }
 
 hs_init_shell() {
@@ -771,6 +787,7 @@ ${CDC} find_subdomain .foobar.com            ${CDM}Search files for sub-domain
 ${CDC} hgrep <string>                        ${CDM}Grep for pattern, output for humans ${CN}${CF}[hgrep password]
 ${CDC} crt foobar.com                        ${CDM}Query crt.sh for all sub-domains
 ${CDC} rdns 1.2.3.4                          ${CDM}Reverse DNS from multiple public databases
+${CDC} cn <IP> [<port>]                      ${CDM}Display TLS's CommonName of remote IP
 ${CDC} scan <port> [<IP or file> ...]        ${CDM}TCP Scan a port + IP
 ${CDC} hide <pid>                            ${CDM}Hide a process
 ${CDC} np <directory>                        ${CDM}Display secrets with NoseyParker ${CN}${CF}[try |less -R]
