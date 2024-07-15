@@ -347,7 +347,7 @@ thcssh()
     echo -e "\e[0;35mTHC says: pimp up your prompt: Cut & Paste the following into your remote shell:\e[0;36m"
     echo -e "PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'\e[0m"
     ttyp=$(stty -g)
-    stty raw -echo opost
+    stty raw -echo icrnl opost
     [[ $(ssh -V 2>&1) == OpenSSH_[67]* ]] && a="no"
     ssh -o UpdateHostKeys=no -o StrictHostKeyChecking="${a:-accept-new}" -T \
         "$@" \
@@ -1508,7 +1508,7 @@ python -c 'import pty; pty.spawn("/bin/bash")'
 
 ```
 # On your terminal execute:
-stty raw -echo opost; fg
+stty raw -echo icrnl opost; fg
 ```
 
 ```sh
@@ -1516,9 +1516,10 @@ stty raw -echo opost; fg
 export SHELL=/bin/bash
 export TERM=xterm-256color
 reset -I
-stty -echo;printf "\033[18t";read -rdt R;stty sane $(echo "$R"|awk -F";" '{ printf "rows "$3" cols "$2; }')
+stty -echo;printf "\033[18t";read -rdt R;stty sane $(echo "${R:-8;80;25}"|awk -F";" '{ printf "rows "$3" cols "$2; }')
 # Pimp up your prompt
-PS1='USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
+# PS1='USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
+PS1='\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ '
 ```
 
 <a id="reverse-shell-socat"></a>
