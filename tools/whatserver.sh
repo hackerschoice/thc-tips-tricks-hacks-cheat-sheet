@@ -112,7 +112,7 @@ addcn() {
     arr+=("$str")
 }
 
-# Line with multiple domain names
+# Line with multiple domain names, \t-separated
 addline() {
     local IFS
     local str="$1"
@@ -124,17 +124,30 @@ addline() {
     done
 }
 
+# First parameters is the x509/pem value (not filename)
+addx509() {
+    local x509="${1}"
+    local str
+
+    [[ "$(echo "$x509" | openssl x509 -noout -ext basicConstraints 2>/dev/null)" == *"CA:TRUE"* ]] && return
+
+    # Extract CN
+    str="$(echo "$x509" | openssl x509 -noout -subject 2>/dev/null)"
+    [[ "$str" == "subject"* ]] && [[ "$str" != *"/CN"* ]] && {
+        str="$(echo "$str" | sed '/^subject/s/^.*CN.*=[ ]*//g')"
+        addcn "$str"
+    }
+
+    # Extract SAN
+    str="$(echo "$x509" | openssl x509 -noout -ext subjectAltName 2>/dev/null | grep -F DNS: | sed 's/\s*DNS://g' | sed 's/[^-a-z0-9\.\*,]//g')"
+    addline "${str//,/$'\t'}"
+}
+
 addcertfn() {
     local fn="$1"
-    local str
     [[ ! -f "$fn" ]] && return
     [[ "$fn" == *_csr-* ]] && return  # Skip certificate requests
-    [[ "$(openssl x509 -noout -in "$fn" -ext basicConstraints 2>/dev/null)" == *"CA:TRUE"* ]] && return
-    str="$(openssl x509 -noout -in "$fn" -subject 2>/dev/null)"
-    [[ "$str" != "subject"* ]] && return
-    [[ "$str" != *"/CN"* ]] && return
-    str="$(echo "$str" | sed '/^subject/s/^.*CN.*=[ ]*//g')"
-    addcn "$str" "$fn"
+    addx509 "$(<"${fn}")"
 }
 
 # Return <Virtualization>/<Container> or EMPTY if baremetal. Mostly stolen from:
@@ -314,7 +327,7 @@ for fn in "${certsfn[@]}"; do
 done
 
 # Grab certificate from live server (in case we dont have read access to the file):
-addcn "$(openssl s_client -showcerts -connect 0:443 2>/dev/null  </dev/null | openssl x509 -noout -subject  2>/dev/null | sed '/^subject/s/^.*CN.*=[ ]*//g')"
+addx509 "$(openssl s_client -showcerts -connect 0:443 2>/dev/null  </dev/null)"
 
 # Assess /etc/hosts. Extract valid domains.
 IFS=$'\n' lines=($(grep -v '^#' /etc/hosts | grep -v -E '(^255\.|\sip6)'))
