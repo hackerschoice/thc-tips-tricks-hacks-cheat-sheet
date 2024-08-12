@@ -117,7 +117,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 <a id="hackshell"></a>
 **1.i. Set up a Hack Shell (bash):**
 
-Make BASH less noisy. Disables *~/.bash_history* and [many other things](tools/hackshell.sh).
+Make BASH less noisy. Disables *~/.bash_history* and [many other things](/hackerschoice/hackshell).
 ```sh
  source <(curl -SsfL https://thc.org/hs)
 ```
