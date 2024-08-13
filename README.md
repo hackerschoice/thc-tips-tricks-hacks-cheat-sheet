@@ -84,6 +84,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Hide files from a User without root privileges](#shell-hide-files)
    1. [Make a file immutable](#perm-files)
    1. [Change user without sudo/su](#nosudo)
+   1. [Obfuscate and crypt payload](#payload)
 1. [Crypto](#crypto)
    1. [Generate quick random Password](#gen-password)
    1. [Linux transportable encrypted filesystems](#crypto-filesystem)
@@ -1864,6 +1865,27 @@ xsu() {
 }
 # xsu user
 ```
+
+<a id="payload"></a>
+**8.vi. Obfuscate and crypt paypload**
+
+Use [UPX](https://github.com/upx/upx) to pack an ELF binary:
+```shell
+upx -qqq /bin/id -o mybin
+```
+
+Then destroy the UPX header and 2nd ELF header to fool the Anit-Virus:
+```shell
+perl -i -0777 -pe 's/^(.{64})(.{0,256})UPX!.{4}/$1$2\0\0\0\0\0\0\0\0/s' mybin
+perl -i -0777 -pe 's/^(.{64})(.{0,256})\x7fELF/$1$2\0\0\0\0/s' mybin
+```
+
+Verify that is can not be unpacked:
+```shell
+upx -d mybin
+```
+
+Optionally encrypt it with [Ezuri](https://github.com/guitmz/ezuri) thereafter.
 
 ---
 <a id="crypto"></a>
