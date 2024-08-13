@@ -1869,29 +1869,31 @@ xsu() {
 <a id="payload"></a>
 **8.vii. Obfuscate and crypt paypload**
 
-Use [UPX](https://github.com/upx/upx) to pack an ELF binary:
+Use [UPX](https://github.com/upx/upx) to pack an ELF binary (example `/bin/id`):
 ```shell
-upx -qqq /bin/id -o mybin
+BIN="mybin"
+upx -qqq /bin/id -o "${BIN}"
 ```
 
 Then destroy the [UPX header](https://github.com/upx/upx/blob/devel/src/stub/src/include/header.S) and 2nd ELF header to fool the Anit-Virus:
 ```shell
-perl -i -0777 -pe 's/^(.{64})(.{0,256})UPX!.{4}/$1$2\0\0\0\0\0\0\0\0/s' mybin
-perl -i -0777 -pe 's/^(.{64})(.{0,256})\x7fELF/$1$2\0\0\0\0/s' mybin
+perl -i -0777 -pe 's/^(.{64})(.{0,256})UPX!.{4}/$1$2\0\0\0\0\0\0\0\0/s' "${BIN}"
+perl -i -0777 -pe 's/^(.{64})(.{0,256})\x7fELF/$1$2\0\0\0\0/s' "${BIN}"
 ```
 
 Optionally destroy traces of UPX:
 ```shell
-perl -i -0777 -pe 's/UPX!/\0\0\0\0/sg' mybin
-cat mybin \
+perl -i -0777 -pe 's/UPX!/\0\0\0\0/sg' "${BIN}"
+cat "${BIN}" \
 | perl -e 'local($/);$_=<>;s/(.*)(\$Info:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' \
-| perl -e 'local($/);$_=<>;s/(.*)(\$Id:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >x
-cat x >mybin; rm -f x
+| perl -e 'local($/);$_=<>;s/(.*)(\$Id:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >"${BIN}.tmpupx"
+cat "${BIN}.tmpupx" >"${BIN}"
+rm -f "${BIN}.tmpupx"
 ```
 
 Verify that is can not be unpacked:
 ```shell
-upx -d mybin
+upx -d "${BIN}"  # Should fail with 'not packed by UPX'
 ```
 
 Optionally encrypt it with [Ezuri](https://github.com/guitmz/ezuri) thereafter.
