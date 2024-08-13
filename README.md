@@ -1883,12 +1883,12 @@ perl -i -0777 -pe 's/^(.{64})(.{0,256})\x7fELF/$1$2\0\0\0\0/s' "${BIN}"
 
 Optionally cleanse signatures and traces of UPX:
 ```shell
-perl -i -0777 -pe 's/UPX!/\0\0\0\0/sg' "${BIN}"
 cat "${BIN}" \
 | perl -e 'local($/);$_=<>;s/(.*)(\$Info:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' \
 | perl -e 'local($/);$_=<>;s/(.*)(\$Id:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >"${BIN}.tmpupx"
 cat "${BIN}.tmpupx" >"${BIN}"
 rm -f "${BIN}.tmpupx"
+perl -i -0777 -pe 's/UPX!/\0\0\0\0/sg' "${BIN}"
 ```
 
 Verify that binary can not be unpacked:
