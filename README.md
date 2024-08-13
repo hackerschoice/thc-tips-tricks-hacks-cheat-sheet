@@ -1875,13 +1875,13 @@ BIN="mybin"
 upx -qqq /bin/id -o "${BIN}"
 ```
 
-Then destroy the [UPX header](https://github.com/upx/upx/blob/devel/src/stub/src/include/header.S) and 2nd ELF header to fool the Anit-Virus:
+Cleanse the [UPX header](https://github.com/upx/upx/blob/devel/src/stub/src/include/header.S) and 2nd ELF header to fool the Anit-Virus:
 ```shell
 perl -i -0777 -pe 's/^(.{64})(.{0,256})UPX!.{4}/$1$2\0\0\0\0\0\0\0\0/s' "${BIN}"
 perl -i -0777 -pe 's/^(.{64})(.{0,256})\x7fELF/$1$2\0\0\0\0/s' "${BIN}"
 ```
 
-Optionally destroy traces of UPX:
+Optionally cleanse signatures and traces of UPX:
 ```shell
 perl -i -0777 -pe 's/UPX!/\0\0\0\0/sg' "${BIN}"
 cat "${BIN}" \
@@ -1891,7 +1891,7 @@ cat "${BIN}.tmpupx" >"${BIN}"
 rm -f "${BIN}.tmpupx"
 ```
 
-Verify that is can not be unpacked:
+Verify that binary can not be unpacked:
 ```shell
 upx -d "${BIN}"  # Should fail with 'not packed by UPX'
 ```
