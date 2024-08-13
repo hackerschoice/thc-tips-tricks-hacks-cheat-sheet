@@ -1874,7 +1874,7 @@ Use [UPX](https://github.com/upx/upx) to pack an ELF binary:
 upx -qqq /bin/id -o mybin
 ```
 
-Then destroy the UPX header and 2nd ELF header to fool the Anit-Virus:
+Then destroy the [UPX header](https://github.com/upx/upx/blob/devel/src/stub/src/include/header.S) and 2nd ELF header to fool the Anit-Virus:
 ```shell
 perl -i -0777 -pe 's/^(.{64})(.{0,256})UPX!.{4}/$1$2\0\0\0\0\0\0\0\0/s' mybin
 perl -i -0777 -pe 's/^(.{64})(.{0,256})\x7fELF/$1$2\0\0\0\0/s' mybin
