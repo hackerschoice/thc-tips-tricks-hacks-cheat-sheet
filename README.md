@@ -1880,6 +1880,15 @@ perl -i -0777 -pe 's/^(.{64})(.{0,256})UPX!.{4}/$1$2\0\0\0\0\0\0\0\0/s' mybin
 perl -i -0777 -pe 's/^(.{64})(.{0,256})\x7fELF/$1$2\0\0\0\0/s' mybin
 ```
 
+Optionally destroy traces of UPX:
+```shell
+perl -i -0777 -pe 's/UPX!/\0\0\0\0/sg' mybin
+cat mybin \
+| perl -e 'local($/);$_=<>;s/(.*)(\$Info:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' \
+| perl -e 'local($/);$_=<>;s/(.*)(\$Id:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >x
+cat x >mybin; rm -f x
+```
+
 Verify that is can not be unpacked:
 ```shell
 upx -d mybin
