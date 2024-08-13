@@ -1867,7 +1867,7 @@ xsu() {
 ```
 
 <a id="payload"></a>
-**8.vi. Obfuscate and crypt paypload**
+**8.vii. Obfuscate and crypt paypload**
 
 Use [UPX](https://github.com/upx/upx) to pack an ELF binary:
 ```shell
