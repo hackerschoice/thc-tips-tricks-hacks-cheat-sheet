@@ -122,6 +122,10 @@ Make BASH less noisy. Disables *~/.bash_history* and [many other things](/hacker
 ```sh
  source <(curl -SsfL https://thc.org/hs)
 ```
+Alternative URL:
+```sh
+ source <(curl -SsfL https://github.com/hackerschoice/hackshell/raw/main/hackshell.sh)
+```
 
 It does much more but most importantly this:
 ```sh
