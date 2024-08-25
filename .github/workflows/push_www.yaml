@@ -26,10 +26,9 @@ jobs:
         git clone -b gh-pages --single-branch git@github.com:hackerschoice/hackerschoice.github.io.git
         cd hackerschoice.github.io
         cmp -s /tmp/whatserver.sh ws || { cat /tmp/whatserver.sh >ws; is_updated=1; }
-        #cmp -s /tmp/hackshell.sh ws  || { cat /tmp/hackshell.sh >hs; is_updated=1; }
 
         [ -n $is_updated ] && {
           git config --local user.name "GitHub Action"
           git config --local user.email "root@proton.thc.org"
-          git add ws hs && git commit -m "whatserver" && git push
+          git add ws && git commit -m "whatserver" && git push
         }

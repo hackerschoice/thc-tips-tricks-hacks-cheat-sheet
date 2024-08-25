@@ -165,17 +165,17 @@ $  id
 Hide as "syslogd".
 
 ```shell
-(exec -a syslogd nmap -T0 10.0.2.1/24) # Note the brackets '(' and ')'
+(exec -a syslogd nmap -Pn -F -n --open -oG - 10.0.2.1/24) # Note the brackets '(' and ')'
 ```
 
 Start a background hidden process:
 ```
-(exec -a syslogd nmap -T0 10.0.2.1/24 &>nmap.log &)
+(exec -a syslogd nmap -Pn -F -n --open -oG - 10.0.2.1/24 &>nmap.log &)
 ```
 
 Start within a [GNU screen](https://linux.die.net/man/1/screen):
 ```
-screen -dmS MyName nmap -T0 10.0.2.1/24
+screen -dmS MyName nmap -Pn -F -n --open -oG - 10.0.2.1/24
 ### Attach back to the nmap process
 screen -x MyName
 ```
@@ -183,7 +183,7 @@ screen -x MyName
 Alternatively if there is no Bash:
 ```sh
 cp "$(command -v nmap)" syslogd
-PATH=.:$PATH syslogd -T0 10.0.2.1/24
+PATH=.:$PATH syslogd -Pn -F -n --open -oG - 10.0.2.1/24
 ```
 In this example we execute *nmap* but let it appear with the name *syslogd* in *ps alxwww* process list.
 
@@ -193,9 +193,9 @@ In this example we execute *nmap* but let it appear with the name *syslogd* in *
 Use [zapper](https://github.com/hackerschoice/zapper):
 ```sh
 # Start Nmap but zap all options and show it as 'klog' in the process list:
-./zapper -a klog nmap -T0 10.0.0.1/24
+./zapper -a klog nmap -Pn -F -n --open -oG - 10.0.0.1/24
 # Same but started as a daemon:
-(./zapper -a klog nmap -T0 10.0.0.1/24 &>nmap.log &)
+(./zapper -a klog nmap -Pn -F -n --open -oG - 10.0.0.1/24 &>nmap.log &)
 # Replace the existing shell with tmux (with 'exec').
 # Then start and hide tmux and all further processes - as some kernel process:
 exec ./zapper -f -a'[kworker/1:0-rcu_gp]' tmux
@@ -319,7 +319,8 @@ echo "ssh-ed25519 AAAAOurPublicKeyHere....blah x@y"$'\r'"$(<authorized_keys)" >a
 Scan 20 hosts in parallel and log each result to a separate log file:
 ```sh
 # hosts.txt contains a long list of hostnames or ip-addresses
-cat hosts.txt | parallel -j20 'exec nmap -n -Pn -sCV -F --open {} >nmap_{}.txt'
+# (Use -sCV for more verbose version)
+cat hosts.txt | parallel -j20 'exec nmap -n -Pn -sV -F --open -oG - {} >nmap_{}.txt'
 ```
 Note: The example uses `exec` to replace the underlying shell with the last process (nmap, gsexec). It's optional but reduces the number of running shell binaries.
 
@@ -499,13 +500,18 @@ ssh -D1080 -R31339:0:31339 -i sshd_key -p 31337 joe@1.2.3.4
 **3.i. Discover hosts**
 
 ```sh
-## ARP disocer computers on the local network
-nmap -r -sn -PR 192.168.0.1/24
+## ARP discover computers on the _LOCAL_ network only
+nmap -n -sn -PR -oG - 192.168.0.1/24
 ```
 
 ```sh
-## ICMP discover computers on the local netowork
-NET="10.11.0"  # discover 10.11.0.1-10.11.0.254
+### ICMP discover hosts
+nmap -n -sn -PI -oG - 192.168.0.1/24
+```
+
+```sh
+## ICMP discover hosts (local LAN) ROOT
+# NET="10.11.0"  # discover 10.11.0.1-10.11.0.254
 seq 1 254 | xargs -P20 -I{} ping -n -c3 -i0.2 -w1 -W200 "${NET:-192.168.0}.{}" | grep 'bytes from' | awk '{print $4" "$7;}' | sort -uV -k1,1
 ```
 
@@ -780,7 +786,7 @@ curl https://internetdb.shodan.io/1.1.1.1
 Fast (-F) vulnerability scan
 ```shell
 # Version gathering
-nmap -sCV -F -Pn --min-rate 10000 scanme.nmap.org
+nmap nmap -n -Pn -sCV -F --open --min-rate 10000 scanme.nmap.org
 # Vulns
 nmap -A -F -Pn --min-rate 10000 --script vulners.nse --script-timeout=5s scanme.nmap.org
 ```
