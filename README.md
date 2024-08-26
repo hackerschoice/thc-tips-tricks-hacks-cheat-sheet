@@ -1799,7 +1799,7 @@ touch -r /etc/shadow /etc/passwd
 # verify with 'stat /etc/passwd'
 ```
 
-Use [hackshell](#hackshell) and `notime` to also adjust the ctime and birth-time of a file.
+Use [hackshell](#hackshell) and `ctime /etc/passwd` to also adjust the ctime and birth-time.
 
 <a id="shell-clean-logs"></a>
 **8.iii. Clear logfile**
