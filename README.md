@@ -2313,11 +2313,12 @@ Exfil<a id="cloudexfil"></a>
 Publishing
 1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
 1. Or use /onion on [segfault.net](https://www.thc.org/segfault) or plain old https with ngrok.
-1. [DuckDNS](https://www.duckdns.org/) - Free Dynamic Domain Names
-3. [afraid.org](https://www.afraid.org) - Free Dynamic DNS for your domain
-2. [he.net](https://dns.he.net/) - Free Nameserver service
-4. [0bin](https://0bin.net/) / [paste.ec](https://paste.ec) - Encrypted PasteBin
-5. [pad.riseup.net](https://pad.riseup.net) - Create documents and share them securely
+1. [DuckDNS](https://www.duckdns.org/) - Free Domain Names
+1. [AnonDNS](https://anondns.net/) - Free Domain Name (anonymous)
+1. [afraid.org](https://www.afraid.org) - Free Dynamic DNS for your domain
+1. [he.net](https://dns.he.net/) - Free Nameserver service
+1. [0bin](https://0bin.net/) / [paste.ec](https://paste.ec) - Encrypted PasteBin
+1. [pad.riseup.net](https://pad.riseup.net) - Create documents and share them securely
 
 Forums and Conferences
 1. [0x00Sec](https://0x00sec.org/) - Reverse Engineering & Hacking with a pinch of Malware
