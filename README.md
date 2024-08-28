@@ -162,15 +162,15 @@ $  id
 <a id="bash-hide-command"></a>
 **1.ii. Hide your command / Daemonzie your command**
 
-Hide as "syslogd".
+This will hide the *process name* only. Use [zapper](#zap) to also hide the command line options.
 
 ```shell
 (exec -a syslogd nmap -Pn -F -n --open -oG - 10.0.2.1/24) # Note the brackets '(' and ')'
 ```
 
-Start a background hidden process:
+Start a background 'nmap' hidden as '/usr/sbin/sshd':
 ```
-(exec -a syslogd nmap -Pn -F -n --open -oG - 10.0.2.1/24 &>nmap.log &)
+(exec -a '/usr/sbin/sshd' nmap -Pn -F -n --open -oG - 10.0.2.1/24 &>nmap.log &)
 ```
 
 Start within a [GNU screen](https://linux.die.net/man/1/screen):
@@ -180,22 +180,34 @@ screen -dmS MyName nmap -Pn -F -n --open -oG - 10.0.2.1/24
 screen -x MyName
 ```
 
-Alternatively if there is no Bash:
+Alternatively, copy the binary to a new name:
 ```sh
+cd /dev/shm
 cp "$(command -v nmap)" syslogd
 PATH=.:$PATH syslogd -Pn -F -n --open -oG - 10.0.2.1/24
 ```
-In this example we execute *nmap* but let it appear with the name *syslogd* in *ps alxwww* process list.
+
+or use bind-mount to (temporarily) let */sbin/init* point to */dev/shm/nmap* instead:
+```shell
+mount -n --bind "$(command -v nmap)" /sbin/init
+# starting /sbin/init will instead execute nmap
+(/sbin/init -Pn -f -n --open -oG - 10.0.2.1/24 &>nmap.log &)
+```
 
 <a id="zap"></a>
 **1.iii. Hide your command line options**
 
 Use [zapper](https://github.com/hackerschoice/zapper):
 ```sh
+curl -fL -o zapper https://github.com/hackerschoice/zapper/releases/latest/download/zapper-linux-$(uname -m) && \
+chmod 755 zapper
+```
+
+```sh
 # Start Nmap but zap all options and show it as 'klog' in the process list:
 ./zapper -a klog nmap -Pn -F -n --open -oG - 10.0.0.1/24
-# Same but started as a daemon:
-(./zapper -a klog nmap -Pn -F -n --open -oG - 10.0.0.1/24 &>nmap.log &)
+# Started as a daemon and sshd-style name:
+(./zapper -a 'sshd: root@pts/0' nmap -Pn -F -n --open -oG - 10.0.0.1/24 &>nmap.log &)
 # Replace the existing shell with tmux (with 'exec').
 # Then start and hide tmux and all further processes - as some kernel process:
 exec ./zapper -f -a'[kworker/1:0-rcu_gp]' tmux
