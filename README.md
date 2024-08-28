@@ -1695,7 +1695,11 @@ curl -fL https://github.com/signalapp/Signal-Desktop/files/15037868/update-for-f
 
 Get [essential information](https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/blob/master/tools/whatserver.sh) about a host:
 ```sh
-curl -fsSL https://thc.org/ws | bash
+bash -c "$(curl -fsSL https://thc.org/ws)"
+```
+or
+```sh
+bash -c "$(curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/raw/master/tools/whatserver.sh)"
 ```
 
 netstat if there is no netstat/ss/lsof:
