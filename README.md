@@ -685,7 +685,7 @@ GS_HOST=213.171.212.212 gs-netcat -i -s ...
 
 ---
 <a id="ghost"></a>
-**3.vi.c Ghsot IP / IP Spoofing**
+**3.vi.c Ghost IP / IP Spoofing**
 
 Useful on a host inside the target network. This tool re-configured (without trace) the SHELL: Any program (nmap, cme, ...) started from this SHELL will use a fake IP. All your attacks will originate from a host that does not exist.
 
