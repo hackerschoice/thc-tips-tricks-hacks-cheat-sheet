@@ -1195,10 +1195,9 @@ Using Python, download only:
 ```sh
 # Declare a curl-alternative
 purl() {
-	local p
-	local url="${1:?}"
-	{ [[ "${url:0:8}" == "https://" ]] || [[ "${url:0:7}" == "http://" ]]; } || url="https://${url}"
-	"$(which python3 || which python || which pyton2 || which false)" -c "\
+    local url="${1:?}"
+    { [[ "${url:0:8}" == "https://" ]] || [[ "${url:0:7}" == "http://" ]]; } || url="https://${url}"
+    "$(which python3 || which python || which pyton2 || which false)" -c "\
 import urllib.request
 import sys
 import ssl
@@ -1232,6 +1231,18 @@ surl() {
 	| sed '1,/^\r\{0,1\}$/d'
 }
 # surl ipinfo.io
+```
+
+using Perl, download only:
+```sh
+lurl() {
+    local url="${1:?}"
+    { [[ "${url:0:8}" == "https://" ]] || [[ "${url:0:7}" == "http://" ]]; } || url="https://${url}"
+    perl -e 'use LWP::Simple qw(get);
+my $url = '"'${1:?}'"';
+print(get $url);'
+}
+# lurl ipinfo.io
 ```
 
 Using bash, download only:
