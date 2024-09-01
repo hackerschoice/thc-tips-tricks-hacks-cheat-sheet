@@ -130,7 +130,7 @@ Alternative URL:
 And if there is no curl/wget, use [surl](#download) and (temporarily) installed curl with `bin curl`.
 ```sh
 source <(surl https://raw.githubusercontent.com/hackerschoice/hackshell/main/hackshell.sh)
-# Afterwards type `bin curl` to install curl
+# Afterwards type `bin curl` to (temporarily) install curl (in memory).
 ```
 
 It does much more but most importantly this:
