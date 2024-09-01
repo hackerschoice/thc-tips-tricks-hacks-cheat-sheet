@@ -569,6 +569,8 @@ socat TCP-LISTEN:25,reuseaddr,fork  openssl-connect:smtp.gmail.com:465
 <a id="ports"></a>
 **3.iii.a Raw TCP reverse ports**
 
+Useful for reverse backdoors that need a TCP Port on a PUBLIC IP Address:
+
 Using [segfault.net](https://thc.org/segfault.net) (free):
 ```sh
 # Request a random public TCP port:
@@ -589,7 +591,7 @@ using [serveo.net](https://serveo.net) (free):
 ssh -R 0:localhost:31337 serveo.net
 ```
 
-See also [remote.moe](#revese-shell-remote-moe) (free) to forward raw TCP from the target to your workstation or [ngrok](https://ngrok.com/) (paid subscription) to forward a raw public TCP port.
+See also [remote.moe](#revese-shell-remote-moe) (free) to forward raw TCP from the target to your workstation or [playit](https://playit.gg/) (free) or [ngrok](https://ngrok.com/) (paid subscription) to forward a raw public TCP port.
 
 Other free services are limited to forward HTTPS only (not raw TCP). Some tricks below show how to tunnel raw TCP over HTTPS forwards (using websockets).
 
