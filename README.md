@@ -1199,7 +1199,7 @@ Using Python, download only:
 purl() {
     local url="${1:?}"
     { [[ "${url:0:8}" == "https://" ]] || [[ "${url:0:7}" == "http://" ]]; } || url="https://${url}"
-    "$(which python3 || which python || which pyton2 || which false)" -c "\
+    "$(which python3 || which python || which python2 || which false)" -c "\
 import urllib.request
 import sys
 import ssl
