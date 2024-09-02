@@ -375,7 +375,7 @@ thcssh()
     [[ $(ssh -V 2>&1) == OpenSSH_[67]* ]] && a="no"
     ssh -o UpdateHostKeys=no -o StrictHostKeyChecking="${a:-accept-new}" -T \
         "$@" \
-        "unset SSH_CLIENT SSH_CONNECTION; TERM=xterm-256color BASH_HISTORY=/dev/null exec -a [ntp] script -qc 'exec -a [uid] /bin/bash -i' /dev/null"
+        "unset SSH_CLIENT SSH_CONNECTION; LESSHISTFILE=- MYSQL_HISTFILE=/dev/null TERM=xterm-256color HISTFILE=/dev/null BASH_HISTORY=/dev/null exec -a [ntp] script -qc 'exec -a [uid] /bin/bash -i' /dev/null"
     stty "${ttyp}"
 }
 ```
