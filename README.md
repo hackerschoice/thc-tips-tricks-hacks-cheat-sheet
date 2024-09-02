@@ -365,8 +365,7 @@ Go full comfort with PTY and colors: `xssh user@server.org`:
 ```sh
 ### Cut & Paste the following to your shell, then execute
 ### xssh user@server.org
-xssh()
-{
+xssh() {
     local ttyp
     echo -e "\e[0;35mTHC says: pimp up your prompt: Cut & Paste the following into your remote shell:\e[0;36m"
     echo -e "PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'\e[0m"
@@ -396,7 +395,7 @@ ssh -S .sshmux NONE
 #ssh -S .sshmux NONE ls -al
 #scp -o "ControlPath=.sshmux" NONE:/etc/passwd .
 ```
-Can be combined with [thcssh](#ssh-invisible) to hide from utmp.
+Can be combined with [xssh](#ssh-invisible) to hide from utmp.
 
 <a id="ssh-tunnel"></a>
 **2.iii SSH tunnel**
