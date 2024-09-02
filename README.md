@@ -366,15 +366,14 @@ Go full comfort with PTY and colors: `xssh user@server.org`:
 ### Cut & Paste the following to your shell, then execute
 ### xssh user@server.org
 xssh() {
-    local ttyp
+    local ttyp="$(stty -g)"
     echo -e "\e[0;35mTHC says: pimp up your prompt: Cut & Paste the following into your remote shell:\e[0;36m"
     echo -e "PS1='"'\[\\033[36m\]\\u\[\\033[m\]@\[\\033[32m\]\\h:\[\\033[33;1m\]\\w\[\\033[m\]\\$ '"'\e[0m"
-    ttyp=$(stty -g)
     stty raw -echo icrnl opost
     [[ $(ssh -V 2>&1) == OpenSSH_[67]* ]] && a="no"
     ssh -oConnectTimeout=5 -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking="${a:-accept-new}" -T \
         "$@" \
-        "unset SSH_CLIENT SSH_CONNECTION; LESSHISTFILE=- MYSQL_HISTFILE=/dev/null TERM=xterm-256color HISTFILE=/dev/null BASH_HISTORY=/dev/null exec -a [ntp] script -qc 'exec -a [uid] /bin/bash -i' /dev/null"
+        "unset SSH_CLIENT SSH_CONNECTION; LESSHISTFILE=- MYSQL_HISTFILE=/dev/null TERM=xterm-256color HISTFILE=/dev/null BASH_HISTORY=/dev/null exec -a [uid] script -qc 'source <(resize); exec -a [uid] bash -i' /dev/null"
     stty "${ttyp}"
 }
 ```
