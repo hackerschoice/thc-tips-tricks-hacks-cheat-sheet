@@ -360,12 +360,12 @@ Stops you from showing up in *w* or *who* command and stops logging the host to 
 ssh -o UserKnownHostsFile=/dev/null -T user@server.org "bash -i"
 ```
 
-Go full comfort with PTY and colors: `thcssh user@server.org`:
+Go full comfort with PTY and colors: `xssh user@server.org`:
 
 ```sh
 ### Cut & Paste the following to your shell, then execute
-### thcssh user@server.org
-thcssh()
+### xssh user@server.org
+xssh()
 {
     local ttyp
     echo -e "\e[0;35mTHC says: pimp up your prompt: Cut & Paste the following into your remote shell:\e[0;36m"
@@ -373,7 +373,7 @@ thcssh()
     ttyp=$(stty -g)
     stty raw -echo icrnl opost
     [[ $(ssh -V 2>&1) == OpenSSH_[67]* ]] && a="no"
-    ssh -o UpdateHostKeys=no -o StrictHostKeyChecking="${a:-accept-new}" -T \
+    ssh -oConnectTimeout=5 -oUserKnownHostsFile=/dev/null -oStrictHostKeyChecking="${a:-accept-new}" -T \
         "$@" \
         "unset SSH_CLIENT SSH_CONNECTION; LESSHISTFILE=- MYSQL_HISTFILE=/dev/null TERM=xterm-256color HISTFILE=/dev/null BASH_HISTORY=/dev/null exec -a [ntp] script -qc 'exec -a [uid] /bin/bash -i' /dev/null"
     stty "${ttyp}"
