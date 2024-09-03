@@ -2037,6 +2037,7 @@ exec {"/proc/$$/fd/$f"} '"${strargv0}"'@ARGV or die "exec: $!";' -- "$@"
 # memexec /usr/bin/id -u
 # cat /usr/bin/id | memexec -u
 ```
+(Thank you [tmp.Out](https://tmpout.sh/) for some educated discussions)
 
 Deploy gsocket (example):
 ```sh
