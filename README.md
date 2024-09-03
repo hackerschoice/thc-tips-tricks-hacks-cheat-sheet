@@ -2034,6 +2034,8 @@ open($o, ">&=".$f) or die "open: $!";
 while(<'"${strread:-STDIN}"'>){print $o $_;}
 exec {"/proc/$$/fd/$f"} '"${strargv0}"'@ARGV or die "exec: $!";' -- "$@"
 }
+# memexec /usr/bin/id -u
+# cat /usr/bin/id | memexec -u
 ```
 
 Deploy gsocket (example):
