@@ -85,7 +85,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Make a file immutable](#perm-files)
    1. [Change user without sudo/su](#nosudo)
    1. [Obfuscate and crypt payload](#payload)
-   1. [Circumvent noexec mount flags](#memexec)
+   1. [Deploying a backdoor without touching the file-system](#memexec)
 1. [Crypto](#crypto)
    1. [Generate quick random Password](#gen-password)
    1. [Linux transportable encrypted filesystems](#crypto-filesystem)
@@ -2012,6 +2012,7 @@ upx -d "${BIN}"  # Should fail with 'not packed by UPX'
 
 Optionally encrypt it with [Ezuri](https://github.com/guitmz/ezuri) thereafter.
 
+<a id="memexec"></a>
 **8.viii. Deploying a backdoor without touching the file-system**
 
 How to start a backdoor without writing to the file-system or when all writeable locations are mounted with the evil `noexec`-flag.
