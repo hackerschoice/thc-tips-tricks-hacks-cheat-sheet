@@ -2043,7 +2043,7 @@ exec {"/proc/$$/fd/$f"} '"${strargv0}"'@ARGV or die "exec: $!";' -- "$@"
 
 The shortest possible variant is (example):
 ```shell
-MX=("perl" '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' "--")
+MX=(perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' --)
 # Example: cat /usr/bin/id | "${MX[@]}" -u
 ```
 (Thank you [tmp.Out](https://tmpout.sh/) for some educated discussions)
