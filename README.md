@@ -2369,6 +2369,7 @@ crt() {
 | https://cli.fyi | Free. curl/json interface to many services. Try `curl cli.fyi/me` or `curl cli.fyi/thc.org`. |
 | https://check-your-website.server-daten.de | Free. TLS/DNS/Security check a domain. |
 | https://ipsniper.info/api.html | rDNS/fDNS and other IP information tools |
+| https://ip.thc.org | fDNS/rDNS lookup: `curl -fL ip.thc.org/140.82.121.3` |
 | https://hackertarget.com/ip-tools/ | Free OSINT Service (Reverse IP, MTR, port scan, CMS scans, Vulnerability Scans, API support) |
 | https://account.shodan.io/billing/tour | Open Port DB & DNS Lookup from around the world |
 | https://dnsdumpster.com/ | Domain Recon Tool |
