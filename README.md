@@ -160,7 +160,8 @@ alias vim="vim -i NONE"
 alias screen="screen -ln"
 
 reset -I
-resize &>/dev/null || stty -echo cols 200;printf "\033[18t";read -t5 -rdt R;stty sane $(echo "${R:-8;25;80}"|awk -F";" '{ printf "rows "$2" cols "$3; }')
+stty cols 400
+resize &>/dev/null || { stty -echo;printf "\e[18t"; read -t5 -rdt R;IFS=';' read -r -a a <<< "${R:-8;25;80}";[ "${a[1]}" -ge "${a[2]}" ] && { R="${a[1]}";a[1]="${a[2]}";a[2]="${R}";};stty sane rows "${a[1]}" cols "${a[2]}";}
 # stty sane rows 60 cols 160
 ```
 
