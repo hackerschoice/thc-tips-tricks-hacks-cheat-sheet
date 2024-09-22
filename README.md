@@ -159,7 +159,7 @@ alias vi="vi -i NONE"
 alias vim="vim -i NONE"
 alias screen="screen -ln"
 
-reset -I
+TERM=xterm reset -I
 stty cols 400 # paste this on its own before pasting the next line:
 resize &>/dev/null || { stty -echo;printf "\e[18t"; read -t5 -rdt R;IFS=';' read -r -a a <<< "${R:-8;25;80}";[ "${a[1]}" -ge "${a[2]}" ] && { R="${a[1]}";a[1]="${a[2]}";a[2]="${R}";};stty sane rows "${a[1]}" cols "${a[2]}";}
 # stty sane rows 60 cols 160
