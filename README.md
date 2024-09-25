@@ -2003,10 +2003,11 @@ Optionally cleanse signatures and traces of UPX:
 ```shell
 cat "${BIN}" \
 | perl -e 'local($/);$_=<>;s/(.*)(\$Info:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' \
-| perl -e 'local($/);$_=<>;s/(.*)(\$Id:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' \
-| perl -e 'local($/);$_=<>;s/(.*)(PROT_EXEC\|PROT_WRI[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >"${BIN}.tmpupx"
-cat "${BIN}.tmpupx" >"${BIN}"
-rm -f "${BIN}.tmpupx"
+| perl -e 'local($/);$_=<>;s/(.*)(\$Id:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >"${BIN}.tmpupx"
+mv "${BIN}.tmpupx" "${BIN}"
+grep -Eq "PROT_EXEC\|PROT_WRITE" "${BIN}" \
+&& cat "${BIN}" | perl -e 'local($/);$_=<>;s/(.*)(PROT_EXEC\|PROT_WRI[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >"${BIN}.tmpupx" \
+&& mv "${BIN}.tmpupx" "${BIN}"
 perl -i -0777 -pe 's/UPX!/\0\0\0\0/sg' "${BIN}"
 ```
 
