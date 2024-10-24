@@ -844,7 +844,7 @@ Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions).
 
 Be aware that `$6$` hashes are SLOW. Even the [1-minute 7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/01%20instant_1-minute/1-minute_7-16.hcmask) would take many days on a 8xRTX4090 cluster to complete.
 
-Rent a GPU-Cluster at [vast.ai](https://www.vast.ai) and use [dizcza/docker-hashcat](https://hub.docker.com/r/dizcza/docker-hashcat) ([read more](https://adamsvoboda.net/password-cracking-in-the-cloud-with-hashcat-vastai/)).
+Rent a RTX-4090 GPU-Cluster at [vast.ai](https://www.vast.ai) for $0.40/h and use [dizcza/docker-hashcat:cuda](https://hub.docker.com/r/dizcza/docker-hashcat) ([read more](https://adamsvoboda.net/password-cracking-in-the-cloud-with-hashcat-vastai/)).
 
 Otherwise, use [Crackstation](https://crackstation.net), [shuck.sh](https://shuck.sh/), [ColabCat/cloud](https://github.com/someshkar/colabcat)/[Cloudtopolis](https://github.com/JoelGMSec/Cloudtopolis) or crack on your own [AWS](https://akimbocore.com/article/hashcracking-with-aws/) instances.
 
