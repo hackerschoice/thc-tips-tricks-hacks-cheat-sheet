@@ -36,6 +36,7 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
       1. [HTTPS reverse forwards](#https)
       2. [Bouncing traffic with iptables](#iptables)
       3. [Ghost IP / IP Spoofing](#ghost)
+      4. [Various](#tunnel-more)
    1. [Use any tool via Socks Proxy](#scan-proxy)
    1. [Find your public IP address](#your-ip)
    1. [Check reachability from around the world](#check-reachable)
@@ -708,6 +709,14 @@ source <(curl -fsSL https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat
 This also works in combination with:
  * [Segfault's ROOT Servers](https://thc.org/segfault/wireguard): Will connect your ROOT Server to the TARGET NETWORK and using a Ghost IP inside the target network.
  * [QEMU Tunnels](https://securelist.com/network-tunneling-with-qemu/111803/): As above, but less secure.
+
+---
+<a id="ghost"></a>
+**3.vi.d Various Tunnel Tricks**
+
+### Connect your host directly to the remote network
+ * [WireTap](https://github.com/sandialabs/wiretap) - Works as user or root. Uses UDP as transport. ([Try it](https://thc.org/segfault/wireguard) on segfault.)
+ * [ligolo-ng](https://github.com/nicocha30/ligolo-ng) - Uses TCP as transport. Works well via [cloudflare CDN](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) or gs-netcat.
 
 ---
 <a id="scan-proxy"></a>
