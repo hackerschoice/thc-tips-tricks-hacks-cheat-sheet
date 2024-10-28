@@ -841,7 +841,7 @@ HashCat is our go-to tool for everything else:
 hashcat my-hash /usr/share/wordlists/rockyou.txt
 ```
 
-Or using a [10-days 7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/) on GPU:
+Using a [10-days 7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/) on GPU:
 ```sh
 curl -fsSL https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010-days/10-days_7-16.hcmask -o 10-days_7-16.hcmask
 # -d2 == Use GPU #2 only (device #2)
@@ -849,7 +849,16 @@ curl -fsSL https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/10%2010
 # -w1 == workload low (-w3 == high)
 nice -n 19 hashcat -o cracked.txt my-hash.txt -w1 -a3 10-days_7-16.hcmask -O -d2
 ```
-Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions).
+
+Crack OpenSSH's `known_hosts` hashes to reveal the IP address:
+```shell
+curl -SsfL https://github.com/chris408/known_hosts-hashcat/raw/refs/heads/master/ipv4_hcmask.txt -o ipv4_hcmask.txt
+curl -SsfL https://github.com/chris408/known_hosts-hashcat/raw/refs/heads/master/kh-converter.py -o kh-converter.py
+python kh-converter.py ~/.ssh/known_hosts >~/.ssh/known_hosts_hashes
+hashcat -m 160 --quiet --hex-salt ~/ssh/known_hosts_hashes -a 3 ipv4_hcmask.txt 
+```
+
+👉 Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions).
 
 Be aware that `$6$` hashes are SLOW. Even the [1-minute 7-16 char hashmask](https://github.com/sean-t-smith/Extreme_Breach_Masks/raw/main/01%20instant_1-minute/1-minute_7-16.hcmask) would take many days on a 8xRTX4090 cluster to complete.
 
