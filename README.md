@@ -2,7 +2,6 @@
 # THC's favourite Tips, Tricks & Hacks (Cheat Sheet)
 
 https://thc.org/tips  
-https://tinyurl.com/thctips
 
 A collection of our favourite tricks. Many of those tricks are not from us. We merely collect them.
 
@@ -2526,6 +2525,7 @@ Forums and Conferences
 3. [AlligatorCon](https://www.alligatorcon.eu/) - the original
 4. [0x41con](https://0x41con.org/)
 5. [TumpiCon](https://tumpicon.org/)
+4. [0x00sec](https://0x00sec.org/)
 
 Telegram Channels<a id="channels"></a>
 1. [The Hacker's Choice](https://t.me/thcorg)
