@@ -711,8 +711,11 @@ This also works in combination with:
  * [QEMU Tunnels](https://securelist.com/network-tunneling-with-qemu/111803/): As above, but less secure.
 
 ---
-<a id="ghost"></a>
+<a id="tunnel-more"></a>
 **3.vi.d Various Tunnel Tricks**
+
+### Tunnel via CDN
+ * Read [How to tunnel any TCP service via CloudFlare](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) or use [DarkFlare](https://github.com/doxx/darkflare).
 
 ### Connect your host directly to the remote network
  * [WireTap](https://github.com/sandialabs/wiretap) - Works as user or root. Uses UDP as transport. ([Try it](https://thc.org/segfault/wireguard) on segfault.)
