@@ -544,10 +544,10 @@ seq 1 254 | xargs -P20 -I{} ping -n -c3 -i0.2 -w1 -W200 "${NET:-192.168.0}.{}" |
 
 ```sh
 ## Monitor every new TCP connection
-tcpdump -np "tcp[tcpflags] == tcp-syn"
+tcpdump -np 'tcp[tcpflags] ^ (tcp-syn|tcp-ack) == 0'
 
 ## Play a *bing*-noise for every new SSH connection
-tcpdump -nplq "tcp[13] == 2 and dst port 22" | while read x; do echo "${x}"; echo -en \\a; done
+tcpdump -nplq 'tcp[13] == 2 and dst port 22' | while read -r x; do echo "${x}"; echo -en \\a; done
 
 ## Ascii output (for all large packets. Change to >40 if no TCP options are used).
 tcpdump -npAq -s0 'tcp and (ip[2:2] > 60)'
