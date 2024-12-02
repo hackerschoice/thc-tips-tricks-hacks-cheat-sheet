@@ -436,7 +436,7 @@ echo -e "${CDR}>>>>> Process List${CN}"
 { ps --ppid 2 -p 2 --deselect flwww || ps alxwww || ps w;} 2>/dev/null | head -n 500
 
 # use "|head -n-1" to not display this line
-echo -e "${CW}>>>>> 📖 Please help to make this tool better - https://t.me/thcorg${CN} 😘"
+echo -e "${CW}>>>>> 📖 Please help to make this tool better - https://thc.org/ops${CN} 😘"
 # return with "success"
 
 exit 0
