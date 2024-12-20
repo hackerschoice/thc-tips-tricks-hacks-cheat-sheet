@@ -2619,6 +2619,7 @@ There are many ways but one is:
 7. [InfoSec CheatSheet](https://github.com/r1cksec/cheatsheets)
 8. [HackTricks](https://book.hacktricks.xyz/welcome/readme)
 9. [Awesome Red Teaming](https://github.com/yeyintminthuhtut/Awesome-Red-Teaming)
+10. [Hacking Resources]https://github.com/vitalysim/Awesome-Hacking-Resources)
 10. [Awesome Hacking](https://github.com/Hack-with-Github/Awesome-Hacking)
 11. [VulHub](https://github.com/vulhub/vulhub) - Test your exploits
 12. [Qubes-OS](https://www.qubes-os.org/) - Desktop OS focused on security with XEN isolated (disposable) guest VMs (Fedora, Debian, Whonix out of the box)
