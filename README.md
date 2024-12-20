@@ -109,9 +109,8 @@ Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
    1. [Cool Linux commands](#cool-linux-commands)
    1. [tmux Cheat Sheet](#tmux)
    1. [Useful commands](#useful-commands)
+1. [How to become a Hacker](#hacker)
 1. [Other Sites](#others)
-    
-   
 
 ---
 <a id="bash"></a>
@@ -2376,7 +2375,7 @@ Many other services (for free)
 Reverse DNS from multiple public databases:
 ```sh
 rdns () {
-    curl -fsSL "https://lookup.segfault.net/api/v1/download?ip_address=${1:?}&limit=10&apex_domain=${2}" | column -t -s,
+    curl -fsSL "https://ip.thc.org/api/v1/download?ip_address=${1:?}&limit=10&apex_domain=${2}" | column -t -s,
 }
 # rdns <IP>
 ```
@@ -2472,7 +2471,7 @@ Network Scanners
 1. https://github.com/ptrrkssn/pnscan - Fast network scanner
 1. https://zmap.io/ - ZMap & ZGrab
 
-Vulnerability Scanners
+Vulnerability Scanners (be aware: these all yield 99% non-exploitable false positives. They all suck.)
 1. [Raccoon](https://github.com/evyatarmeged/Raccoon) - Reconnaissance and Information Gathering
 1. [Osmedeus](https://github.com/j3ssie/osmedeus) - Vulnerability and Information gathering
 1. [FullHunt](https://github.com/fullhunt/) - log4j and spring4shell scanner 
@@ -2492,7 +2491,7 @@ Phishing
 
 Tools
 1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
-1. https://tmate.io/ - Share A screen with others
+1. https://tmate.io/ - Share a screen with others
 
 Callback / Canary / Command & Control
 1. https://app.interactsh.com
@@ -2501,7 +2500,7 @@ Callback / Canary / Command & Control
 
 Tunneling
 1. [Gost](https://github.com/ginuerzh/gost/blob/master/README_en.md)
-1. [TCP Gender Changer](https://tgcd.sourceforge.net/) for all your 'connect back' needs.
+1. [WireTap](https://github.com/sandialabs/wiretap) or [Segfault's WireGuard](https://www.thc.org/segfault/wireguard/).
 1. [ngrok](https://ngrok.com/download), [cloudflared](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps) or [pagekite](https://pagekite.net/) to make a server behind NAT accessible from the public Internet.
 
 Exfil<a id="cloudexfil"></a>
@@ -2526,10 +2525,10 @@ Publishing
 1. [pad.riseup.net](https://pad.riseup.net) - Create documents and share them securely
 
 Forums and Conferences
-3. [AlligatorCon](https://www.alligatorcon.eu/) - the original
-4. [0x41con](https://0x41con.org/)
-5. [TumpiCon](https://tumpicon.org/)
-4. [0x00sec](https://0x00sec.org/)
+1. [AlligatorCon](https://www.alligatorcon.eu/) - the original
+1. [0x41con](https://0x41con.org/)
+1. [TumpiCon](https://tumpicon.org/)
+1. [0x00sec](https://0x00sec.org/)
 
 Telegram Channels<a id="channels"></a>
 1. [The Hacker's Choice](https://t.me/thcorg)
@@ -2538,7 +2537,6 @@ Telegram Channels<a id="channels"></a>
 1. [Offensive Twitter](https://t.me/OffensiveTwitter)
 1. [Pwn3rzs](https://t.me/Pwn3rzs)
 1. [VX-Underground](https://t.me/vxunderground)
-1. [cKure](https://t.me/cKure)
 1. [Android Security / Malware](https://t.me/androidMalware)
 1. [OSINT CyberDetective](https://t.me/cybdetective)
 1. [BookZillaaa](https://t.me/bookzillaaa)
@@ -2594,8 +2592,19 @@ Example for *SSH*:
 rlwrap --always-readline ssh user@host
 ```
 ---
+<a id="hacker"></a>
+## 14. How to become a hacker
+
+There are many ways but one is:
+
+1. Use Linux and get proficient with Bash.
+2. Learn how the Internet works. Install and configure some servers.
+3. Read every book. Ask yourself "why is it dont that way and not the other way"?
+4. Join a hacker-channel or sign up to HackTheBox or simmilar services.
+
+---
 <a id="others"></a>
-## 14. Other Sites
+## 15. Other Sites
 
 1. [Phineas Fisher](https://blog.isosceles.com/phineas-fisher-hacktivism-and-magic-tricks/) - No nonsense. Direct. How we like it.
 1. [Hacking HackingTeam - a HackBack](https://gist.github.com/jaredsburrows/9e121d2e5f1147ab12a696cf548b90b0) - Old but real talent at work.
