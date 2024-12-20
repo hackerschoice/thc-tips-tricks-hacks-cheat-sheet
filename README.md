@@ -7,7 +7,7 @@ A collection of our favourite tricks. Many of those tricks are not from us. We m
 
 We show the tricks 'as is' without any explanation why they work. You need to know Linux to understand how and why they work.
 
-Got tricks? Join us on Telegram: [https://t.me/thcorg](https://t.me/thcorg)
+Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
 
 1. [Bash](#bash)
    1. [Set up a Hack Shell](#hackshell)
