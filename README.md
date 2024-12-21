@@ -2597,12 +2597,12 @@ rlwrap --always-readline ssh user@host
 
 There are many ways but one is:
 
-1. Use Linux and get proficient with Bash.
-2. Learn how the Internet works. Install and configure some servers.
+1. Use Linux and get proficient with Bash. Learn all Linux commands.
+2. Learn how the Internet works. Install and configure some servers (via shell access).
 4. Understand System Architecture and how an OS works.
 4. Read every book. Ask yourself "why is it done this way and not the other way?".
 5. Read the top 10 articles of [Phrack](https://www.phrack.org). 
-6. Join a hacker-channel or sign up to HackTheBox or simmilar services.
+6. Join a hacker-channel. Sign up to [TryHackMe](https://tryhackme.com/) or [HackTheBox](https://www.hackthebox.com/).
 7. Be playful.
 
 ---
