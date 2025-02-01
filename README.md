@@ -1127,7 +1127,8 @@ On your workstation, and from a different terminal, send base64-encoded data. It
 ```shell
 tmux send-keys -t foo "$(base64 -w64 </etc/issue.net)"$'\n'
 # Press 'Ctrl-d' in the receiving terminal.
-# Use -t foo:1.2 to send to a window #1 and pane #2 or use 'Ctrl-b ,' to rename the window
+# Optional: Use -t foo:1.2 to send to window #1 and pane #2 instead.
+# Optional: Use 'Ctrl-b ,' to rename the window
 ```
 
 ---
