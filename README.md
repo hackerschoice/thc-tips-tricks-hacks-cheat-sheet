@@ -730,7 +730,8 @@ This method is similar to [HTTPS reverse tunnels](#https) but uses SSH instead o
  1. Go to your CF Dashboard -> Zero Trust -> Networks -> Tunnels
  2. Create a new 'Cloudflared' tunnel of any name.
  3. Select Debian & 64-bit. The Token is not fully shown. Extract the "Token" by copying the grayed out area into a separate document to reveal the entire Token (the long hex-strings after `sudo cloudflared service install <TunnelTokenHere>`).
- 4. Add a subdomain (example uses `ssh.team-teso.net`. Set Type=TCP URL=localhost:22
+ 4. Add a subdomain (example uses `ssh.team-teso.net`).
+ 5. Set Type=TCP URL=localhost:22
 
 ```shell
 ### On YOUR workstation:
