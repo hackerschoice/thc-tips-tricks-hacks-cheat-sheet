@@ -271,7 +271,7 @@ unset mem cpu ncpu
 
 hostnamectl 2>/dev/null || lsb_release -a 2>/dev/null
 # || cat /etc/banner 2>/dev/null
-source /etc/os-release 2>/dev/null && echo "Pretty Name: ${PRETTY_NAME}"
+(source /etc/*release 2>/dev/null; [ -n "$PRETTY_NAME" ] && echo "Pretty Name: ${PRETTY_NAME}")
 echo "Date       : $(date)"
 command -v uptime >/dev/null && {
     str=$(uptime | sed -e 's/^[ \t]*//')
@@ -409,7 +409,7 @@ else
         netstat -in 2>/dev/null
     }
     echo -e "${CB}>>>>> ARP table${CN}"
-    { command -v arp >/dev/null && arp -an 2>/dev/null || cat /proc/net/arp; } | COL
+    { arp -an | grep -iv 'incomplete' || cat /proc/net/arp || ip neigh show | grep -iv 'FAILED'; } 2>/dev/null | COL
 fi
 
 command -v netstat >/dev/null && {
