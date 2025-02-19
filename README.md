@@ -2435,6 +2435,7 @@ https://thc.org/segfault
 Trusted VPN Providers
 1. https://www.mullvad.net
 1. https://www.cryptostorm.is
+2. https://ivpn.net
 1. https://proton.me - Offers FREE VPN
 1. https://vpn.fail - Run by volunteers
 
