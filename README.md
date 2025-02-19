@@ -2439,7 +2439,7 @@ Trusted VPN Providers
 1. https://proton.me - Offers FREE VPN
 1. https://vpn.fail - Run by volunteers
 
-Virtual Private Servers
+Virtual Private Servers. Please check [offshore.cat](https://offshore.cat/).
 1. https://www.hetzner.com - Cheap
 2. https://hivecloud.pw - No KYC. Bullet Proof. Accepts Crypto.
 1. https://dmzhost.co - Ignore most abuse requests
