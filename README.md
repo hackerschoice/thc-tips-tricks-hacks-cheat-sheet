@@ -1622,7 +1622,7 @@ Access a remote shell from your web browser [https://sshx.io](https://sshx.io).
 curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null >.s \
 && chmod 755 .s \
 && (PATH=.:$PATH .s -q >.u 2>/dev/null &);
-sleep 10;cat .u;rm -f .u .s;
+for _ in {1..10}; do [ -s .u ] && break;sleep 1;done;cat .u;rm -f .u .s;
 ```
 
 Or pipe directly into memory:
