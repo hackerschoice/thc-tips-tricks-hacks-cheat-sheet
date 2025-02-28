@@ -2122,7 +2122,7 @@ BIN="mybin"
 upx -qqq /bin/id -o "${BIN}"
 ```
 
-Cleanse the [UPX header](https://github.com/upx/upx/blob/devel/src/stub/src/include/header.S) and 2nd ELF header to fool the Anit-Virus:
+Cleanse the [UPX header](https://github.com/upx/upx/blob/devel/src/stub/src/include/header.S) and 2nd ELF header to fool the Anti-Virus:
 ```shell
 perl -i -0777 -pe 's/^(.{64})(.{0,256})UPX!.{4}/$1$2\0\0\0\0\0\0\0\0/s' "${BIN}"
 perl -i -0777 -pe 's/^(.{64})(.{0,256})\x7fELF/$1$2\0\0\0\0/s' "${BIN}"
@@ -2134,7 +2134,7 @@ cat "${BIN}" \
 | perl -e 'local($/);$_=<>;s/(.*)(\$Info:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' \
 | perl -e 'local($/);$_=<>;s/(.*)(\$Id:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >"${BIN}.tmpupx"
 mv "${BIN}.tmpupx" "${BIN}"
-grep -Eq "PROT_EXEC\|PROT_WRITE" "${BIN}" \
+grep -Eqm1 "PROT_EXEC\|PROT_WRITE" "${BIN}" \
 && cat "${BIN}" | perl -e 'local($/);$_=<>;s/(.*)(PROT_EXEC\|PROT_WRI[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >"${BIN}.tmpupx" \
 && mv "${BIN}.tmpupx" "${BIN}"
 perl -i -0777 -pe 's/UPX!/\0\0\0\0/sg' "${BIN}"
