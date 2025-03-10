@@ -383,6 +383,9 @@ ghost_up2() {
 
     [ "$GHOST_IP_LAN" != "-1" ] && { ghost_lan || return; }
 
+    # Return if this is not a router.
+    [ "$single_dev" == "$gw_dev" ] && return
+
     [ "${GHOST_IP_WAN:-$GHOST_IP}" != "-1" ] && {
         ghost_ip="${GHOST_IP_WAN:-$GHOST_IP}"
         single_dev="$gw_dev"
