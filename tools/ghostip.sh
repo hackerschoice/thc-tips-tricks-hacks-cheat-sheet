@@ -60,8 +60,9 @@
 # Example 1: Use an unused Ghost-IP from this host:
 #   $ source ./ghostip.sh
 # Identical to:
-#   $ GHOST_IP_WAN=192.168.0.222 source ./ghostip.sh
 #   $ GHOST_IP=192.168.0.222 source ./ghostip.sh
+#   $ GHOST_IP_LAN=192.168.0.222 source ./ghostip.sh
+#   $ GHOST_IP_WAN=192.168.0.222 GHOST_IP_LAN=-1 source ./ghostip.sh
 #
 # Complex Examples for ROUTERS:
 # =============================
@@ -208,7 +209,7 @@ ghost_init() {
     [ "$UID" -ne 0 ] && { err "Must be root. Try ${CDC}sudo bash${CN} first."; return 255; }
 
     command -v iptables >/dev/null || { err "iptables: command not found. Try ${CDC}apt install iptables${CN}"; return 255; }
-    GHOST_NAME="${GHOST_NAME:-update}"
+    _GHOST_NAME="${GHOST_NAME:-update}"
 
     # Some iptables use '-m cgroup' when it should be '-m cgroup2'
     # https://www.spinics.net/lists/netdev/msg352495.html
@@ -232,7 +233,7 @@ ghost_init() {
         [ ! -f "${cg_rootv2}/cgroup.procs" ] && unset cg_rootv2
         [ -n "$cg_rootv2" ] && {
             cg_root="${cg_rootv2}"
-            ipt_args=("-m" "$ipt_cgroup" "--path" "${GHOST_NAME:?}")
+            ipt_args=("-m" "$ipt_cgroup" "--path" "${_GHOST_NAME:?}")
         }
     else
         [ -z "$cg_root" ] && {
@@ -245,8 +246,8 @@ ghost_init() {
     ipt_args=($(echo "$GHOST_IPT") "${ipt_args[@]}")
     [ -z "$cg_root" ] && { err "No cgroup v1 or v2 found. Not possible to isolate an app to a ghost-IP."; return 255; }
 
-    mkdir -p "${cg_root}/${GHOST_NAME}" 2>/dev/null
-    [ -z "$cg_rootv2" ] && echo "$classid" >"${cg_root}/${GHOST_NAME}/net_cls.classid"
+    mkdir -p "${cg_root}/${_GHOST_NAME}" 2>/dev/null
+    [ -z "$cg_rootv2" ] && echo "$classid" >"${cg_root}/${_GHOST_NAME}/net_cls.classid"
     return 0
 }
 
@@ -308,7 +309,7 @@ ghost_find_local() {
 ghost_print() {
     local dev="$3                  "
     local ip="$2                  "
-    echo -e "[${CDG}$4${CN}] ${CDM}Traffic leaving ${CDG}${dev:0:8}${CDM} will now appear as ${CY}${ip:0:16} ${CDY}${CF}[not $1]${CN}"
+    echo -e "[${CDG}$4${CN}] ${CDM}Traffic leaving ${CDG}${dev:0:12}${CDM} will now appear as ${CY}${ip:0:16} ${CDY}${CF}[not $1]${CN}"
 }
 
 # ghost_single [LAN,WAN]
@@ -376,25 +377,46 @@ ghost_lan() {
     return 0
 }
 
+
+ghost_down() {
+    local c
+
+    [ -n "$GHOST_PS_BAK" ] && PS1="$GHOST_PS_BAK"
+    unset GHOST_PS_BAK
+
+    [ "${#GHOST_UNDO_CMD[@]}" -le 0 ] && return
+    for c in "${GHOST_UNDO_CMD[@]}"; do
+        eval "$c" &>/dev/null
+    done
+    unset GHOST_UNDO_CMD
+    unset -f ghost_down
+}
+
 ghost_up2() {
     local ghost_ip
 
     ghost_find_gw || return
 
-    [ "$GHOST_IP_LAN" != "-1" ] && { ghost_lan || return; }
-
-    # Return if this is not a router.
-    [ "$single_dev" == "$gw_dev" ] && return
-
-    [ "${GHOST_IP_WAN:-$GHOST_IP}" != "-1" ] && {
-        ghost_ip="${GHOST_IP_WAN:-$GHOST_IP}"
-        single_dev="$gw_dev"
-        single_dev_ip="$gw_dev_ip"
-     
-        ghost_single "WAN"
-        return
+    [ -n "$GHOST_IP" ] && ghost_ip="$GHOST_IP"
+    [ -z "$GHOST_IP" ] && [ -z "$GHOST_IP_LAN" ] && [ -z "$GHOST_IP_WAN" ] && {
+        # HERE: No parameters set. HOST only. Find a Ghost-IP automatically.
+        [ -z "$ghost_ip" ] && {
+            ghost_find_local "$gw_dev" "WAN"
+            [ -z "$ghost_ip" ] && { err "No unused IP found. Set ${CDC}GHOST_IP=<IP>${CN}"; is_error=1; return; }
+        }
     }
 
+    ### LAN
+    [ -z "$ghost_ip" ] && [ "$GHOST_IP_LAN" != "-1" ] && { ghost_lan || return; }
+
+    [ "${GHOST_IP_WAN}" == "-1" ] && return
+
+    ### WAN + HOST
+    ghost_ip="${GHOST_IP_WAN:-$ghost_ip}"
+    single_dev="$gw_dev"
+    single_dev_ip="$gw_dev_ip"
+    
+    ghost_single "WAN"
     return 0
 }
 
@@ -406,6 +428,7 @@ ghost_up() {
 
     [ -n "$is_error" ] && {
         ghost_down
+        [ -n "$sourced" ] && unset -f ghost_down
         err "Oops. This did not work..."
         return
     }
@@ -419,28 +442,31 @@ ghost_up() {
     [ -n "$GHOST_IPT" ] && echo -e "Traffic matching: ${CDG}${GHOST_IPT}${CN}"
 
     if [ -n "$sourced" ]; then
-        echo "$$" >"${cg_root:?}/${GHOST_NAME}/cgroup.procs"
+        echo "$$" >"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"
         [[ "$PS1" != *$'\n'* ]] && {
             GHOST_PS_BAK="$PS1"
             PS1="${PS1//\\h/\\h-GHOST}"
             [ "$PS1" == "$GHOST_PS_BAK" ] && unset GHOST_PS_BAK
         }
         # sfwg support
-        export TYPE=wiretap
+        [ -z "$TYPE" ] && {
+            export TYPE="wiretap"
+            GHOST_UNDO_CMD+=("unset TYPE")
+        }
         echo -e "\
 --> Your current shell (${SHELL##*/}/$$) and any further process started
     from this shell are now ghost-routed.
 --> To ghost-route new connections of an already running process:
-    ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}
+    ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"'"'"${CN}
 To UNDO type ${CDC}ghost_down${CN} or:${CF}"
         [ -n "$GHOST_PS_BAK" ] && echo "PS1='$GHOST_PS_BAK'"
     else
         echo -e "\
 --> To ghost-route the current shell and all processes started from
     this shell:
-    ${CDC}"'echo "$$" >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}
+    ${CDC}"'echo "$$" >"'"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"'"'"${CN}
 --> To ghost-route new connections of an already running process:
-    ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${GHOST_NAME}/cgroup.procs"'"'"${CN}
+    ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"'"'"${CN}
 To UNDO type:${CF}"
     fi
 
@@ -449,18 +475,14 @@ To UNDO type:${CF}"
     done
     [ -n "$sourced" ] && echo "unset GHOST_UNDO_CMD GHOST_PS_BAK TYPE"
     echo -en "${CN}"
+    unset _GHOST_NAME
 }
 
-ghost_down() {
-    local c
-
-    [ -n "$GHOST_PS_BAK" ] && PS1="$GHOST_PS_BAK"
-    for c in "${GHOST_UNDO_CMD[@]}"; do
-        eval "$c" &>/dev/null
-    done
-    unset GHOST_PS_BAK
-    unset GHOST_UNDO_CMD
-}
 
 ghost_init && \
 ghost_up
+
+[ -n "$sourced" ] && {
+    unset -f ghost_init ghost_up ghost_up2 ghost_single ghost_lan ghost_print ghost_find_gw ghost_find_other ghost_find_single ghost_find_local iptnat is_arp_bad
+    unset ghost_all_dev ghost_all_dev_ip gw_dev gw_dev_ip single_dev single_dev_ip ipt_args cg_root cg_rootv2 _GHOST_NAME
+}
