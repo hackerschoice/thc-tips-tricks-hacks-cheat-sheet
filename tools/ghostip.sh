@@ -15,7 +15,7 @@
 # Using it on a HOST/LAN-Spoofing: It uses an unused IP (aka Ghost-IP) from
 # the LAN's network range. All traffic will originate from that Ghost-IP.
 #
-# Using it on a ROUTER/WAN-Spooing: It uses 1.0.0.2 to access any workstation
+# Using it on a ROUTER/WAN-Spoofing: It uses 1.0.0.2 to access any workstation
 # within the LAN. The workstation will see the traffic originating from
 # 1.0.0.2, whereas it really originates from the router (e.g. nmap running on
 # the router, not on the spoofed IP of 1.0.0.2).
@@ -23,41 +23,45 @@
 # This tool will fail on some VPS providers (like AWS) which don't allow
 # ghost-IPs (IPs not registered to the host).
 #
-# Practiacal Scenarios:
-# =====================
+# Practical Scenarios:
+# ====================
 # We have access to a workstation. We like to scan the internal
 # network but without the target seeing our workstation's IP address.
 #
 # We have access to a router. We like to scan the internal network
 # (or multiple internal networks) but without the target seeing
 # that the scan comes from within the internal network (we make it appear
-# as if comming from 1.0.0.2 - an exteranl IP address).
+# as if coming from 1.0.0.2 - an external IP address).
 #
 # Notes:
 # ======
-# Ghost-route LAN & WAN taffic by default.
+# Ghost-route LAN & WAN traffic by default.
+#
+# GHOST_IP=
+#     An unused IP address on the LAN. Used for hosts only (don't use on routers)
 #
 # GHOST_IP_WAN=
 #     An unused IP address on the WAN facing Interface (the default route).
-#     For HOSTS (not routers) this is a unused IP address of the LAN.
-#     Find an IP Address automatcially if not set [default].
+#     For HOSTS (not routers) this is a unused IP address on the LAN.
+#     Find an IP Address automatically if not set [default].
 #     -1 to disable WAN ghosting.
 #
 # GHOST_IP_LAN=
 #     The Ghost IP to use for traffic towards the LAN [default=1.0.0.2].
-#     Only needed when GhostIP is used on a ROUTER (which typicallly has
-#     a WAN and a LAN interface).
+#     Only needed when GhostIP is used on a ROUTER (which typically has
+#     a WAN interface as well as a LAN interface).
 #     If set to a LAN address then ghost a single LAN interface only.
 #     -1 to disable LAN ghosting.
 #
 # On a single host (not a router) only the GHOST_IP_WAN= is used.
 #
-# Complex Examples for HOSTS:
-# ===========================
-# Example 1: Ghost-route traffic towards the LAN & WAN:
-#    appearing from 192.168.0.222 (an unused local LAN IP):
-#    $ GHOST_IP_WAN=192.168.0.222 GHOST_IP_LAN=-1 source ./ghostip.sh
-#
+# Simple Example for HOSTS:
+# =========================
+# Example 1: Use an unused Ghost-IP from this host:
+#   $ source ./ghostip.sh
+# Identical to:
+#   $ GHOST_IP_WAN=192.168.0.222 source ./ghostip.sh
+#   $ GHOST_IP=192.168.0.222 source ./ghostip.sh
 #
 # Complex Examples for ROUTERS:
 # =============================
@@ -86,11 +90,11 @@
 #
 # How it work:
 # ============
-# It createa a cgroup and iptable SNAT/DNAT rules for the cgroup. It then moves
-# the current shell into the new cgroup. Any new programm started from that shell
+# It creates a cgroup and iptable SNAT/DNAT rules for the cgroup. It then moves
+# the current shell into the new cgroup. Any new program started from that shell
 # will use the Ghost-IP.
 #
-# This script can be sourced/evaled or executed as BASH or ZSH script.
+# This script can be sourced/eval'ed or executed as BASH or ZSH script.
 # Some ninja to make it work on ZSH & BASH:
 # - Bash arrays start at index #0, Zsh at index #1.
 # - Array expansion differs between Bash and Zsh.
@@ -379,8 +383,8 @@ ghost_up2() {
 
     [ "$GHOST_IP_LAN" != "-1" ] && { ghost_lan || return; }
 
-    [ "$GHOST_IP_WAN" != "-1" ] && {
-        ghost_ip="${GHOST_IP_WAN}"
+    [ "${GHOST_IP_WAN:-$GHOST_IP}" != "-1" ] && {
+        ghost_ip="${GHOST_IP_WAN:-$GHOST_IP}"
         single_dev="$gw_dev"
         single_dev_ip="$gw_dev_ip"
      
