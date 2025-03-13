@@ -323,7 +323,6 @@ ghost_find_local() {
     for n in {0..10}; do
         ipc=$((ipn + RANDOM % range + 2))
         ghost_ip="$((ipc / 2**24)).$(( (ipc % 2**24) / 2**16)).$(( (ipc % 2**16) / 2**8)).$(( ipc % 2**8 ))"
-        echo "testing $ghost_ip"
         ping -c2 -i1 -W2 -w2 -A -q "$ghost_ip" &>/dev/null || {
             # Cannot ping. Check if ARP is bad as well and only then is it an unused IP.
             is_arp_bad "$ghost_ip" && break
