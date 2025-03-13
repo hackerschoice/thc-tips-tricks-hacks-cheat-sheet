@@ -119,9 +119,10 @@ ghost_find_gw() {
     local arr
     local IFS
     local l
-    IFS=" " arr=($(ip route show match "1.1.1.1"))
-    gw_dev="${arr[@]:4:1}"
-    # gw_ip="${arr[@]:2:1}"
+
+    str=$(ip route show match 1.1.1.1)
+    str="${str##*dev }"
+    gw_dev="${str%% *}"
 
     # Get the device IP:
     l="$(ip addr show dev "$gw_dev" | grep -m1 'inet '))"
@@ -141,6 +142,8 @@ ghost_find_other() {
 
     [ "$GHOST_IP_LAN" == "-1" ] && return
 
+    # not not use "mapfile" because job-control is not always available on
+    # hacked shells (and thus /dev/fd/63 fails).
     IFS=$'\n' arr=($(ip addr show))
     for l in "${arr[@]}"; do
         [[ "$l" =~ ^[0-9]+: ]] && {
@@ -246,6 +249,16 @@ ghost_init() {
     ipt_args=($(echo "$GHOST_IPT") "${ipt_args[@]}")
     [ -z "$cg_root" ] && { err "No cgroup v1 or v2 found. Not possible to isolate an app to a ghost-IP."; return 255; }
 
+
+### DISABLED: Better to execute again so that to make ghost_down etc available.
+#     [ -d "${cg_root}/${_GHOST_NAME}" ] && {
+#         echo -e "\
+# Ghost IP already exists.
+# --> To ghost-route new connections of an already running process:
+#     ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"'"'"${CN}"
+#         return 255
+#     }
+
     mkdir -p "${cg_root}/${_GHOST_NAME}" 2>/dev/null
     [ -z "$cg_rootv2" ] && echo "$classid" >"${cg_root}/${_GHOST_NAME}/net_cls.classid"
     return 0
@@ -273,35 +286,50 @@ else
     }
 fi
 
-# Find an unused IP Address on the LAN
+# Find an unused IP Address on the LAN interface.
 ghost_find_local() {
     local arr
     local IFS
     local str
     local cidr
-    local ipp
     local dev="${1:?}"
     local mode="${2}"
+    local range ipn ipc i1 i2 i3 i4
 
     IFS=" " arr=($(ip addr show dev "${dev:?}" | grep -m1 -F " inet "))
-    str="${arr[@]:1:1}"
+    str="${arr[@]:1:1}" # zsh & bash compat
     cidr=${str##*/}
-    ipp=${str%%/*}
-    ipp=${ipp%.*}
-    [ -z "$cidr" ] && cidr="24"
-    [ "$cidr" -lt 24 ] && cidr="24"
-    [ "$cidr" -gt 24 ] && return  # To bad. cant find automatically.
+
+    # Ensure it's a number
+    cidr=$((cidr + 0))
+    [ "$cidr" -lt 8 ] && cidr=8
+    # Some hosts use /32 even when /24 are available.
+    [ "$cidr" -ge 30 ] && cidr=24
+
+    range="$((2**(32-cidr)))"
+    # Limit range to nearest 256 (if larger)
+    # E.g. when 10.0.0.0/8 is used but practically only 10.0.0.1-10.0.0.254 look genuine
+    [ "$range" -gt 256 ] && range=256
+
+    IFS=. read -r i1 i2 i3 i4 <<< "${str%%/*}"
+    ipa=$((i1 * 2**24 + i2 * 2**16 + i3*2**8 + i4))
+
+    # IP Network (start)
+    ipn="$(( (ipa / range) * range))"
+
+    # First and Last IP are not valid _and_ dont try .1 and .254
+    ((range-=4))
+
     for n in {0..10}; do
-        # .0, .1 , .254, .255 should not be tried.
-        d=$((RANDOM % 252 + 2))
-        # ping -4 not supported on older versions
-        ping -c2 -i1 -W2 -w2 -A -q "$ipp.$d" &>/dev/null || {
-            is_arp_bad "$ipp.$d" && break
+        ipc=$((ipn + RANDOM % range + 2))
+        ghost_ip="$((ipc / 2**24)).$(( (ipc % 2**24) / 2**16)).$(( (ipc % 2**16) / 2**8)).$(( ipc % 2**8 ))"
+        ping -c2 -i1 -W2 -w2 -A -q "$ghost_ip" &>/dev/null || {
+            # Cannot ping. Check if ARP is bad as well and only then is it an unused IP.
+            is_arp_bad "$ghost_ip" && break
         }
-        unset d
+        unset ghost_ip
     done
-    [ -z "$d" ] && return
-    ghost_ip="$ipp.$d"
+    [ -z "$ghost_ip" ] && return
     echo -e "--> Using unused IP ${CDY}${ghost_ip}${CN}. Set ${CDC}GHOST_IP_${mode}=<IP>${CN} otherwise."
 }
 
