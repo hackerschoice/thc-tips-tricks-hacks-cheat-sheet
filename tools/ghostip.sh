@@ -309,7 +309,7 @@ ghost_find_local() {
     range="$((2**(32-cidr)))"
     # Limit range to nearest 256 (if larger)
     # E.g. when 10.0.0.0/8 is used but practically only 10.0.0.1-10.0.0.254 look genuine
-    [ "$range" -gt 256 ] && range=256
+    [ "$range" -gt 512 ] && range=512
 
     IFS=. read -r i1 i2 i3 i4 <<< "${str%%/*}"
     ipa=$((i1 * 2**24 + i2 * 2**16 + i3*2**8 + i4))
@@ -323,6 +323,7 @@ ghost_find_local() {
     for n in {0..10}; do
         ipc=$((ipn + RANDOM % range + 2))
         ghost_ip="$((ipc / 2**24)).$(( (ipc % 2**24) / 2**16)).$(( (ipc % 2**16) / 2**8)).$(( ipc % 2**8 ))"
+        echo "testing $ghost_ip"
         ping -c2 -i1 -W2 -w2 -A -q "$ghost_ip" &>/dev/null || {
             # Cannot ping. Check if ARP is bad as well and only then is it an unused IP.
             is_arp_bad "$ghost_ip" && break
