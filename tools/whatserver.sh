@@ -20,6 +20,11 @@
 
 # Some ideas by slav and from virt-what
 
+# Stop bash -c "$(curl .. ws)" to show up badly in process list
+[ -z "$NOEVAL" ] && [ -n "$BASH_EXECUTION_STRING" ] && {
+	c="$BASH_EXECUTION_STRING" NOEVAL=1 exec bash -c 'eval "$c"'
+}
+
 : <<-'COMMENT'
 
 # Extracting all domain names from all log files and displaying them with
