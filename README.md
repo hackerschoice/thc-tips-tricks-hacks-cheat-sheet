@@ -595,7 +595,12 @@ bore local 31337 --to bore.pub
 using [serveo.net](https://serveo.net) (free):
 ```sh
 # Forward a random public TCP port to localhost:31337
-ssh -R 0:localhost:31337 serveo.net
+ssh -R 0:localhost:31337 tcp@serveo.net
+```
+
+using [pinggy.io](https://www.pinggy.io) (60 mins free):
+```sh
+ssh -p 443 -R 0:localhost:31337 tcp@a.pinggy.io
 ```
 
 See also [remote.moe](#revese-shell-remote-moe) (free) to forward raw TCP from the target to your workstation or [playit](https://playit.gg/) (free) or [ngrok](https://ngrok.com/) (paid subscription) to forward a raw public TCP port.
