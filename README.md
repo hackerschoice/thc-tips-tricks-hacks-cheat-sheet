@@ -2071,6 +2071,7 @@ chmod 700 np && \
 ./np report --color=always | less -R
 ```
 - Use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history
+- Use [Chrome-ABE](https://github.com/xaitax/Chrome-App-Bound-Encryption-Decryption) to extract & decrypt Chrome passwords from the running process (windows only)
 - Extract passwords from Browsers using [https://github.com/kiryano/chrome-password-decryptor](https://github.com/kiryano/chrome-password-decryptor)
 
 Using `grep`:
