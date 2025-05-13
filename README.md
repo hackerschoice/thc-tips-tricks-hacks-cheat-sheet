@@ -167,6 +167,12 @@ resize &>/dev/null || { stty -echo;printf "\e[18t"; read -t5 -rdt R;IFS=';' read
 # stty sane rows 60 cols 160
 ```
 
+We use `anew` a lot, and this is a quick workaround:
+```shell
+xanew() { awk 'hit[$0]==0 {hit[$0]=1; print $0}'; }
+which anew &>/dev/null || alias anew=xanew
+```
+
 Bonus tip:
 Any command starting with a " " (space) will [not get logged to history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
 ```
