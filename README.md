@@ -2057,14 +2057,15 @@ wfind() {
 # Usage: wfind /etc /var /usr 
 ```
 
-Find local passwords (using [noseyparker](https://github.com/praetorian-inc/noseyparker)):
+Find local passwords (using [noseyparker](https://github.com/praetorian-inc/noseyparker) or [trufflehog](https://github.com/trufflesecurity/trufflehog)):
 ```sh
 curl -o np -fsSL https://github.com/hackerschoice/binary/raw/main/tools/noseyparker-x86_64-static
 chmod 700 np && \
 ./np scan . && \
 ./np report --color=always | less -R
 ```
-(Or use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history)
+- Use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history
+- Extract passwords from Browsers using [https://github.com/kiryano/chrome-password-decryptor](https://github.com/kiryano/chrome-password-decryptor)
 
 Using `grep`:
 ```sh
