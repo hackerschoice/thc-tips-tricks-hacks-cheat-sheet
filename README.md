@@ -2195,7 +2195,7 @@ mount -o bind,ro /boot/backdoor.cgi /var/www/cgi/blah.cgi
 <a id="nosudo"></a>
 **8.vi. Change user without sudo/su**
 
-Needed for taking screenshots of X11 sessions (aka `xwd -root -display :0 | convert - jpg:screenshot.jpg` or `import -window root screenshot.png`)
+Needed for taking screenshots of X11 sessions (aka `xwd -display :0 -silent -root | convert - jpg:screenshot.jpg` or `import -display :0 -window root screenshot.png`)
 ```bash
 xsu() {
     local name="${1:?}"
