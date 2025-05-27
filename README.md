@@ -924,10 +924,10 @@ nice -n 19 hashcat -o cracked.txt my-hash.txt -w1 -a3 10-days_7-16.hcmask -O -d2
 
 Crack OpenSSH's `known_hosts` hashes to reveal the IP address:
 ```shell
-curl -SsfL https://github.com/chris408/known_hosts-hashcat/raw/refs/heads/master/ipv4_hcmask.txt -o ipv4_hcmask.txt
-curl -SsfL https://github.com/chris408/known_hosts-hashcat/raw/refs/heads/master/kh-converter.py -o kh-converter.py
-python kh-converter.py ~/.ssh/known_hosts >~/.ssh/known_hosts_hashes
-hashcat -m 160 --quiet --hex-salt ~/ssh/known_hosts_hashes -a 3 ipv4_hcmask.txt 
+curl -SsfL https://github.com/chris408/known_hosts-hashcat/raw/refs/heads/master/ipv4_hcmask.txt -O
+curl -SsfL https://github.com/chris408/known_hosts-hashcat/raw/refs/heads/master/kh-converter.py -O
+python3 kh-converter.py ~/.ssh/known_hosts >known_hosts_hashes
+hashcat -m 160 --quiet --hex-salt known_hosts_hashes -a 3 ipv4_hcmask.txt 
 ```
 
 👉 Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions).
