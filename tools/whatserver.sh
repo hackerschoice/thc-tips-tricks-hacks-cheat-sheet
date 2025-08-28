@@ -21,41 +21,7 @@
 # Some ideas by slav and from virt-what
 
 # Stop bash -c "$(curl .. ws)" to show up badly in process list
-[ -z "$NOEVAL" ] && [ -n "$BASH_EXECUTION_STRING" ] && {
-	c="$BASH_EXECUTION_STRING" NOEVAL=1 exec bash -c 'eval "$c"'
-}
-
-: <<-'COMMENT'
-
-# Extracting all domain names from all log files and displaying them with
-# GeoLocation and AS information (and converted to UTF-8)
-# This will only work on segfault.net (as it needs geoip and idn2)
-
-find . -name 'whatserver*.log' | while read fn; do
-        s=$(grep -F '  "org": ' "$fn")
-        s=${s##*: \"}
-        s=${s%\"*}
-        as=${s%% *}
-        name=${s#* }
-        name=${name//\\}
-        name=${name:0:32}
-        ip=$(grep -F '  "ip": ' "$fn")
-        ip=${ip##*: \"}
-        ip=${ip%\"*}
-        unset geoip
-        [[ -n "$ip" ]] && geoip=$(geoip "${ip}")
-        grep ^DOMAIN "$fn" | while read x; do
-	        x=${x//|}
-	        x=${x//$'\r'}
-	        unset origcn
-	        [[ "$x" == *"xn--"* ]] && {
-		        origcn=" [${x:7:40}]"
-		        x="DOMAIN $(idn2 -d "${x:7}" 2>/dev/null)"
-	        }
-	       echo "$as|${geoip:-N/A}|${ip:-N/A}|${x:7:64}${origcn}"
-	    done
-done | anew | column -t -s'|' -o' | '
-COMMENT
+[ -t 0 ] && [ -z "$NOEVAL" ] && [ -n "$BASH_EXECUTION_STRING" ] && c="$BASH_EXECUTION_STRING" IFS="" NOEVAL=1 exec bash -c 'eval "$c"'
 
 [[ -z "$NOCOLOR" ]] && {
     CY="\e[1;33m" # yellow
@@ -349,6 +315,13 @@ for x in "${lines[@]}"; do
 done
 unset lines
 unset IFS
+
+# Extract domain name from msmtp config if no domain was found.
+[ "${#res[@]}" -eq 0 ] && [ -f ~/.msmtprc ] && {
+    res="$(grep -im1 ^from ~/.msmtprc)"
+    res="${res##*@}"
+    [ -n "$res" ] && addcn "$res"
+}
 
 IFS=$'\n' res=($(printf "%s\n" "${arr[@]}" | sort -u))
 unset arr
