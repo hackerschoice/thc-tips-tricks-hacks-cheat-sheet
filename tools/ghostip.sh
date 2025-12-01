@@ -37,6 +37,9 @@
 # ======
 # Ghost-route LAN & WAN traffic by default.
 #
+# GHOST_DEV=
+#     Optional. The network interface the Ghost IP will operate on.
+#
 # GHOST_IP=
 #     An unused IP address on the LAN. Used for hosts only (don't use on routers)
 #
@@ -59,6 +62,7 @@
 # =========================
 # Example 1: Use an unused Ghost-IP from this host:
 #   $ source ./ghostip.sh
+#.  $ GHOST_DEV=wg0 source ./ghostip.sh   # Ghost towards specific interface
 # Identical to:
 #   $ GHOST_IP=192.168.0.222 source ./ghostip.sh
 #   $ GHOST_IP_LAN=192.168.0.222 source ./ghostip.sh
@@ -114,15 +118,21 @@ err() {
     echo -e >&2 "${CDR}ERROR: ${CN}$*"
 }
 
-# Find the Internet facing GW
+# Find the GW towards we like to ghost traffic
+# For HOST-ghosting, the first parameter is the Ghost-IP (if known).
+# Example: eth0 or wg0
 ghost_find_gw() {
+    local ip="$1"
     local arr
     local IFS
     local l
 
-    str=$(ip route show match 1.1.1.1)
-    str="${str##*dev }"
-    gw_dev="${str%% *}"
+    gw_dev="$GHOST_DEV"
+    [ -z "$gw_dev" ] && {
+        str=$(ip route show match "${ip:-1.1.1.1}")
+        str="${str##*dev }"
+        gw_dev="${str%% *}"
+    }
 
     # Get the device IP:
     l="$(ip addr show dev "$gw_dev" | grep -m1 'inet '))"
@@ -423,7 +433,7 @@ ghost_down() {
 ghost_up2() {
     local ghost_ip
 
-    ghost_find_gw || return
+    ghost_find_gw "${GHOST_IP}" || return
 
     [ -n "$GHOST_IP" ] && ghost_ip="$GHOST_IP"
     [ -z "$GHOST_IP" ] && [ -z "$GHOST_IP_LAN" ] && [ -z "$GHOST_IP_WAN" ] && {

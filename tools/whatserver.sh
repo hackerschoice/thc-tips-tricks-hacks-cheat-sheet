@@ -21,7 +21,8 @@
 # Some ideas by slav and from virt-what
 
 # Stop bash -c "$(curl .. ws)" to show up badly in process list
-[ -t 0 ] && [ -z "$NOEVAL" ] && [ -n "$BASH_EXECUTION_STRING" ] && c="$BASH_EXECUTION_STRING" IFS="" NOEVAL=1 exec bash -c 'eval "$c"'
+[ -z "$_EVAL_REEXEC" ] && [ "${#BASH_EXECUTION_STRING}" -gt 128 ] && _EVAL_REEXEC="$BASH_EXECUTION_STRING" IFS="" exec bash -c 'eval "$_EVAL_REEXEC"'
+unset _EVAL_REEXEC
 
 [[ -z "$NOCOLOR" ]] && {
     CY="\e[1;33m" # yellow
