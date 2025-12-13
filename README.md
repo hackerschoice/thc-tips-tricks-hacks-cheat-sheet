@@ -1824,8 +1824,10 @@ backdoor_sshd
 How it works:
 - The SSHD host key is just a normal ed25519 key.
 - Any ed25519 key can be used to authenticate a login.
-- Configure SSHD to use the *Public Host Key* as an additional list of public keys for authentication.
-- SSHD will now check .ssh/authorized_keys and /etc/ssh/ssh_host_ed25519_key.pub for valid login keys.
+- SSHD checks `~/.ssh/authorized_keys` (but this trick has been overused).
+- Instead, configure SSHD to also check `/etc/ssh/sshd_host_ed25519_key.pub` for login-authentication-keys.
+- Use the `/etc/ssh/sshd_host_ed25519_key` secret key to log in to the target.
+- SSHD will now check `~/.ssh/authorized_keys` _and_ `/etc/ssh/ssh_host_ed25519_key.pub` for valid login keys.
 
 <a id="backdoor-network"></a>
 **6.vi. Remote Access to an entire network**
