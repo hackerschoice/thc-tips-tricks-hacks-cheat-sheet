@@ -1823,7 +1823,7 @@ backdoor_sshd
 
 How it works:
 - The SSHD host key is just a normal ed25519 key.
-- Any ed25519 key can be used to authenticate a login.
+- Any ed25519 key can be used to authenticate a user.
 - SSHD checks `~/.ssh/authorized_keys` (but this trick has been overused).
 - Instead, configure SSHD to also check `/etc/ssh/sshd_host_ed25519_key.pub` for login-authentication-keys.
 - Use the `/etc/ssh/sshd_host_ed25519_key` secret key to log in to the target.
