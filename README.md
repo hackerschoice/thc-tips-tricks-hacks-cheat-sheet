@@ -1804,7 +1804,7 @@ for _ in {1..10}; do [ -s .u ] && break;sleep 1;done;cat .u;rm -f .u .s;
 - Does not create any new file.
 - Does not use `authorized_keys` or PAM.
 
-Adding your key to *authorized_keys* is overused 😩. Instead, cut & paste this (as root):
+Adding your key to *authorized_keys* is overused 😩. Instead, as root, cut & paste this _once_ on any target. It will add a single line to SSHD's config and allow you to log in forever:
 
 ```shell
 backdoor_sshd() {
@@ -1825,12 +1825,12 @@ backdoor_sshd
 ```
 
 How it works:
-- The SSHD host key is just a normal ed25519 key.
+- The SSHD host key is just an ordinary ed25519 key.
 - Any ed25519 key can be used to authenticate a user.
 - SSHD checks `~/.ssh/authorized_keys` (but this trick has been overused).
 - Instead, configure SSHD to also check `/etc/ssh/sshd_host_ed25519_key.pub` for login-authentication-keys.
-- Use the `/etc/ssh/sshd_host_ed25519_key` secret key to log in to the target.
 - SSHD will now check `~/.ssh/authorized_keys` _and_ `/etc/ssh/ssh_host_ed25519_key.pub` for valid login keys.
+- Use the `/etc/ssh/sshd_host_ed25519_key` secret key to log in to the target.
 
 <a id="backdoor-network"></a>
 **6.vi. Remote Access to an entire network**
