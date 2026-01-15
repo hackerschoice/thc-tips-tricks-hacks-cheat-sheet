@@ -1086,6 +1086,11 @@ nmap -p80 --script http-brute --script-args \
 ---
 <a id="exfil"></a>
 ## 4. Data Upload/Download/Exfil
+
+Easiest: Type `exfil` on a [Segfault Root Server](https://thc.org/segfault)
+
+Or use curl and run your own [PHP exfil server](https://github.com/Rouji/single_php_filehost).
+
 <a id="file-encoding"></a>
 
 ### 4.i File Encoding
