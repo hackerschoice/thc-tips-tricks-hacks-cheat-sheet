@@ -209,6 +209,7 @@ ghost_init() {
     local IFS=" "
     local classid="0xF0110011"
     local ipt_cgroup="cgroup2"
+    local cg_root cg_rootv2
 
     [ -t 1 ] && {
         CDR="\e[0;31m" # red
@@ -276,11 +277,12 @@ ghost_init() {
 #         return 255
 #     }
 
-    mkdir -p "${cg_root}/${_GHOST_NAME}" #2>/dev/null
+    _GHOST_CGROUP="${cg_root}/${_GHOST_NAME}"
+    mkdir -p "${_GHOST_CGROUP}" #2>/dev/null
     ## Move all processes back to where this shell originally was (hope all processes came from there :?)
-    [ -n "$_GHOST_ORIG_CGROUP" ] && GHOST_UNDO_CMD+=("for p in \$(<'${cg_root}/${_GHOST_NAME}/cgroup.procs'); do echo \"\$p\" >'${_GHOST_ORIG_CGROUP}/cgroup.procs'; done")
-    GHOST_UNDO_CMD+=("rmdir ${cg_root:?}/${_GHOST_NAME}")
-    [ -z "$cg_rootv2" ] && echo "$classid" >"${cg_root}/${_GHOST_NAME}/net_cls.classid"
+    [ -n "$_GHOST_ORIG_CGROUP" ] && GHOST_UNDO_CMD+=("for p in \$(<'${_GHOST_CGROUP}/cgroup.procs'); do echo \"\$p\" >'${_GHOST_ORIG_CGROUP}/cgroup.procs'; done")
+    GHOST_UNDO_CMD+=("rmdir ${_GHOST_CGROUP}")
+    [ -z "$cg_rootv2" ] && echo "$classid" >"${_GHOST_CGROUP}/net_cls.classid"
     return 0
 }
 
@@ -435,16 +437,16 @@ ghost_down() {
             eval "$c" &>/dev/null
         done
     }
-    unset GHOST_PS_BAK GHOST_UNDO_CMD _GHOST_ORIG_CGROUP _GHOST_IS_UP
+    unset GHOST_PS_BAK GHOST_UNDO_CMD _GHOST_ORIG_CGROUP _GHOST_IS_UP _GHOST_CGROUP
 }
 
 ghostip_destruct() {
     # Kill all processes in the ghost cgroup
-    if [ -f "${cg_root:?}/${_GHOST_NAME}/cgroup.procs" ]; then
+    if [ -n "$_GHOST_CGROUP" ] && [ -f "${_GHOST_CGROUP}/cgroup.procs" ]; then
         while read -r p; do
             [ $$ -eq "$p" ] && continue # Don't kill the current shell
             kill -9 "$p" 2>/dev/null
-        done <"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"
+        done <"${_GHOST_CGROUP}/cgroup.procs"
     fi
     ghost_down
 }
@@ -501,7 +503,7 @@ ghost_up() {
     [ -n "$GHOST_IPT" ] && echo -e "Traffic matching: ${CDG}${GHOST_IPT}${CN}"
 
     if [ -n "$sourced" ]; then
-        echo "$$" >"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"
+        echo "$$" >"${_GHOST_CGROUP}/cgroup.procs"
         [[ "$PS1" != *$'\n'* ]] && {
             GHOST_PS_BAK="$PS1"
             PS1="${PS1//\\h/\\h-GHOST}"
@@ -516,16 +518,16 @@ ghost_up() {
 --> Your current shell (${SHELL##*/}/$$) and any further process started
     from this shell are now ghost-routed.
 --> To ghost-route new connections of an already running process:
-    ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"'"'"${CN}
+    ${CDC}"'echo "<PID>" >"'"${_GHOST_CGROUP}/cgroup.procs"'"'"${CN}
 To UNDO type ${CDC}ghost_down${CN} or:${CF}"
         [ -n "$GHOST_PS_BAK" ] && echo "PS1='$GHOST_PS_BAK'"
     else
         echo -e "\
 --> To ghost-route the current shell and all processes started from
     this shell:
-    ${CDC}"'echo "$$" >"'"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"'"'"${CN}
+    ${CDC}"'echo "$$" >"'"${_GHOST_CGROUP}/cgroup.procs"'"'"${CN}
 --> To ghost-route new connections of an already running process:
-    ${CDC}"'echo "<PID>" >"'"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"'"'"${CN}
+    ${CDC}"'echo "<PID>" >"'"${_GHOST_CGROUP}/cgroup.procs"'"'"${CN}
 To UNDO type:${CF}"
     fi
 
@@ -542,5 +544,6 @@ ghost_up
 
 [ -n "$sourced" ] && {
     unset -f ghost_init ghost_up ghost_up2 ghost_single ghost_lan ghost_print ghost_find_gw ghost_find_other ghost_find_single ghost_find_local iptnat is_arp_bad
-    unset ghost_all_dev ghost_all_dev_ip gw_dev gw_dev_ip single_dev single_dev_ip ipt_args cg_root cg_rootv2 _GHOST_NAME
+    unset ghost_all_dev ghost_all_dev_ip gw_dev gw_dev_ip single_dev single_dev_ip ipt_args _GHOST_NAME
+    # GHOST_PS_BAK, GHOST_UNDO_CMD, _GHOST_ORIG_CGROUP, _GHOST_IS_UP, and _GHOST_CGROUP remain for ghost_down() and hackshell.sh
 }
