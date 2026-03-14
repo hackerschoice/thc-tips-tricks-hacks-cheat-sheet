@@ -134,11 +134,14 @@ ghost_find_gw() {
         gw_dev="${str%% *}"
     }
 
-    # Get the device IP:
-    l="$(ip addr show dev "$gw_dev" | grep -m1 'inet '))"
-    l="${l##*inet }"
-    l="${l%% *}"
-    gw_dev_ip="${l%%/*}"
+    gw_dev_ip="$GHOST_DEV_IP"
+    [ -z "$gw_dev_ip" ] && {
+        # Get the device IP:
+        l="$(ip addr show dev "$gw_dev" | grep -m1 'inet '))"
+        l="${l##*inet }"
+        l="${l%% *}"
+        gw_dev_ip="${l%%/*}"
+    }
 }
 
 ghost_find_other() {
@@ -224,6 +227,7 @@ ghost_init() {
     command -v iptables >/dev/null || { err "iptables: command not found. Try ${CDC}apt install iptables${CN}"; return 255; }
     _GHOST_NAME="${GHOST_NAME:-update}"
 
+    GHOST_UNDO_CMD=()
     # Some iptables use '-m cgroup' when it should be '-m cgroup2'
     # https://www.spinics.net/lists/netdev/msg352495.html
     iptables -m "$ipt_cgroup" -h &>/dev/null || {
@@ -247,12 +251,15 @@ ghost_init() {
         [ -n "$cg_rootv2" ] && {
             cg_root="${cg_rootv2}"
             ipt_args=("-m" "$ipt_cgroup" "--path" "${_GHOST_NAME:?}")
+            [ -z "$_GHOST_ORIG_CGROUP" ] && _GHOST_ORIG_CGROUP="/sys/fs/cgroup$(sed -n 's|0::||p' /proc/$$/cgroup)"
         }
     else
         [ -z "$cg_root" ] && {
             err "iptables expect cgroup1 but kernel does not support cgroup1"
             return 255
         }
+        # it is cgroup v1.
+        [ -z "$_GHOST_ORIG_CGROUP" ] && _GHOST_ORIG_CGROUP="/sys/fs/cgroup/pids$(sed -n 's/.*:pids://p' /proc/self/cgroup)"
     fi
 
     # ZSH/BASH compat (see notes above)
@@ -269,7 +276,10 @@ ghost_init() {
 #         return 255
 #     }
 
-    mkdir -p "${cg_root}/${_GHOST_NAME}" 2>/dev/null
+    mkdir -p "${cg_root}/${_GHOST_NAME}" #2>/dev/null
+    ## Move all processes back to where this shell originally was (hope all processes came from there :?)
+    [ -n "$_GHOST_ORIG_CGROUP" ] && GHOST_UNDO_CMD+=("for p in \$(<'${cg_root}/${_GHOST_NAME}/cgroup.procs'); do echo \"\$p\" >'${_GHOST_ORIG_CGROUP}/cgroup.procs'; done")
+    GHOST_UNDO_CMD+=("rmdir ${cg_root:?}/${_GHOST_NAME}")
     [ -z "$cg_rootv2" ] && echo "$classid" >"${cg_root}/${_GHOST_NAME}/net_cls.classid"
     return 0
 }
@@ -281,8 +291,8 @@ iptnat() {
     shift 1
 
     unset IFS
-    GHOST_UNDO_CMD+=("iptables -t nat -D $*")
     iptables -t nat -C "$@" 2>/dev/null && return
+    GHOST_UNDO_CMD+=("iptables -t nat -D $*")
     iptables -t nat "$ins" "$@" || return
 }
 
@@ -415,19 +425,28 @@ ghost_lan() {
     return 0
 }
 
-
 ghost_down() {
     local c
 
     [ -n "$GHOST_PS_BAK" ] && PS1="$GHOST_PS_BAK"
-    unset GHOST_PS_BAK
 
-    [ "${#GHOST_UNDO_CMD[@]}" -le 0 ] && return
-    for c in "${GHOST_UNDO_CMD[@]}"; do
-        eval "$c" &>/dev/null
-    done
-    unset GHOST_UNDO_CMD
-    unset -f ghost_down
+    [ "${#GHOST_UNDO_CMD[@]}" -gt 0 ] && {
+        for c in "${GHOST_UNDO_CMD[@]}"; do
+            eval "$c" &>/dev/null
+        done
+    }
+    unset GHOST_PS_BAK GHOST_UNDO_CMD _GHOST_ORIG_CGROUP _GHOST_IS_UP
+}
+
+ghostip_destruct() {
+    # Kill all processes in the ghost cgroup
+    if [ -f "${cg_root:?}/${_GHOST_NAME}/cgroup.procs" ]; then
+        while read -r p; do
+            [ $$ -eq "$p" ] && continue # Don't kill the current shell
+            kill -9 "$p" 2>/dev/null
+        done <"${cg_root:?}/${_GHOST_NAME}/cgroup.procs"
+    fi
+    ghost_down
 }
 
 ghost_up2() {
@@ -460,8 +479,9 @@ ghost_up2() {
 
 ghost_up() {
     local is_error
+    local unset_extra
 
-    ghost_down
+    [ -n "$_GHOST_IS_UP" ] && ghost_down
     ghost_up2
 
     [ -n "$is_error" ] && {
@@ -470,6 +490,7 @@ ghost_up() {
         err "Oops. This did not work..."
         return
     }
+    _GHOST_IS_UP=1
 
     # We cant exit yet if LAN or WAN was a success.
     if [ "${#GHOST_UNDO_CMD[@]}" -le 0 ]; then
@@ -489,7 +510,7 @@ ghost_up() {
         # sfwg support
         [ -z "$TYPE" ] && {
             export TYPE="wiretap"
-            GHOST_UNDO_CMD+=("unset TYPE")
+            unset_extra=" TYPE"
         }
         echo -e "\
 --> Your current shell (${SHELL##*/}/$$) and any further process started
@@ -511,11 +532,10 @@ To UNDO type:${CF}"
     for c in "${GHOST_UNDO_CMD[@]}"; do
         echo "$c";
     done
-    [ -n "$sourced" ] && echo "unset GHOST_UNDO_CMD GHOST_PS_BAK TYPE"
+    [ -n "$sourced" ] && echo "unset GHOST_UNDO_CMD GHOST_PS_BAK${unset_extra}"
     echo -en "${CN}"
     unset _GHOST_NAME
 }
-
 
 ghost_init && \
 ghost_up
