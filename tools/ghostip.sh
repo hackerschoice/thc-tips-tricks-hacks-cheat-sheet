@@ -437,7 +437,7 @@ ghost_down() {
             eval "$c" &>/dev/null
         done
     }
-    unset GHOST_PS_BAK GHOST_UNDO_CMD _GHOST_ORIG_CGROUP _GHOST_IS_UP _GHOST_CGROUP
+    unset GHOST_PS_BAK GHOST_UNDO_CMD _GHOST_ORIG_CGROUP _GHOSTIP_IS_UP _GHOST_CGROUP
 }
 
 ghostip_destruct() {
@@ -483,7 +483,7 @@ ghost_up() {
     local is_error
     local unset_extra
 
-    [ -n "$_GHOST_IS_UP" ] && ghost_down
+    [ -n "$_GHOSTIP_IS_UP" ] && ghost_down
     ghost_up2
 
     [ -n "$is_error" ] && {
@@ -492,7 +492,7 @@ ghost_up() {
         err "Oops. This did not work..."
         return
     }
-    _GHOST_IS_UP=1
+    _GHOSTIP_IS_UP=1
 
     # We cant exit yet if LAN or WAN was a success.
     if [ "${#GHOST_UNDO_CMD[@]}" -le 0 ]; then
@@ -545,5 +545,5 @@ ghost_up
 [ -n "$sourced" ] && {
     unset -f ghost_init ghost_up ghost_up2 ghost_single ghost_lan ghost_print ghost_find_gw ghost_find_other ghost_find_single ghost_find_local iptnat is_arp_bad
     unset ghost_all_dev ghost_all_dev_ip gw_dev gw_dev_ip single_dev single_dev_ip ipt_args _GHOST_NAME
-    # GHOST_PS_BAK, GHOST_UNDO_CMD, _GHOST_ORIG_CGROUP, _GHOST_IS_UP, and _GHOST_CGROUP remain for ghost_down() and hackshell.sh
+    # GHOST_PS_BAK, GHOST_UNDO_CMD, _GHOST_ORIG_CGROUP, _GHOSTIP_IS_UP, and _GHOST_CGROUP remain for ghost_down() and hackshell.sh
 }
