@@ -958,6 +958,7 @@ ssh root@segfaul.net # password is 'segfault'
 (You may want to use your [own EXIT node](https://www.thc.org/segfault/wireguard))
 
 Tools:
+* [Darkmoon](https://github.com/ASCIT31/Dark-Moon) - Open source (GPL-3.0) autonomous AI penetration testing platform covering web, API, Active Directory and Kubernetes, with proof of exploitation.
 * [Ncrack](https://nmap.org/ncrack/man.html)
 * [Nmap BRUTE](https://nmap.org/nsedoc/categories/brute.html)
 * [THC Hydra](https://sectools.org/tool/hydra/)
